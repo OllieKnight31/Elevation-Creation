@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Property Labs Webinar - Slide Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --base: #0a0a0a;
+    --base-light: #141414;
+    --coral: #FF5A5F;
+    --gold: #D4AF37;
+    --white: #ffffff;
+    --white-muted: rgba(255, 255, 255, 0.6);
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--base);
+    font-family: 'Inter', sans-serif;
+    color: var(--white);
+    cursor: pointer;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Slide Container ── */
+  .slides-wrapper {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.7s ease, visibility 0.7s ease;
+    padding: 6vh 8vw;
+  }
+
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* ── Slide Counter ── */
+  .slide-counter {
+    position: fixed;
+    bottom: 28px;
+    right: 36px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--white-muted);
+    letter-spacing: 0.5px;
+    z-index: 100;
+    user-select: none;
+  }
+
+  /* ── Navigation Hint ── */
+  .nav-hint {
+    position: fixed;
+    bottom: 28px;
+    left: 36px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.25);
+    z-index: 100;
+    user-select: none;
+    transition: opacity 3s ease;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      text-shadow: 0 0 20px rgba(255, 90, 95, 0.0);
+    }
+    50% {
+      text-shadow: 0 0 40px rgba(255, 90, 95, 0.35), 0 0 80px rgba(255, 90, 95, 0.15);
+    }
+  }
+
+  @keyframes radiateRing {
+    0% {
+      transform: translate(-50%, -50%) scale(0.2);
+      opacity: 0.5;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1.8);
+      opacity: 0;
+    }
+  }
+
+  .animate-on-active {
+    opacity: 0;
+  }
+
+  .slide.active .animate-on-active {
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .slide.active .animate-fade {
+    animation: fadeIn 0.8s ease forwards;
+  }
+
+  /* Delay utility classes */
+  .slide.active .delay-200 { animation-delay: 0.2s; }
+  .slide.active .delay-400 { animation-delay: 0.4s; }
+  .slide.active .delay-600 { animation-delay: 0.6s; }
+  .slide.active .delay-800 { animation-delay: 0.8s; }
+  .slide.active .delay-1000 { animation-delay: 1.0s; }
+  .slide.active .delay-1200 { animation-delay: 1.2s; }
+
+  /* ══════════════════════════════════════
+     SLIDE 1 — TITLE CARD
+     ══════════════════════════════════════ */
+  .slide-1 {
+    background: linear-gradient(170deg, var(--base) 0%, var(--base-light) 100%);
+    text-align: center;
+  }
+
+  .slide-1 .presents {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(11px, 1.1vw, 15px);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: var(--coral);
+    margin-bottom: 3vh;
+    animation-name: pulseGlow;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+  }
+
+  .slide-1 .headline {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(28px, 4vw, 62px);
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--white);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .slide-1 .wordmark {
+    position: absolute;
+    bottom: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(12px, 1.2vw, 16px);
+    font-weight: 700;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.15);
+  }
+
+  /* ══════════════════════════════════════
+     SLIDE 2 — FORTUNE TELLER
+     ══════════════════════════════════════ */
+  .slide-2 {
+    background: var(--base);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .slide-2 .rings-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .slide-2 .ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 90, 95, 0.12);
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+  }
+
+  .slide.active .ring {
+    animation: radiateRing 4s ease-out infinite;
+  }
+
+  .slide.active .ring:nth-child(1) { animation-delay: 0s; }
+  .slide.active .ring:nth-child(2) { animation-delay: 0.7s; }
+  .slide.active .ring:nth-child(3) { animation-delay: 1.4s; }
+  .slide.active .ring:nth-child(4) { animation-delay: 2.1s; }
+  .slide.active .ring:nth-child(5) { animation-delay: 2.8s; }
+
+  .slide-2 .fortune-text {
+    position: relative;
+    z-index: 2;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(24px, 3.5vw, 52px);
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDES 3, 4, 5 — PREDICTIONS
+     ══════════════════════════════════════ */
+  .slide-prediction {
+    background: var(--base);
+    text-align: left;
+    align-items: flex-start;
+    justify-content: center;
+    padding-left: 10vw;
+    padding-right: 15vw;
+  }
+
+  .slide-prediction .line {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(26px, 3.8vw, 56px);
+    font-weight: 700;
+    line-height: 1.3;
+    max-width: 850px;
+  }
+
+  .slide-prediction .line-white {
+    color: var(--white);
+  }
+
+  .slide-prediction .line-coral {
+    color: var(--coral);
+    margin-top: 0.6em;
+  }
+
+  /* ── Mobile adjustments ── */
+  @media (max-width: 768px) {
+    .slide {
+      padding: 5vh 6vw;
+    }
+
+    .slide-prediction {
+      padding-left: 6vw;
+      padding-right: 6vw;
+    }
+
+    .slide-counter {
+      bottom: 16px;
+      right: 20px;
+      font-size: 12px;
+    }
+
+    .nav-hint {
+      bottom: 16px;
+      left: 20px;
+      font-size: 11px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="slides-wrapper">
+
+  <!-- SLIDE 1 — TITLE CARD -->
+  <div class="slide slide-1 active" data-slide="1">
+    <div class="presents animate-on-active">Property Labs Presents</div>
+    <h1 class="headline animate-on-active delay-400">How 25 Everyday People Launched Profitable Airbnbs in Under 90 Days</h1>
+    <div class="wordmark animate-on-active delay-800">Property Labs</div>
+  </div>
+
+  <!-- SLIDE 2 — FORTUNE TELLER -->
+  <div class="slide slide-2" data-slide="2">
+    <div class="rings-container">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+    </div>
+    <div class="fortune-text animate-fade delay-600">Let Me Read Your Mind</div>
+  </div>
+
+  <!-- SLIDE 3 — PREDICTION 1 -->
+  <div class="slide slide-prediction" data-slide="3">
+    <div class="line line-white animate-on-active delay-200">You've been researching Airbnb for months.</div>
+    <div class="line line-coral animate-on-active delay-1200">But you haven't started.</div>
+  </div>
+
+  <!-- SLIDE 4 — PREDICTION 2 -->
+  <div class="slide slide-prediction" data-slide="4">
+    <div class="line line-white animate-on-active delay-200">You think you need your own money to get into this.</div>
+  </div>
+
+  <!-- SLIDE 5 — PREDICTION 3 -->
+  <div class="slide slide-prediction" data-slide="5">
+    <div class="line line-white animate-on-active delay-200">You've seen the courses.</div>
+    <div class="line line-coral animate-on-active delay-1200">You're wondering if any of them actually work.</div>
+  </div>
+
+</div>
+
+<!-- Slide Counter -->
+<div class="slide-counter"><span id="currentSlide">1</span> / 5</div>
+
+<!-- Navigation Hint -->
+<div class="nav-hint" id="navHint">Arrow keys or click to navigate</div>
+
+<script>
+(function () {
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.getElementById('currentSlide');
+  const navHint = document.getElementById('navHint');
+  const total = slides.length;
+  let current = 0;
+  let transitioning = false;
+
+  function goTo(index) {
+    if (index < 0 || index >= total || index === current || transitioning) return;
+    transitioning = true;
+
+    // Reset animations on the target slide by removing and re-adding classes
+    const targetSlide = slides[index];
+    const animatedEls = targetSlide.querySelectorAll('.animate-on-active, .animate-fade');
+    animatedEls.forEach(function (el) {
+      el.style.opacity = '0';
+      el.style.animation = 'none';
+    });
+
+    slides[current].classList.remove('active');
+    slides[index].classList.add('active');
+
+    // Force reflow then restore animations
+    void targetSlide.offsetWidth;
+    animatedEls.forEach(function (el) {
+      el.style.animation = '';
+      el.style.opacity = '';
+    });
+
+    current = index;
+    counter.textContent = current + 1;
+
+    setTimeout(function () {
+      transitioning = false;
+    }, 750);
+  }
+
+  function next() {
+    goTo(current + 1);
+  }
+
+  function prev() {
+    goTo(current - 1);
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      next();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      prev();
+    }
+  });
+
+  // Click to advance
+  document.addEventListener('click', function () {
+    next();
+  });
+
+  // Fade out nav hint after a few seconds
+  setTimeout(function () {
+    navHint.style.opacity = '0';
+  }, 5000);
+})();
+</script>
+
+</body>
+</html>

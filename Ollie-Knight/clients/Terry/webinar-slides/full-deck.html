@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Property Labs Webinar — Full Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --base: #0a0f0d;
+  --base-light: #0d1410;
+  --coral: #3ECFA0;
+  --gold: #3ECFA0;
+  --white: #ffffff;
+  --white-muted: rgba(255,255,255,0.7);
+  --white-dim: rgba(255,255,255,0.45);
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--base);
+  font-family: 'Inter', sans-serif;
+  color: var(--white);
+  cursor: pointer;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Slide Container ── */
+.slides-wrapper { position: relative; width: 100vw; height: 100vh; }
+
+.slide {
+  position: absolute; inset: 0;
+  width: 100vw; height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.7s ease, visibility 0.7s ease;
+  padding: 6vh 8vw;
+}
+.slide.active { opacity: 1; visibility: visible; }
+
+/* ── Slide Counter ── */
+.slide-counter {
+  position: fixed; bottom: 28px; right: 36px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: var(--white-muted); letter-spacing: 0.5px;
+  z-index: 100; user-select: none;
+}
+
+/* ── Navigation Hint ── */
+.nav-hint {
+  position: fixed; bottom: 28px; left: 36px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px; color: rgba(255,255,255,0.25);
+  z-index: 100; user-select: none;
+  transition: opacity 3s ease;
+}
+
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pulseGlow {
+  0%,100% { text-shadow: 0 0 20px rgba(62,207,160,0); }
+  50%      { text-shadow: 0 0 40px rgba(62,207,160,0.4), 0 0 80px rgba(62,207,160,0.2); }
+}
+@keyframes pulseGlowGold {
+  0%,100% { text-shadow: 0 0 20px rgba(62,207,160,0); }
+  50%      { text-shadow: 0 0 40px rgba(62,207,160,0.5), 0 0 80px rgba(62,207,160,0.2); }
+}
+@keyframes radiateRing {
+  0%   { transform: translate(-50%,-50%) scale(0.2); opacity: 0.5; }
+  100% { transform: translate(-50%,-50%) scale(1.8); opacity: 0; }
+}
+@keyframes lineExpand {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+@keyframes subtlePulse {
+  0%,100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+
+.animate-on-active { opacity: 0; }
+.slide.active .animate-on-active { animation: fadeInUp 0.8s ease forwards; }
+.slide.active .animate-fade       { animation: fadeIn  0.8s ease forwards; }
+
+.slide.active .delay-100  { animation-delay: 0.1s; }
+.slide.active .delay-200  { animation-delay: 0.2s; }
+.slide.active .delay-300  { animation-delay: 0.3s; }
+.slide.active .delay-400  { animation-delay: 0.4s; }
+.slide.active .delay-500  { animation-delay: 0.5s; }
+.slide.active .delay-600  { animation-delay: 0.6s; }
+.slide.active .delay-700  { animation-delay: 0.7s; }
+.slide.active .delay-800  { animation-delay: 0.8s; }
+.slide.active .delay-1000 { animation-delay: 1.0s; }
+.slide.active .delay-1200 { animation-delay: 1.2s; }
+.slide.active .delay-1400 { animation-delay: 1.4s; }
+.slide.active .delay-1600 { animation-delay: 1.6s; }
+.slide.active .delay-1800 { animation-delay: 1.8s; }
+.slide.active .delay-2000 { animation-delay: 2.0s; }
+
+/* ── Reusable Type Styles ── */
+.label {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(10px, 0.9vw, 13px);
+  font-weight: 600; text-transform: uppercase;
+  letter-spacing: 4px; color: var(--coral);
+  margin-bottom: 2.5vh;
+}
+.label-gold {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(10px, 0.9vw, 13px);
+  font-weight: 600; text-transform: uppercase;
+  letter-spacing: 4px; color: var(--gold);
+  margin-bottom: 2.5vh;
+}
+.hl {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(28px, 4.2vw, 64px);
+  font-weight: 800; line-height: 1.15; color: var(--white);
+}
+.hl-lg {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(34px, 5vw, 76px);
+  font-weight: 800; line-height: 1.1; color: var(--white);
+}
+.hl-sm {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(18px, 2.2vw, 32px);
+  font-weight: 700; line-height: 1.3; color: var(--white-muted);
+}
+.body-lg {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(16px, 1.6vw, 22px);
+  font-weight: 400; line-height: 1.7; color: var(--white-muted);
+  max-width: 700px;
+}
+em.coral { color: var(--coral); font-style: normal; }
+em.gold  { color: var(--gold);  font-style: normal; }
+
+/* ── Layout Variants ── */
+.center-stack { text-align: center; }
+.left-stack   { align-items: flex-start; padding-left: 10vw; padding-right: 15vw; }
+
+/* ── Prediction style ── */
+.prediction-line {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(26px, 3.8vw, 56px);
+  font-weight: 700; line-height: 1.3; max-width: 850px;
+}
+.prediction-line.white { color: var(--white); }
+.prediction-line.coral { color: var(--coral); margin-top: 0.6em; }
+.prediction-line.muted { color: var(--white-muted); margin-top: 0.4em; }
+
+/* ── Big Number ── */
+.big-number {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(80px, 14vw, 200px);
+  font-weight: 800; line-height: 1;
+  background: linear-gradient(135deg, #3ECFA0 0%, #2BB88A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: pulseGlowGold 3s ease-in-out infinite;
+}
+.big-number-label {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(16px, 1.8vw, 26px);
+  font-weight: 500; color: var(--white-muted);
+  letter-spacing: 1px; margin-top: 2vh;
+}
+
+/* ── Quote style ── */
+.quote-block {
+  border-left: 4px solid var(--coral);
+  padding: 2vh 0 2vh 4vw;
+  max-width: 800px;
+}
+.quote-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(22px, 3vw, 46px);
+  font-weight: 600; font-style: italic;
+  line-height: 1.4; color: var(--white);
+}
+.quote-attr {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(12px, 1.1vw, 16px);
+  font-weight: 500; color: var(--white-muted);
+  margin-top: 2vh; letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── Section Divider ── */
+.section-divider {
+  background: var(--base);
+  justify-content: center; align-items: center; text-align: center;
+}
+.section-label {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(10px, 1vw, 14px);
+  font-weight: 600; text-transform: uppercase;
+  letter-spacing: 6px; color: rgba(62,207,160,0.5);
+  margin-bottom: 2vh;
+}
+.section-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(40px, 7vw, 100px);
+  font-weight: 800; color: var(--coral);
+  animation: pulseGlow 3s ease-in-out infinite;
+  letter-spacing: -1px;
+}
+.section-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(14px, 1.4vw, 20px);
+  font-weight: 400; color: var(--white-muted);
+  margin-top: 3vh; max-width: 600px; line-height: 1.6;
+}
+
+/* ── Case Study ── */
+.case-study-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(36px, 5.5vw, 80px);
+  font-weight: 800;
+  background: linear-gradient(135deg, #3ECFA0 0%, #2BB88A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  border-bottom: 3px solid #3ECFA0;
+  padding-bottom: 1vh; margin-bottom: 2.5vh;
+  animation: pulseGlowGold 3s ease-in-out infinite;
+}
+.case-study-tag {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(12px, 1.1vw, 16px);
+  font-weight: 600; text-transform: uppercase;
+  letter-spacing: 4px; color: var(--gold);
+  opacity: 0.7; margin-bottom: 1.5vh;
+}
+.case-line {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(20px, 2.6vw, 38px);
+  font-weight: 600; color: var(--white); line-height: 1.4;
+  max-width: 800px;
+}
+.case-line + .case-line { margin-top: 1.2vh; }
+.case-line .gold { color: var(--gold); }
+
+/* ── Bullet list ── */
+.bullet-list { list-style: none; max-width: 800px; }
+.bullet-list li {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(18px, 2.2vw, 32px);
+  font-weight: 600; color: var(--white);
+  padding: 1.2vh 0; display: flex; align-items: flex-start; gap: 1.5vw;
+}
+.bullet-list li::before {
+  content: '→'; color: var(--coral);
+  font-size: 0.9em; margin-top: 0.1em; flex-shrink: 0;
+}
+.bullet-list li .muted { color: var(--white-muted); font-weight: 400; }
+
+/* ── Tier card ── */
+.tier-row {
+  display: flex; flex-direction: column; gap: 2.5vh;
+  max-width: 760px; width: 100%;
+}
+.tier-card {
+  background: var(--base-light);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 2.8vh 3.2vw;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.tier-card.highlight { border-color: var(--coral); }
+.tier-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(15px, 1.6vw, 22px); font-weight: 700; color: var(--white);
+}
+.tier-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(11px, 1vw, 14px); color: var(--white-muted); margin-top: 0.5vh;
+}
+.tier-price {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(22px, 2.8vw, 40px); font-weight: 800; color: var(--gold);
+  white-space: nowrap; margin-left: 3vw;
+}
+
+/* ── Misconception ── */
+.misc-number {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(60px, 9vw, 130px);
+  font-weight: 800; color: rgba(62,207,160,0.12);
+  line-height: 1; margin-bottom: -1.5vh;
+}
+.misc-claim {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(22px, 3vw, 44px);
+  font-weight: 700; color: var(--white-muted);
+  line-height: 1.3; max-width: 700px;
+  text-decoration: line-through;
+  text-decoration-color: rgba(62,207,160,0.4);
+}
+.misc-verdict {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(28px, 4vw, 60px);
+  font-weight: 800; color: var(--coral);
+  margin-top: 2vh;
+}
+.misc-proof {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(14px, 1.3vw, 18px);
+  color: var(--white-muted); margin-top: 1.5vh;
+}
+
+/* ── Divider line ── */
+.h-rule {
+  width: 60px; height: 3px;
+  background: var(--coral); border-radius: 2px;
+  margin: 2.5vh 0;
+}
+.h-rule-gold {
+  width: 60px; height: 3px;
+  background: var(--gold); border-radius: 2px;
+  margin: 2.5vh 0;
+}
+
+/* ── 3C System ── */
+.three-c {
+  display: flex; gap: 4vw; align-items: flex-start; max-width: 900px;
+}
+.c-block { flex: 1; text-align: center; }
+.c-letter {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(40px, 6vw, 90px);
+  font-weight: 800; color: var(--coral); line-height: 1;
+}
+.c-label {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(11px, 1vw, 15px);
+  font-weight: 600; text-transform: uppercase;
+  letter-spacing: 3px; color: var(--white-muted);
+  margin-top: 1.5vh;
+}
+.c-arrow {
+  font-size: clamp(24px, 3vw, 46px);
+  color: rgba(255,255,255,0.2);
+  align-self: center; padding-top: 2.5vh;
+}
+
+/* ── Path fork ── */
+.path-block {
+  display: flex; gap: 4vw; max-width: 960px; width: 100%;
+}
+.path-card {
+  flex: 1;
+  background: var(--base-light);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: 4vh 3.5vw;
+}
+.path-card.coral { border-top: 4px solid var(--coral); }
+.path-card.gold  { border-top: 4px solid var(--gold); }
+.path-head {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(14px, 1.4vw, 20px);
+  font-weight: 700; text-transform: uppercase;
+  letter-spacing: 3px; margin-bottom: 2.5vh;
+}
+.path-head.coral { color: var(--coral); }
+.path-head.gold  { color: var(--gold); }
+.path-item {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(13px, 1.2vw, 17px);
+  color: var(--white-muted); line-height: 1.8;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 1vh 0;
+}
+
+/* ── Value Stack ── */
+.value-stack { width: 100%; max-width: 800px; }
+.value-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.8vh 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.value-item:last-child { border-bottom: none; }
+.value-name {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(13px, 1.2vw, 17px);
+  font-weight: 500; color: var(--white);
+}
+.value-price {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(14px, 1.3vw, 18px);
+  font-weight: 700; color: var(--gold); white-space: nowrap;
+}
+
+/* ── Rings (Fortune Teller) ── */
+.rings-container {
+  position: absolute; top: 50%; left: 50%;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.ring {
+  position: absolute; top: 50%; left: 50%;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  border: 1px solid rgba(62,207,160,0.12);
+  transform: translate(-50%,-50%) scale(0.2);
+  opacity: 0;
+}
+.slide.active .ring { animation: radiateRing 4s ease-out infinite; }
+.slide.active .ring:nth-child(1) { animation-delay: 0s; }
+.slide.active .ring:nth-child(2) { animation-delay: 0.7s; }
+.slide.active .ring:nth-child(3) { animation-delay: 1.4s; }
+.slide.active .ring:nth-child(4) { animation-delay: 2.1s; }
+.slide.active .ring:nth-child(5) { animation-delay: 2.8s; }
+
+/* ── Objection Q&A ── */
+.objection-q {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(20px, 2.5vw, 36px);
+  font-weight: 700; color: var(--white-muted); line-height: 1.3;
+  max-width: 800px;
+}
+.objection-a {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(24px, 3.2vw, 48px);
+  font-weight: 800; color: var(--white); line-height: 1.25;
+  max-width: 800px; margin-top: 2.5vh;
+}
+
+/* ── CTA Button ── */
+.cta-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #3ECFA0 0%, #2BB88A 100%);
+  color: var(--white);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(16px, 1.6vw, 22px);
+  font-weight: 700;
+  padding: 2.2vh 5vw;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+  margin-top: 4vh;
+  cursor: default;
+  animation: subtlePulse 2s ease-in-out infinite;
+}
+.cta-url {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(14px, 1.3vw, 18px);
+  color: var(--white-muted); margin-top: 1.5vh;
+  letter-spacing: 1px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .slide { padding: 5vh 6vw; }
+  .left-stack { padding-left: 6vw; padding-right: 6vw; }
+  .three-c { flex-direction: column; gap: 2vh; }
+  .c-arrow { display: none; }
+  .path-block { flex-direction: column; gap: 2vh; }
+  .slide-counter { bottom: 16px; right: 20px; font-size: 12px; }
+  .nav-hint { bottom: 16px; left: 20px; font-size: 11px; }
+}
+
+/* ── Image slides ── */
+.slide-with-image {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 5vw;
+  padding: 6vh 6vw;
+}
+.slide-with-image .slide-text {
+  flex: 1;
+  text-align: left;
+}
+.slide-with-image .slide-img {
+  flex: 0 0 35%;
+  max-width: 35%;
+  height: 60vh;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.slide-with-image .slide-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+/* Circular portrait for host slide */
+.portrait-circle {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 3vh;
+  border: 3px solid #3ECFA0;
+}
+.portrait-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Case study image */
+.case-study-portrait {
+  width: 180px;
+  height: 180px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid rgba(62, 207, 160, 0.3);
+}
+.case-study-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Social proof grid */
+.proof-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 3vh;
+  max-width: 700px;
+}
+.proof-grid-item {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(62, 207, 160, 0.2);
+}
+.proof-grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Background image slides */
+.slide-bg-image {
+  position: relative;
+}
+.slide-bg-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  z-index: 0;
+}
+.slide-bg-image > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .slide-with-image {
+    flex-direction: column !important;
+  }
+  .slide-with-image .slide-img {
+    flex: none;
+    max-width: 60%;
+    height: 30vh;
+  }
+  .proof-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+</style>
+</head>
+<body>
+<div class="slides-wrapper">
+
+<!-- ═══════════════════════════════════════════════
+     ACT 1 · HOOK — Fortune Teller (Slides 1–20)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 1 — Brand intro -->
+<div class="slide center-stack" style="background:linear-gradient(170deg,var(--base) 0%,var(--base-light) 100%);background-image:url('deck-images/terry-bookshelf.jpg');background-size:cover;background-position:center;">
+  <div style="position:absolute;inset:0;background:rgba(10,15,13,0.90);z-index:0;"></div>
+  <div class="label animate-on-active" style="animation:pulseGlow 3s ease-in-out infinite;position:relative;z-index:1;">Property Labs Presents</div>
+  <h1 class="hl-lg animate-on-active delay-400" style="max-width:820px;text-align:center;position:relative;z-index:1;"><em style="background:linear-gradient(135deg,#3ECFA0 0%,#2BB88A 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-style:normal;">The 3C System:</em></h1>
+  <p class="animate-on-active delay-800" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(22px,3vw,46px);font-weight:700;color:var(--white);margin-top:1.5vh;text-align:center;max-width:820px;position:relative;z-index:1;">How Complete Beginners Are Launching Profitable Airbnbs in 90 Days</p>
+  <div class="animate-on-active delay-1200" style="font-family:'Inter',sans-serif;font-size:clamp(12px,1.1vw,16px);font-weight:700;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.12);position:absolute;bottom:5vh;z-index:1;">PROPERTY LABS</div>
+</div>
+
+<!-- SLIDE 2 — Welcome + Host -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="portrait-circle animate-on-active">
+    <img src="deck-images/terry-hero.jpg" alt="Terry Dwobeng" loading="lazy">
+  </div>
+  <div class="label animate-on-active delay-200">Tonight's Host</div>
+  <div class="hl-lg animate-on-active delay-300">Terry Dwobeng</div>
+  <div class="h-rule animate-on-active delay-600" style="margin:2.5vh auto;"></div>
+  <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);text-align:center;">Founder, <em class="coral">Property Labs</em></div>
+  <div class="animate-on-active delay-1000" style="font-family:'Inter',sans-serif;font-size:clamp(13px,1.2vw,17px);color:var(--white-dim);margin-top:2.5vh;text-align:center;">14 Units · £50k/month Revenue · Zero Own Capital</div>
+</div>
+
+<!-- SLIDE 3 — Tonight is different -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="hl-lg animate-on-active" style="max-width:780px;">Tonight is <em class="coral">unlike anything</em> you've ever sat through.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-studio.jpg" alt="Terry working at studio" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 4 — No slides. No pitch. -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="color:var(--white-muted);text-align:center;">No filler.</div>
+  <div class="hl-lg animate-on-active delay-500" style="color:var(--white);text-align:center;">Just the <em class="coral">exact system</em> that changed my life.</div>
+</div>
+
+<!-- SLIDE 5 — Let Me Read Your Mind -->
+<div class="slide center-stack" style="background:var(--base);overflow:hidden;">
+  <div class="rings-container">
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="ring"></div><div class="ring"></div>
+  </div>
+  <div class="animate-fade delay-400" style="position:relative;z-index:2;font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(14px,1.4vw,20px);font-weight:600;text-transform:uppercase;letter-spacing:5px;color:var(--coral);margin-bottom:3vh;">What if I told you</div>
+  <div class="animate-fade delay-800" style="position:relative;z-index:2;font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(32px,5vw,76px);font-weight:800;color:var(--white);text-align:center;">Let Me Read Your Mind</div>
+</div>
+
+<!-- SLIDE 6 — Prediction 1a -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">You have a good job.</div>
+</div>
+
+<!-- SLIDE 7 — Prediction 1b -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">You have a good job.</div>
+  <div class="prediction-line coral animate-on-active delay-900">But there's a voice that says…</div>
+  <div class="prediction-line animate-on-active delay-1400" style="color:var(--white);font-size:clamp(30px,4.2vw,62px);font-weight:800;">"Is this it?"</div>
+</div>
+
+<!-- SLIDE 8 — Prediction 2a -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">You've thought about property.</div>
+</div>
+
+<!-- SLIDE 9 — Prediction 2b -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">You've thought about property.</div>
+  <div class="prediction-line coral animate-on-active delay-900">But every time you look into it…</div>
+  <div class="prediction-line muted animate-on-active delay-1400">You close the tab.</div>
+</div>
+
+<!-- SLIDE 10 — Prediction 3a -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">Money wasn't handed to you.</div>
+</div>
+
+<!-- SLIDE 11 — Prediction 3b -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">Money wasn't handed to you.</div>
+  <div class="prediction-line coral animate-on-active delay-900">No trust fund.</div>
+  <div class="prediction-line coral animate-on-active delay-1200">No Bank of Mum and Dad.</div>
+  <div class="prediction-line muted animate-on-active delay-1500">Just you.</div>
+</div>
+
+<!-- SLIDE 12 — Prediction 4a -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">You're tired.</div>
+</div>
+
+<!-- SLIDE 13 — Prediction 4b -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">You're tired.</div>
+  <div class="prediction-line coral animate-on-active delay-900">Not physically.</div>
+  <div class="prediction-line muted animate-on-active delay-1200">Mentally.</div>
+</div>
+
+<!-- SLIDE 14 — Prediction 5a -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">Deep down, you believe you're capable of more.</div>
+</div>
+
+<!-- SLIDE 15 — Prediction 5b -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">Deep down, you believe you're capable of more.</div>
+  <div class="prediction-line coral animate-on-active delay-1000">You just don't have the system.</div>
+</div>
+
+<!-- SLIDE 16 — Church conversation -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="hl-lg animate-on-active" style="color:var(--white-muted);font-size:clamp(18px,2vw,28px);font-weight:500;letter-spacing:1px;">I know, because I was there.</div>
+    <div class="hl-lg animate-on-active delay-700" style="margin-top:2vh;font-size:clamp(36px,5.5vw,82px);">One conversation at church <em class="coral">changed everything.</em></div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-apartment.jpg" alt="Terry in apartment" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 17 — Today? -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label animate-on-active">Today</div>
+    <div class="hl-lg animate-on-active delay-300"><em class="gold">14 units.</em> £50,000/month revenue.</div>
+    <div class="hl animate-on-active delay-800" style="color:var(--coral);margin-top:2vh;">Zero of my own money.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-lifestyle2.jpg" alt="Terry celebration" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 18 — Zero. -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="big-number animate-on-active">Zero.</div>
+  <div class="big-number-label animate-on-active delay-600">Not a penny of my own capital.</div>
+</div>
+
+<!-- SLIDE 19 — The 3C System tease -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Tonight I'm revealing</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;color:var(--coral);">The 3C System</div>
+  <div class="hl-sm animate-on-active delay-700" style="text-align:center;margin-top:2vh;">The exact framework I used. The exact framework <em class="coral">complete beginners</em> are using right now.</div>
+</div>
+
+<!-- SLIDE 20 — Complete beginners -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;"><em class="coral">Complete beginners.</em></div>
+  <div class="animate-on-active delay-500" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(20px,2.8vw,42px);font-weight:600;color:var(--white-muted);margin-top:2vh;text-align:center;">No experience. No capital. No connections.</div>
+  <div class="animate-on-active delay-1000" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(22px,3vw,44px);font-weight:700;color:var(--white);margin-top:2vh;text-align:center;">All profitable <em class="coral">inside 90 days.</em></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ACT 2 · PAIN — Misconceptions (Slides 21–40)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 21 — Act 2 intro -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;">But first.</div>
+  <div class="hl animate-on-active delay-600" style="text-align:center;color:var(--white-muted);margin-top:2vh;">Let's talk about the path you were <em class="coral">sold.</em></div>
+</div>
+
+<!-- SLIDE 22 — The Traditional Path header -->
+<div class="slide center-stack" style="background:var(--base);background-image:url('deck-images/terry-filming.jpg');background-size:cover;background-position:center;">
+  <div style="position:absolute;inset:0;background:rgba(10,15,13,0.92);z-index:0;"></div>
+  <div class="label animate-on-active" style="position:relative;z-index:1;">The Traditional Path to Property</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;position:relative;z-index:1;">Save → Mortgage → 1 Property</div>
+  <div class="hl animate-on-active delay-700" style="text-align:center;color:var(--white-muted);margin-top:1.5vh;position:relative;z-index:1;">Wait → Repeat</div>
+</div>
+
+<!-- SLIDE 23 — Average house price -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">The Problem</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;">Average house price</div>
+  <div class="animate-on-active delay-600" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(50px,8vw,120px);font-weight:800;color:var(--gold);margin-top:1vh;">£290,000</div>
+</div>
+
+<!-- SLIDE 24 — Average salary -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Average UK salary</div>
+  <div class="animate-on-active delay-500" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(50px,8vw,120px);font-weight:800;color:var(--coral);margin-top:1vh;">£34,000</div>
+</div>
+
+<!-- SLIDE 25 — 4-6 years saving -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="animate-on-active" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(30px,4.5vw,68px);font-weight:800;color:var(--white);text-align:center;"><em class="gold">4–6 years</em> of aggressive saving.</div>
+  <div class="animate-on-active delay-700" style="font-family:'Inter',sans-serif;font-size:clamp(16px,1.6vw,22px);color:var(--white-muted);margin-top:2.5vh;text-align:center;">For one property. One.</div>
+</div>
+
+<!-- SLIDE 26 — Treadmill -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="quote-block animate-on-active">
+      <div class="quote-text">That's not a wealth strategy.</div>
+    </div>
+    <div class="hl-lg animate-on-active delay-700" style="color:var(--coral);margin-top:3vh;">That's a treadmill.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-studio.jpg" alt="Terry working late" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 27 — 5 Misconceptions header -->
+<div class="slide section-divider" style="background:var(--base);">
+  <div class="section-label animate-on-active">What's actually holding you back</div>
+  <div class="section-title animate-on-active delay-400">5 Misconceptions</div>
+  <div class="section-sub animate-on-active delay-900">Every single one is keeping you stuck. Let's destroy them.</div>
+</div>
+
+<!-- SLIDE 28 — Misconception #1 header -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="misc-number animate-on-active">#1</div>
+  <div class="misc-claim animate-on-active delay-400">You need your own money to start.</div>
+  <div class="misc-verdict animate-on-active delay-900">FALSE.</div>
+</div>
+
+<!-- SLIDE 29 — Misc #1 proof -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="color:var(--white-muted);">Other people's capital exists.</div>
+  <div class="hl-lg animate-on-active delay-600" style="color:var(--white);">Your credibility <em class="coral">IS</em> the capital.</div>
+</div>
+
+<!-- SLIDE 30 — Misconception #2 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="misc-number animate-on-active">#2</div>
+  <div class="misc-claim animate-on-active delay-400">You need years of experience.</div>
+  <div class="misc-verdict animate-on-active delay-900">FALSE.</div>
+  <div class="misc-proof animate-on-active delay-1200">Ihab — zero experience. £25k raised. 2 Airbnbs live. <em class="gold">5 weeks.</em></div>
+</div>
+
+<!-- SLIDE 31 — Misconception #3 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="misc-number animate-on-active">#3</div>
+  <div class="misc-claim animate-on-active delay-400">Airbnb is saturated.</div>
+  <div class="misc-verdict animate-on-active delay-900">FALSE.</div>
+  <div class="misc-proof animate-on-active delay-1200">Airbnb growing at <em class="gold">2x the rate of hotels.</em> 11% vs 5%. £5.7bn UK economy contribution.</div>
+</div>
+
+<!-- SLIDE 32 — Misconception #4 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="misc-number animate-on-active">#4</div>
+  <div class="misc-claim animate-on-active delay-400">You need to quit your job.</div>
+  <div class="misc-verdict animate-on-active delay-900">FALSE.</div>
+  <div class="misc-proof animate-on-active delay-1200">Andrew — Masters student. Junior accountant. <em class="gold">3 units</em> running. 5–10 hrs/week.</div>
+</div>
+
+<!-- SLIDE 33 — Misconception #5 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="misc-number animate-on-active">#5</div>
+  <div class="misc-claim animate-on-active delay-400">Now isn't the right time.</div>
+  <div class="misc-verdict animate-on-active delay-900">FALSE.</div>
+  <div class="misc-proof animate-on-active delay-1200">This is the best window in years. I'll prove it in <em class="coral">Secret 3.</em></div>
+</div>
+
+<!-- SLIDE 34 — Everything you've been told -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="hl-lg animate-on-active">What if everything you've been told…</div>
+    <div class="hl-lg animate-on-active delay-800" style="color:var(--coral);">is wrong?</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-bookshelf.jpg" alt="Terry confident" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 35 — Different path -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">What if there's a completely different path?</div>
+  <div class="hl-lg animate-on-active delay-700" style="text-align:center;color:var(--white);">One that <em class="coral">doesn't require</em> your own money.</div>
+</div>
+
+<!-- SLIDE 36 — Let me show you -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;">Let me show you <em class="coral">exactly</em> how I found it.</div>
+</div>
+
+<!-- SLIDE 37 — Bridge to origin story -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">The origin</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;">It started with <em class="coral">one conversation</em> and £8,500.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ACT 3 · POSITIONING — Origin Story (Slides 38–65)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 38 — South London -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="prediction-line muted animate-on-active delay-200">South London.</div>
+    <div class="prediction-line white animate-on-active delay-600">Immigrant family.</div>
+    <div class="prediction-line coral animate-on-active delay-1000">Nothing handed to us.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-london.jpg" alt="Terry outside a London property" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 39 — Did everything right -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">Did everything right.</div>
+  <div class="prediction-line muted animate-on-active delay-700">Kept my head down. Got the grades.</div>
+</div>
+
+<!-- SLIDE 40 — University of Warwick -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label animate-on-active">University of Warwick</div>
+    <div class="hl-lg animate-on-active delay-400"><em class="gold">Law.</em></div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-blue.jpg" alt="Terry young professional" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 41 — Magic circle offer -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">The offer</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;">Magic circle law firm.</div>
+  <div class="hl-sm animate-on-active delay-700" style="text-align:center;color:var(--white-muted);">Top 5 in the UK.</div>
+</div>
+
+<!-- SLIDE 42 — Mum cried -->
+<div class="slide center-stack" style="background:var(--base);background-image:url('deck-images/terry-bookshelf.jpg');background-size:cover;background-position:center;">
+  <div style="position:absolute;inset:0;background:rgba(10,15,13,0.92);z-index:0;"></div>
+  <div class="quote-block animate-on-active" style="margin:0 auto;position:relative;z-index:1;">
+    <div class="quote-text">"My mum cried."</div>
+    <div class="quote-attr animate-on-active delay-800">She thought we'd finally made it.</div>
+  </div>
+</div>
+
+<!-- SLIDE 43 — Bigger cage -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;color:var(--white-muted);">A bigger cage</div>
+  <div class="hl-lg animate-on-active delay-700" style="text-align:center;color:var(--coral);">is still a cage.</div>
+</div>
+
+<!-- SLIDE 44 — £8,500 first capital -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text" style="text-align:center;">
+    <div class="big-number animate-on-active">£8,500</div>
+    <div class="big-number-label animate-on-active delay-600">First capital raised. Warm outreach. No bank. No mortgage.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-apartment.jpg" alt="Terry apartment now" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 45 — Staring at the ceiling -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">Someone at church mentioned Airbnb.</div>
+  <div class="prediction-line muted animate-on-active delay-700">That one conversation rewired my brain.</div>
+  <div class="prediction-line coral animate-on-active delay-1200">Knowing something had to change.</div>
+</div>
+
+<!-- SLIDE 46 — Kiyosaki quote -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="quote-block animate-on-active" style="margin:0 auto;max-width:760px;">
+    <div class="quote-text">"The richest people don't work for money. Money works for them."</div>
+    <div class="quote-attr animate-on-active delay-900">Robert Kiyosaki</div>
+  </div>
+</div>
+
+<!-- SLIDE 47 — But how? -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;">How do you get money to work for you…</div>
+  <div class="hl-lg animate-on-active delay-700" style="text-align:center;color:var(--coral);">when you don't have any?</div>
+</div>
+
+<!-- SLIDE 48 — That question changed everything -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="hl-lg animate-on-active" style="color:var(--white-muted);">That question</div>
+    <div class="hl-lg animate-on-active delay-600" style="color:var(--white);">changed my <em class="coral">life.</em></div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-property-shoot.jpg" alt="Terry property shoot" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 49 — Everyone said save -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line muted animate-on-active delay-200">Everyone said:</div>
+  <div class="prediction-line white animate-on-active delay-600">"Save up. Get a mortgage."</div>
+</div>
+
+<!-- SLIDE 50 — Law degree + church conversation -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="prediction-line white animate-on-active delay-200">I had a law degree.</div>
+  <div class="prediction-line coral animate-on-active delay-700">And one conversation that changed everything.</div>
+  <div class="prediction-line muted animate-on-active delay-1100">No savings. No contacts in property. Nothing.</div>
+</div>
+
+<!-- SLIDE 51 — What if my credibility IS the capital? -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);font-style:italic;">Then I asked a different question.</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;margin-top:2vh;">What if my <em class="coral">credibility</em> IS the capital?</div>
+</div>
+
+<!-- SLIDE 52 — 3C System reveal -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">The answer became</div>
+  <div class="animate-on-active delay-400" style="margin-top:1vh;">
+    <div class="three-c">
+      <div class="c-block">
+        <div class="c-letter">C</div>
+        <div class="c-label">Credibility</div>
+      </div>
+      <div class="c-arrow">→</div>
+      <div class="c-block">
+        <div class="c-letter">C</div>
+        <div class="c-label">Capital</div>
+      </div>
+      <div class="c-arrow">→</div>
+      <div class="c-block">
+        <div class="c-letter">C</div>
+        <div class="c-label">Cash Flow</div>
+      </div>
+    </div>
+  </div>
+  <div class="hl-sm animate-on-active delay-1000" style="text-align:center;margin-top:3.5vh;color:var(--coral);">The 3C System</div>
+</div>
+
+<!-- SLIDE 53 — First property -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">The result</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;">First property — profitable <em class="coral">month one.</em></div>
+</div>
+
+<!-- SLIDE 54 — Where I am now -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label animate-on-active">Today</div>
+    <div class="hl-lg animate-on-active delay-300"><em class="gold">14 units.</em></div>
+    <div class="hl animate-on-active delay-600">£50k/month. <em class="gold">£16k profit.</em></div>
+    <div class="hl animate-on-active delay-900" style="color:var(--coral);">Zero own money.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-lifestyle1.jpg" alt="Terry lifestyle" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 55 — Not just my story -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">This isn't just my story.</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">This is a <em class="coral">system.</em></div>
+  <div class="hl-sm animate-on-active delay-1100" style="text-align:center;margin-top:2vh;">A system anyone can run.</div>
+</div>
+
+<!-- SLIDE 56 — Three secrets intro -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Tonight I'm sharing</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;">Three <em class="coral">secrets</em> most people will never know.</div>
+  <div class="hl-sm animate-on-active delay-800" style="text-align:center;margin-top:2vh;color:var(--white-muted);">Let's start with Secret 1.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ACT 4 · SECRET 1 — CREDIBILITY (Slides 57–88)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 57 — SECRET 1 divider -->
+<div class="slide section-divider" style="background:var(--base);">
+  <div class="section-label animate-on-active">The first secret</div>
+  <div class="section-title animate-on-active delay-400">SECRET 1</div>
+  <div class="section-sub animate-on-active delay-900">Your Credibility IS Your Capital</div>
+</div>
+
+<!-- SLIDE 58 — Credibility as capital -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="hl-lg animate-on-active">Your <em class="coral">Credibility</em> IS Your Capital</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-filming.jpg" alt="Terry building credibility" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 59 — Private capital raising -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active">How the wealthy have always done it</div>
+  <div class="hl-lg animate-on-active delay-300">Private capital raising.</div>
+  <div class="hl-sm animate-on-active delay-700" style="margin-top:2vh;">The mechanism is not new. Access to it, for people like us — that's new.</div>
+</div>
+
+<!-- SLIDE 60 — Credibility is not about being rich -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Credibility is not about being rich.</div>
+  <div class="hl-lg animate-on-active delay-700" style="text-align:center;color:var(--white);">It's about <em class="coral">packaging</em> what you already have.</div>
+</div>
+
+<!-- SLIDE 61 — Do you have a degree? -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Ask yourself</div>
+  <div class="prediction-line white animate-on-active delay-300">Do you have a degree?</div>
+  <div class="prediction-line white animate-on-active delay-600">A professional job?</div>
+  <div class="prediction-line white animate-on-active delay-900">A track record of any kind?</div>
+  <div class="prediction-line coral animate-on-active delay-1300">You already have credibility.</div>
+</div>
+
+<!-- SLIDE 62 — Haven't packaged it -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;color:var(--white-muted);">You already have it.</div>
+  <div class="hl-lg animate-on-active delay-700" style="text-align:center;color:var(--white);">You just haven't <em class="coral">packaged it.</em></div>
+</div>
+
+<!-- SLIDE 63 — The Credibility Pack -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label animate-on-active">The tool</div>
+    <div class="hl animate-on-active delay-300" style="margin-bottom:3vh;color:var(--coral);">The Credibility Pack</div>
+    <ul class="bullet-list animate-on-active delay-600">
+      <li>Who you are</li>
+      <li>The strategy</li>
+      <li>The numbers</li>
+      <li>Legal structure</li>
+      <li>Risk mitigation</li>
+    </ul>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-laptop.jpg" alt="Terry building the pack" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 64 — Your network trusts you -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Your network already trusts you.</div>
+  <div class="hl-lg animate-on-active delay-700" style="text-align:center;color:var(--white);">The Credibility Pack gives them the <em class="coral">rational justification.</em></div>
+</div>
+
+<!-- SLIDE 65 — Case Study: IHAB header -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="case-study-portrait animate-on-active" style="margin:0 auto 2.5vh;">
+    <img src="deck-images/ihab.jpg" alt="Ihab" loading="lazy">
+  </div>
+  <div class="case-study-tag animate-on-active delay-200">Case Study</div>
+  <div class="case-study-name animate-on-active delay-300">Ihab</div>
+  <div class="case-line animate-on-active delay-700">Zero property experience.</div>
+</div>
+
+<!-- SLIDE 66 — Ihab Week 1-2 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="case-study-tag animate-on-active">Ihab — Week 1–2</div>
+  <div class="case-line animate-on-active delay-300">Built his Credibility Pack.</div>
+  <div class="case-line animate-on-active delay-600" style="color:var(--white-muted);font-size:clamp(16px,1.8vw,24px);">Document. Strategy. Numbers. Legal framework.</div>
+</div>
+
+<!-- SLIDE 67 — Ihab Week 3 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="case-study-tag animate-on-active">Ihab — Week 3</div>
+  <div class="case-line animate-on-active delay-300">Approached <em class="gold">3 people</em> in his network.</div>
+  <div class="case-line animate-on-active delay-700" style="color:var(--white-muted);font-size:clamp(16px,1.8vw,24px);">Not cold contacts. People who already knew him.</div>
+</div>
+
+<!-- SLIDE 68 — Ihab Week 5 -->
+<div class="slide left-stack" style="background:var(--base);position:relative;">
+  <div class="case-study-tag animate-on-active">Ihab — Week 5</div>
+  <div class="case-line animate-on-active delay-300"><em class="gold">£25,000 committed.</em></div>
+  <div class="case-line animate-on-active delay-700" style="color:var(--white-muted);font-size:clamp(16px,1.8vw,24px);">From people who trusted him. Not strangers.</div>
+  <div style="position:absolute;bottom:4vh;right:4vw;width:120px;height:120px;border-radius:12px;overflow:hidden;border:2px solid rgba(62,207,160,0.3);"><img src="deck-images/ihab.jpg" style="width:100%;height:100%;object-fit:cover;" loading="lazy" alt="Ihab"></div>
+</div>
+
+<!-- SLIDE 69 — Ihab Day 45 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="case-study-tag animate-on-active">Ihab — Day 45</div>
+  <div class="case-line animate-on-active delay-300">2 Airbnbs <em class="coral">live.</em></div>
+  <div class="case-line animate-on-active delay-600"><em class="gold">Cash-flow positive.</em></div>
+  <div class="case-line animate-on-active delay-900" style="color:var(--white-muted);font-size:clamp(16px,1.8vw,24px);">Zero property experience. Six weeks prior.</div>
+</div>
+
+<!-- SLIDE 70 — Two models -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Two ways to structure investor deals</div>
+  <div class="hl animate-on-active delay-300" style="text-align:center;color:var(--coral);margin-bottom:3vh;">Equity vs Debt</div>
+</div>
+
+<!-- SLIDE 71 — Equity model -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Model 1 — Equity</div>
+  <div class="hl animate-on-active delay-300" style="color:var(--gold);">Investor funds 100%.</div>
+  <div class="hl animate-on-active delay-700">You split profits.</div>
+  <div class="hl-sm animate-on-active delay-1100" style="color:var(--white-muted);margin-top:2vh;">You bring the system. They bring the capital. Both win.</div>
+</div>
+
+<!-- SLIDE 72 — Debt model -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label animate-on-active">Model 2 — Debt</div>
+    <div class="hl animate-on-active delay-300" style="color:var(--gold);">Loan at agreed interest.</div>
+    <div class="hl animate-on-active delay-700">Pay back with returns.</div>
+    <div class="hl-sm animate-on-active delay-1100" style="color:var(--white-muted);margin-top:2vh;">Clean. Simple. Legally structured. Investor gets a fixed return. You keep the rest.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-bookshelf.jpg" alt="Terry professional" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 73 — Legal structures -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Both models are</div>
+  <div class="hl-lg animate-on-active delay-500" style="text-align:center;color:var(--white);">legally <em class="coral">structured.</em></div>
+  <div class="hl-sm animate-on-active delay-1000" style="text-align:center;margin-top:2vh;">JV agreements. Loan agreements. Proper documentation.</div>
+</div>
+
+<!-- SLIDE 74 — Secret 1 recap -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="animation:pulseGlow 3s ease-in-out infinite;">Secret 1 Recap</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;">Package your credibility.</div>
+  <div class="hl animate-on-active delay-700" style="text-align:center;color:var(--coral);">Approach your network.</div>
+  <div class="hl animate-on-active delay-1100" style="text-align:center;color:var(--gold);">Raise the capital.</div>
+</div>
+
+<!-- SLIDE 75 — Transition to Secret 2 -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Now you have the capital.</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">Secret 2 tells you <em class="coral">exactly what to do with it.</em></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ACT 5 · SECRET 2 — CAPITAL (Slides 76–115)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 76 — SECRET 2 divider -->
+<div class="slide section-divider" style="background:var(--base);">
+  <div class="section-label animate-on-active">The second secret</div>
+  <div class="section-title animate-on-active delay-400">SECRET 2</div>
+  <div class="section-sub animate-on-active delay-900">You Don't Need Experience. You Need a System.</div>
+</div>
+
+<!-- SLIDE 77 — You don't need experience -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;color:var(--white-muted);">You don't need experience.</div>
+  <div class="hl-lg animate-on-active delay-700" style="text-align:center;color:var(--white);">You need a <em class="coral">system.</em></div>
+</div>
+
+<!-- SLIDE 78 — Capital Deployment Framework -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label animate-on-active">Introducing</div>
+    <div class="hl animate-on-active delay-300" style="color:var(--coral);">The Capital Deployment Framework</div>
+    <div class="hl-sm animate-on-active delay-700" style="margin-top:2vh;">Five steps. Rinse and repeat.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-studio.jpg" alt="Terry at work" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 79 — Step 1 -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label-gold animate-on-active">Step 1</div>
+    <div class="hl-lg animate-on-active delay-300">Deal Sourcing Team</div>
+    <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);margin-top:2vh;">They find the property. You don't spend weekends on Rightmove.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-property-shoot.jpg" alt="Terry sourcing properties" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 80 — Step 2 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label-gold animate-on-active">Step 2</div>
+  <div class="hl-lg animate-on-active delay-300">Numbers Analysis</div>
+  <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);margin-top:2vh;">If it doesn't work on paper, we don't touch it. Simple rule. Protects everyone.</div>
+</div>
+
+<!-- SLIDE 81 — Step 3 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label-gold animate-on-active">Step 3</div>
+  <div class="hl-lg animate-on-active delay-300">Property Setup</div>
+  <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);margin-top:2vh;">Furnishing. Photography. Optimised listing. Priced to win from day one.</div>
+</div>
+
+<!-- SLIDE 82 — Step 4 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label-gold animate-on-active">Step 4</div>
+  <div class="hl-lg animate-on-active delay-300">Operations</div>
+  <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);margin-top:2vh;">Cleaning team. Maintenance. Automated guest messaging. You're not the cleaner.</div>
+</div>
+
+<!-- SLIDE 83 — Step 5 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label-gold animate-on-active">Step 5</div>
+  <div class="hl-lg animate-on-active delay-300">Optimisation</div>
+  <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);margin-top:2vh;">Dynamic pricing. Review strategy. Corporate contracts. Revenue grows over time.</div>
+</div>
+
+<!-- SLIDE 84 — You provide capital, system does rest -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">You provide the capital.</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">The <em class="coral">system</em> does the rest.</div>
+</div>
+
+<!-- SLIDE 85 — Warm Outreach Framework -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label animate-on-active">A framework within the framework</div>
+    <div class="hl animate-on-active delay-300" style="color:var(--coral);margin-bottom:3vh;">The Warm Outreach Framework</div>
+    <div class="hl-sm animate-on-active delay-700">The exact words to say when approaching investors in your network.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-cafe.jpg" alt="Terry having conversations" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 86a — Step 1: Start Casual -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Step 1</div>
+  <div class="hl-lg animate-on-active delay-300" style="color:var(--coral);">Start Casual</div>
+  <div class="quote-block animate-on-active delay-700" style="margin-top:3vh;">
+    <div class="quote-text" style="font-size:clamp(18px,2.2vw,32px);">"Hey, how are you doing?"</div>
+  </div>
+  <div class="hl-sm animate-on-active delay-1100" style="color:var(--white-muted);margin-top:2vh;">Have a genuine conversation first. No pitch. No agenda.</div>
+</div>
+
+<!-- SLIDE 86b — Step 2: Build Credibility -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Step 2</div>
+  <div class="hl-lg animate-on-active delay-300" style="color:var(--coral);">Build Credibility</div>
+  <div class="quote-block animate-on-active delay-700" style="margin-top:3vh;">
+    <div class="quote-text" style="font-size:clamp(18px,2.2vw,32px);">"I've been working alongside Terry for the past few months with Airbnb."</div>
+  </div>
+  <div class="hl-sm animate-on-active delay-1100" style="color:var(--white-muted);margin-top:2vh;">Share real numbers. Let the results do the talking.</div>
+</div>
+
+<!-- SLIDE 86c — Step 3: Social Proof + Ask -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Step 3</div>
+  <div class="hl-lg animate-on-active delay-300" style="color:var(--coral);">Social Proof + Ask</div>
+  <div class="quote-block animate-on-active delay-700" style="margin-top:3vh;">
+    <div class="quote-text" style="font-size:clamp(18px,2.2vw,32px);">"I've already received a £5,000 investment."</div>
+  </div>
+  <div class="quote-block animate-on-active delay-1000" style="margin-top:2vh;border-left-color:var(--gold);">
+    <div class="quote-text" style="font-size:clamp(18px,2.2vw,32px);color:var(--gold);">"I need £15,000 in total."</div>
+  </div>
+  <div class="hl-sm animate-on-active delay-1400" style="color:var(--white-muted);margin-top:2vh;">Herd mentality triggers. Someone else already said yes.</div>
+</div>
+
+<!-- SLIDE 87 — Case Study: ANDREW header -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="case-study-portrait animate-on-active" style="margin:0 auto 2.5vh;">
+    <img src="deck-images/andrew.jpg" alt="Andrew" loading="lazy" style="object-position:center 20%;">
+  </div>
+  <div class="case-study-tag animate-on-active delay-200">Case Study</div>
+  <div class="case-study-name animate-on-active delay-300">Andrew</div>
+  <div class="case-line animate-on-active delay-700">Masters student. Junior accountant. No savings.</div>
+</div>
+
+<!-- SLIDE 88 — Andrew Month 1 -->
+<div class="slide left-stack" style="background:var(--base);position:relative;">
+  <div class="case-study-tag animate-on-active">Andrew — Month 1</div>
+  <div class="case-line animate-on-active delay-300">Raised <em class="gold">£13,000.</em></div>
+  <div class="case-line animate-on-active delay-600" style="color:var(--white-muted);font-size:clamp(16px,1.8vw,24px);">Friends and former colleagues. Warm network. Credibility Pack.</div>
+  <div style="position:absolute;bottom:4vh;right:4vw;width:120px;height:120px;border-radius:12px;overflow:hidden;border:2px solid rgba(62,207,160,0.3);"><img src="deck-images/andrew.jpg" style="width:100%;height:100%;object-fit:cover;" loading="lazy" alt="Andrew"></div>
+</div>
+
+<!-- SLIDE 89 — Andrew Month 3 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="case-study-tag animate-on-active">Andrew — Month 3</div>
+  <div class="case-line animate-on-active delay-300"><em class="gold">3 units live.</em></div>
+  <div class="case-line animate-on-active delay-600">Cash flowing.</div>
+  <div class="case-line animate-on-active delay-900" style="color:var(--white-muted);font-size:clamp(16px,1.8vw,24px);">Still completing his Masters. Still working as an accountant.</div>
+</div>
+
+<!-- SLIDE 90 — Andrew 5-10 hours -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="big-number animate-on-active" style="font-size:clamp(70px,11vw,160px);">5–10</div>
+  <div class="big-number-label animate-on-active delay-600">hours per week. That's it.</div>
+  <div class="animate-on-active delay-1100" style="font-family:'Inter',sans-serif;font-size:clamp(14px,1.2vw,17px);color:var(--white-dim);margin-top:1.5vh;">Andrew still has his job, his degree, and his life.</div>
+</div>
+
+<!-- SLIDE 91 — The system is the moat -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Most people never launch because they're trying</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">to do it <em class="coral">alone.</em></div>
+</div>
+
+<!-- SLIDE 92 — You're not alone -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;">With Property Labs,</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--coral);">you never are.</div>
+</div>
+
+<!-- SLIDE 93 — Secret 2 recap -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="animation:pulseGlow 3s ease-in-out infinite;">Secret 2 Recap</div>
+  <div class="hl animate-on-active delay-300" style="text-align:center;">A proven 5-step system replaces years of experience.</div>
+  <div class="hl animate-on-active delay-800" style="text-align:center;color:var(--coral);margin-top:2vh;">Anyone can run it.</div>
+</div>
+
+<!-- SLIDE 94 — Bridge to Secret 3 -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Credibility raised the capital.</div>
+  <div class="hl animate-on-active delay-500" style="text-align:center;">The system deployed it.</div>
+  <div class="hl-lg animate-on-active delay-1000" style="text-align:center;color:var(--coral);">Now let's talk about the cash flow.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ACT 6 · SECRET 3 — CASH FLOW (Slides 95–140)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 95 — SECRET 3 divider -->
+<div class="slide section-divider" style="background:var(--base);">
+  <div class="section-label animate-on-active">The third secret</div>
+  <div class="section-title animate-on-active delay-400">SECRET 3</div>
+  <div class="section-sub animate-on-active delay-900">The Biggest Opportunity Window in UK Airbnb History</div>
+</div>
+
+<!-- SLIDE 96 — Renters' Rights Act header -->
+<div class="slide section-divider" style="background:var(--base);">
+  <div class="section-label animate-on-active">Factor 1</div>
+  <div class="section-title animate-on-active delay-400">THE RENTERS' RIGHTS ACT</div>
+</div>
+
+<!-- SLIDE 96b — From 1 May 2026 -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;">From <em class="coral">1 May 2026</em></div>
+  <div class="hl-sm animate-on-active delay-600" style="text-align:center;color:var(--white-muted);margin-top:2vh;">Section 21 'no-fault' evictions abolished.</div>
+</div>
+
+<!-- SLIDE 96c — Can't evict individual tenants -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Landlords can no longer evict individual tenants</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">without <em class="coral">legal grounds.</em></div>
+</div>
+
+<!-- SLIDE 96d — Company lets exempt -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;">But company lets are <em class="coral">EXEMPT.</em></div>
+  <div class="hl-sm animate-on-active delay-600" style="text-align:center;color:var(--white-muted);margin-top:2vh;">Landlords now PREFER letting to companies.</div>
+</div>
+
+<!-- SLIDE 96e — That's us -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--coral);">That's us.</div>
+  <div class="hl animate-on-active delay-500" style="text-align:center;color:var(--gold);">Airbnb operators.</div>
+  <div class="hl animate-on-active delay-1000" style="text-align:center;color:var(--white);">Property Labs students.</div>
+</div>
+
+<!-- SLIDE 97 — Housing Crisis header -->
+<div class="slide section-divider" style="background:var(--base);">
+  <div class="section-label animate-on-active">Factor 2</div>
+  <div class="section-title animate-on-active delay-400" style="font-size:clamp(34px,6vw,80px);">THE HOUSING CRISIS</div>
+</div>
+
+<!-- SLIDE 97b — 6.5 million -->
+<div class="slide center-stack" style="background:var(--base);background-image:url('deck-images/terry-london.jpg');background-size:cover;background-position:center;">
+  <div style="position:absolute;inset:0;background:rgba(10,15,13,0.90);z-index:0;"></div>
+  <div class="big-number animate-on-active" style="position:relative;z-index:1;">6.5M</div>
+  <div class="big-number-label animate-on-active delay-600" style="position:relative;z-index:1;">homes the UK is short.</div>
+</div>
+
+<!-- SLIDE 97c — Children in temp accommodation -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--coral);">172,420 children</div>
+  <div class="hl animate-on-active delay-500" style="text-align:center;color:var(--white-muted);">in temporary accommodation.</div>
+  <div class="hl animate-on-active delay-1000" style="text-align:center;color:var(--gold);">£2.7 billion spent on emergency housing.</div>
+</div>
+
+<!-- SLIDE 97d — Demand is everywhere -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Once you control the property,</div>
+  <div class="hl-lg animate-on-active delay-500" style="text-align:center;color:var(--white);">demand is <em class="coral">everywhere.</em></div>
+  <div class="hl-sm animate-on-active delay-1000" style="text-align:center;color:var(--white-muted);margin-top:2vh;">Airbnb. Social housing. Temporary accommodation.</div>
+</div>
+
+<!-- SLIDE 98 — Airbnb outgrowing hotels header -->
+<div class="slide section-divider" style="background:var(--base);">
+  <div class="section-label animate-on-active">Factor 3</div>
+  <div class="section-title animate-on-active delay-400" style="font-size:clamp(28px,4.5vw,64px);">AIRBNB IS OUTGROWING HOTELS</div>
+</div>
+
+<!-- SLIDE 98b — 11% vs 5% -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="animate-on-active" style="display:flex;gap:8vw;align-items:center;justify-content:center;">
+    <div style="text-align:center;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(60px,10vw,140px);font-weight:800;color:var(--coral);">11%</div>
+      <div style="font-family:'Inter',sans-serif;font-size:clamp(14px,1.4vw,20px);color:var(--white-muted);margin-top:1vh;">Short-term rentals</div>
+    </div>
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(24px,3vw,44px);font-weight:700;color:var(--white-dim);">vs</div>
+    <div style="text-align:center;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(60px,10vw,140px);font-weight:800;color:var(--white-dim);">5%</div>
+      <div style="font-family:'Inter',sans-serif;font-size:clamp(14px,1.4vw,20px);color:var(--white-dim);margin-top:1vh;">Hotels</div>
+    </div>
+  </div>
+  <div class="hl-sm animate-on-active delay-800" style="text-align:center;color:var(--white-muted);margin-top:3vh;">Short-term rentals growing at 2x the rate of hotels.</div>
+</div>
+
+<!-- SLIDE 98c — Hotel revenues declining -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Hotel revenues declined</div>
+  <div class="hl-lg animate-on-active delay-500" style="text-align:center;color:var(--white);">from £24.7bn to <em class="coral">£22.9bn.</em></div>
+</div>
+
+<!-- SLIDE 99 — £5.7 billion -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="big-number animate-on-active" style="font-size:clamp(60px,10vw,150px);">£5.7BN</div>
+  <div class="big-number-label animate-on-active delay-600">Airbnb's contribution to the UK economy.</div>
+</div>
+
+<!-- SLIDE 100 — Investor returns angle -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Factor 4</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;">YOUR INVESTORS' MONEY IS <em class="coral">DYING</em></div>
+</div>
+
+<!-- SLIDE 100b — Savings returns -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="big-number animate-on-active" style="font-size:clamp(60px,10vw,150px);">2.12%</div>
+  <div class="big-number-label animate-on-active delay-600">Average savings account return.</div>
+</div>
+
+<!-- SLIDE 100c — Stocks ISA -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="big-number animate-on-active" style="font-size:clamp(60px,10vw,150px);">3.8%</div>
+  <div class="big-number-label animate-on-active delay-600">Stocks & Shares ISA average over 3 years.</div>
+</div>
+
+<!-- SLIDE 100d — You can offer 12-14% -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;color:var(--coral);">YOU can offer 12–14% fixed returns.</div>
+  <div class="hl-sm animate-on-active delay-700" style="text-align:center;color:var(--white-muted);margin-top:2vh;">Where else are they getting that?</div>
+</div>
+
+<!-- SLIDE 101 — Article 4 Precedent -->
+<div class="slide section-divider" style="background:var(--base);">
+  <div class="section-label animate-on-active">Factor 5</div>
+  <div class="section-title animate-on-active delay-400" style="font-size:clamp(28px,4.5vw,64px);">THE ARTICLE 4 PRECEDENT</div>
+</div>
+
+<!-- SLIDE 101b — HMO investors -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="color:var(--white-muted);">HMO investors who got in before Article 4</div>
+  <div class="hl-lg animate-on-active delay-500" style="color:var(--white);">got <em class="coral">grandfather rights.</em></div>
+  <div class="hl-sm animate-on-active delay-900" style="color:var(--white-muted);margin-top:2vh;">Their property values went up. Their ROI became exponential.</div>
+</div>
+
+<!-- SLIDE 101c — Same thing coming -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;">The same thing is coming</div>
+  <div class="hl-lg animate-on-active delay-500" style="text-align:center;color:var(--coral);">for Airbnb.</div>
+  <div class="hl-sm animate-on-active delay-1000" style="text-align:center;color:var(--white-muted);margin-top:2vh;">Get in NOW. Before the regulations land.</div>
+</div>
+
+<!-- SLIDE 101d — Spring = Peak Season -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="color:var(--gold);">Factor 6</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;color:var(--gold);">SPRING = PEAK SEASON</div>
+  <div class="hl-sm animate-on-active delay-700" style="text-align:center;color:var(--white-muted);margin-top:2vh;">Summer bookings are the highest-revenue months.</div>
+</div>
+
+<!-- SLIDE 102 — Professional operators win -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="hl animate-on-active" style="color:var(--white-muted);">When the rules tighten,</div>
+    <div class="hl-lg animate-on-active delay-600" style="color:var(--white);">professional operators <em class="coral">win.</em></div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-filming.jpg" alt="Terry professional" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 103 — The equation -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">The equation</div>
+  <div class="animate-on-active delay-400" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(16px,1.8vw,26px);font-weight:700;color:var(--white);text-align:center;line-height:2;">
+    <span style="color:var(--coral);">Renters' Rights Act</span><br>
+    + <span style="color:var(--gold);">Housing Crisis</span><br>
+    + <span style="color:var(--coral);">Airbnb Growth</span><br>
+    + <span style="color:var(--gold);">Regulation Urgency</span>
+  </div>
+  <div class="animate-on-active delay-1200" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(22px,2.8vw,42px);font-weight:800;color:var(--white);margin-top:2.5vh;text-align:center;">= <em class="gold">Best Entry Window Ever</em></div>
+</div>
+
+<!-- SLIDE 104 — The window -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">The window is open.</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--coral);">It won't stay open forever.</div>
+</div>
+
+<!-- SLIDE 105 — Case Study: DYLAN header -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="case-study-portrait animate-on-active" style="margin:0 auto 2.5vh;">
+    <img src="deck-images/dylan.jpg" alt="Dylan" loading="lazy">
+  </div>
+  <div class="case-study-tag animate-on-active delay-200">Case Study</div>
+  <div class="case-study-name animate-on-active delay-300">Dylan</div>
+  <div class="case-line animate-on-active delay-700">Six-figure events company. Wanted assets, not just income.</div>
+</div>
+
+<!-- SLIDE 106 — Dylan 3 months -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="case-study-tag animate-on-active">Dylan — 3 months in</div>
+  <div class="case-line animate-on-active delay-300"><em class="gold">5 Airbnbs.</em></div>
+  <div class="case-line animate-on-active delay-600">All systemised. All running.</div>
+</div>
+
+<!-- SLIDE 107 — Dylan best month -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label-gold animate-on-active">Dylan's best month</div>
+  <div class="animate-on-active delay-400" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(60px,10vw,150px);font-weight:800;color:var(--gold);">£12,000</div>
+</div>
+
+<!-- SLIDE 108 — Dylan Richard Mille -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="hl animate-on-active" style="color:var(--white-muted);">He bought a Richard Mille.</div>
+    <div class="hl-lg animate-on-active delay-600" style="color:var(--white);">Because the <em class="coral">system works.</em></div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/dylan-2.jpg" alt="Dylan lifestyle" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 109 — Case Study: ELITE KLEANS header -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="case-study-tag animate-on-active">Case Study</div>
+  <div class="case-study-name animate-on-active delay-300">Elite Kleans</div>
+  <div class="case-line animate-on-active delay-700">Cleaning company. Wanted to own, not just service.</div>
+</div>
+
+<!-- SLIDE 110 — Elite Kleans result -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="case-study-tag animate-on-active">Elite Kleans — Result</div>
+    <div class="case-line animate-on-active delay-300">1 unit sourced.</div>
+    <div class="case-line animate-on-active delay-600"><em class="gold">£2,200/month.</em></div>
+    <div class="case-line animate-on-active delay-900" style="color:var(--white-muted);font-size:clamp(16px,1.8vw,24px);">Service business became an asset-backed portfolio.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-property-shoot.jpg" alt="Property sourced" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 111 — 3C Recap -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">The full system</div>
+  <div class="animate-on-active delay-400" style="margin-top:1vh;">
+    <div class="three-c">
+      <div class="c-block"><div class="c-letter">C</div><div class="c-label">Credibility</div></div>
+      <div class="c-arrow">→</div>
+      <div class="c-block"><div class="c-letter">C</div><div class="c-label">Capital</div></div>
+      <div class="c-arrow">→</div>
+      <div class="c-block"><div class="c-letter">C</div><div class="c-label">Cash Flow</div></div>
+    </div>
+  </div>
+  <div class="hl-sm animate-on-active delay-1000" style="text-align:center;margin-top:3.5vh;">This is how <em class="coral">complete beginners</em> did it. This is how <em class="coral">you</em> can do it.</div>
+</div>
+
+<!-- SLIDE 112 — Capital Follows Conviction (big statement) -->
+<div class="slide center-stack" style="background:var(--base);background-image:url('deck-images/terry-lifestyle1.jpg');background-size:cover;background-position:center;">
+  <div style="position:absolute;inset:0;background:rgba(10,15,13,0.88);z-index:0;"></div>
+  <div class="animate-on-active" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(36px,6vw,88px);font-weight:800;color:var(--coral);text-align:center;animation:pulseGlow 3s ease-in-out infinite;line-height:1.1;position:relative;z-index:1;">CAPITAL FOLLOWS CONVICTION</div>
+</div>
+
+<!-- SLIDE 113 — What you need -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">You don't need money.</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">You need <em class="coral">credibility,</em> a system, and conviction.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ACT 7 · BRIDGE (Slides 114–125)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 114 — The fork in the road -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label animate-on-active">Right now, in this moment</div>
+    <div class="hl-lg animate-on-active delay-300">You're standing at a <em class="coral">fork in the road.</em></div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-bookshelf.jpg" alt="Terry guiding" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 115 — Two paths -->
+<div class="slide center-stack" style="background:var(--base);padding:5vh 6vw;">
+  <div class="label animate-on-active" style="margin-bottom:2.5vh;">Two paths forward</div>
+  <div class="path-block animate-on-active delay-400">
+    <div class="path-card coral">
+      <div class="path-head coral">Path One</div>
+      <div class="path-item">Leave tonight feeling inspired.</div>
+      <div class="path-item">Feel great for 24 hours.</div>
+      <div class="path-item">Back to normal by Monday.</div>
+    </div>
+    <div class="path-card gold">
+      <div class="path-head gold">Path Two</div>
+      <div class="path-item">Decide tonight.</div>
+      <div class="path-item">Take the next step.</div>
+      <div class="path-item">12 months from now — different life.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 116 — Path One outcome -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active">12 months on Path One</div>
+  <div class="prediction-line white animate-on-active delay-300">Same salary.</div>
+  <div class="prediction-line coral animate-on-active delay-600">Same frustration.</div>
+  <div class="prediction-line muted animate-on-active delay-900">Same scroll.</div>
+</div>
+
+<!-- SLIDE 117 — Path Two: Decide tonight -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;">Path Two starts with one decision.</div>
+  <div class="hl-lg animate-on-active delay-700" style="text-align:center;color:var(--coral);">Tonight.</div>
+</div>
+
+<!-- SLIDE 118 — Take the next step -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="hl animate-on-active" style="color:var(--white-muted);">Not a massive leap.</div>
+    <div class="hl-lg animate-on-active delay-600" style="color:var(--white);">Just the <em class="coral">next step.</em></div>
+    <div class="hl-sm animate-on-active delay-1100" style="margin-top:2vh;">A conversation. 30 minutes. That's it.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-hero.jpg" alt="Terry approachable" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 119 — Complete beginners have proven it -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;"><em class="coral">Complete beginners</em> have already proven this works.</div>
+  <div class="hl-lg animate-on-active delay-700" style="text-align:center;color:var(--white-muted);">The only missing piece</div>
+  <div class="hl-lg animate-on-active delay-1100" style="text-align:center;color:var(--coral);">is you.</div>
+  <div class="proof-grid animate-on-active delay-1400" style="margin-left:auto;margin-right:auto;">
+    <div class="proof-grid-item"><img src="deck-images/dami.jpg" alt="Dami" loading="lazy"></div>
+    <div class="proof-grid-item"><img src="deck-images/daniel.jpg" alt="Daniel" loading="lazy"></div>
+    <div class="proof-grid-item"><img src="deck-images/ihab.jpg" alt="Ihab" loading="lazy"></div>
+    <div class="proof-grid-item"><img src="deck-images/dylan.jpg" alt="Dylan" loading="lazy"></div>
+    <div class="proof-grid-item"><img src="deck-images/andrew.jpg" alt="Andrew" loading="lazy"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ACT 8 · OFFER STACK (Slides 120–165)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 120 — What's inside Property Labs -->
+<div class="slide section-divider" style="background:var(--base);">
+  <div class="section-label animate-on-active">Everything you need to launch</div>
+  <div class="section-title animate-on-active delay-400" style="font-size:clamp(36px,5.5vw,80px);">Property Labs</div>
+  <div class="section-sub animate-on-active delay-900">Let me show you exactly what's inside.</div>
+  <div class="animate-on-active delay-1200" style="margin-top:3vh;width:160px;height:160px;border-radius:50%;overflow:hidden;margin-left:auto;margin-right:auto;border:3px solid rgba(62,207,160,0.3);">
+    <img src="deck-images/terry-laptop.jpg" alt="Terry at work" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+  </div>
+</div>
+
+<!-- SLIDE 121 — Component 1 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label-gold animate-on-active">Component 1</div>
+  <div class="hl-lg animate-on-active delay-300">7-Module Airbnb Foundations Course</div>
+  <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);margin-top:2vh;">Everything from deal structure to guest experience. The full operating playbook.</div>
+</div>
+
+<!-- SLIDE 122 — Component 2 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label-gold animate-on-active">Component 2</div>
+  <div class="hl-lg animate-on-active delay-300">Raising Finance Course</div>
+  <div class="hl animate-on-active delay-700" style="color:var(--coral);">"Nobody else teaches this."</div>
+  <div class="hl-sm animate-on-active delay-1100" style="color:var(--white-muted);margin-top:1.5vh;">How to approach investors. The Credibility Pack. Legal frameworks. Word-for-word scripts.</div>
+</div>
+
+<!-- SLIDE 123 — Component 3 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label-gold animate-on-active">Component 3</div>
+  <div class="hl-lg animate-on-active delay-300">Legal Contract Pack</div>
+  <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);margin-top:2vh;">JV agreements. Rent-to-rent contracts. Investor loan agreements. Professionally drafted. Ready to use.</div>
+</div>
+
+<!-- SLIDE 124 — Component 4 -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label-gold animate-on-active">Component 4</div>
+    <div class="hl-lg animate-on-active delay-300">Deal Sourcing Team Access</div>
+    <div class="hl animate-on-active delay-700" style="color:var(--coral);">"This is what makes us different."</div>
+    <div class="hl-sm animate-on-active delay-1100" style="color:var(--white-muted);margin-top:1.5vh;">A team that finds the properties for you. You don't spend months searching Rightmove.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-london.jpg" alt="Terry sourcing in action" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 125 — Component 5 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label-gold animate-on-active">Component 5</div>
+  <div class="hl-lg animate-on-active delay-300">Cleaning & Maintenance Team</div>
+  <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);margin-top:2vh;">Your operational backbone. Vetted. Reliable. Built into the system from day one.</div>
+</div>
+
+<!-- SLIDE 126 — Component 6 -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label-gold animate-on-active">Component 6</div>
+    <div class="hl-lg animate-on-active delay-300">Weekly Group Coaching Calls</div>
+    <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);margin-top:2vh;">Live sessions. Real questions. Real answers. Plus a community of people building alongside you.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-lifestyle2.jpg" alt="Terry community celebration" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 127 — Component 7 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label-gold animate-on-active">Component 7</div>
+  <div class="hl-lg animate-on-active delay-300">The Full Toolkit</div>
+  <div class="hl-sm animate-on-active delay-700" style="color:var(--white-muted);margin-top:2vh;">Investor outreach scripts. Pricing calculators. Deal analysis sheets. Listing templates. Everything pre-built.</div>
+</div>
+
+<!-- SLIDE 128 — Value Stack -->
+<div class="slide center-stack" style="background:var(--base);padding:5vh 8vw;">
+  <div class="label animate-on-active" style="margin-bottom:2vh;">Everything inside Property Labs</div>
+  <div class="value-stack animate-on-active delay-300">
+    <div class="value-item"><span class="value-name">7-Module Foundations Course</span><span class="value-price">£2,000</span></div>
+    <div class="value-item"><span class="value-name">Raising Finance Course</span><span class="value-price">£3,000</span></div>
+    <div class="value-item"><span class="value-name">Legal Contract Pack</span><span class="value-price">£1,500</span></div>
+    <div class="value-item"><span class="value-name">Deal Sourcing Team Access</span><span class="value-price">£5,000+</span></div>
+    <div class="value-item"><span class="value-name">Cleaning & Maintenance Team</span><span class="value-price">£2,000</span></div>
+    <div class="value-item"><span class="value-name">Weekly Group Coaching + Community</span><span class="value-price">£3,000</span></div>
+    <div class="value-item"><span class="value-name">Full Toolkit</span><span class="value-price">£500</span></div>
+  </div>
+</div>
+
+<!-- SLIDE 129 — Total value -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">If you got this separately</div>
+  <div class="animate-on-active delay-400" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(50px,8vw,120px);font-weight:800;color:var(--white-muted);text-decoration:line-through;text-decoration-color:var(--coral);">£17,000+</div>
+</div>
+
+<!-- SLIDE 130 — 4 Tiers header -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Choose your path</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;color:var(--coral);">4 Investment Levels</div>
+  <div class="hl-sm animate-on-active delay-700" style="text-align:center;margin-top:2vh;">Each designed for where you are right now.</div>
+</div>
+
+<!-- SLIDE 131 — Tier 1 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Tier 1</div>
+  <div class="hl-lg animate-on-active delay-300" style="color:var(--white);">Foundations Course</div>
+  <div class="hl-sm animate-on-active delay-600" style="color:var(--white-muted);margin-top:1.5vh;">Self-study. The full operating blueprint.</div>
+  <div class="animate-on-active delay-900" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(36px,5vw,72px);font-weight:800;color:var(--gold);margin-top:2.5vh;">£500</div>
+</div>
+
+<!-- SLIDE 132 — Tier 2 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Tier 2</div>
+  <div class="hl-lg animate-on-active delay-300" style="color:var(--white);">Both Courses</div>
+  <div class="hl-sm animate-on-active delay-600" style="color:var(--white-muted);margin-top:1.5vh;">The full blueprint including the Raising Finance Course. The complete picture.</div>
+  <div class="animate-on-active delay-900" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(36px,5vw,72px);font-weight:800;color:var(--gold);margin-top:2.5vh;">£1,000</div>
+</div>
+
+<!-- SLIDE 133 — Tier 3 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="color:var(--coral);">Tier 3 — Most Popular</div>
+  <div class="hl-lg animate-on-active delay-300" style="color:var(--white);">Group Coaching</div>
+  <div class="hl-sm animate-on-active delay-600" style="color:var(--white-muted);margin-top:1.5vh;">Both courses + deal sourcing team + cleaning team + weekly calls + community + full toolkit.</div>
+  <div class="animate-on-active delay-900" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(36px,5vw,72px);font-weight:800;color:var(--gold);margin-top:2.5vh;">£3,000</div>
+</div>
+
+<!-- SLIDE 134 — Tier 4 -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active">Tier 4</div>
+  <div class="hl-lg animate-on-active delay-300" style="color:var(--white);">1:1 Coaching</div>
+  <div class="hl-sm animate-on-active delay-600" style="color:var(--white-muted);margin-top:1.5vh;">Everything in Tier 3, plus weekly personal sessions with Terry. Maximum accountability. Maximum results.</div>
+  <div class="animate-on-active delay-900" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(36px,5vw,72px);font-weight:800;color:var(--gold);margin-top:2.5vh;">£5,000</div>
+</div>
+
+<!-- SLIDE 135 — 4 Tiers overview -->
+<div class="slide center-stack" style="background:var(--base);padding:5vh 8vw;">
+  <div class="label animate-on-active" style="margin-bottom:2.5vh;">All four levels at a glance</div>
+  <div class="tier-row animate-on-active delay-300">
+    <div class="tier-card"><div><div class="tier-name">Foundations Course</div><div class="tier-desc">Self-study blueprint</div></div><div class="tier-price">£500</div></div>
+    <div class="tier-card"><div><div class="tier-name">Both Courses</div><div class="tier-desc">Full blueprint including finance raising</div></div><div class="tier-price">£1,000</div></div>
+    <div class="tier-card highlight"><div><div class="tier-name">Group Coaching</div><div class="tier-desc">Courses + team + calls + community ★</div></div><div class="tier-price">£3,000</div></div>
+    <div class="tier-card"><div><div class="tier-name">1:1 Coaching</div><div class="tier-desc">Everything + personal weekly sessions</div></div><div class="tier-price">£5,000</div></div>
+  </div>
+</div>
+
+<!-- SLIDE 136 — The Guarantee header -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="animation:pulseGlow 3s ease-in-out infinite;">Our promise to you</div>
+  <div class="hl-lg animate-on-active delay-400" style="text-align:center;">The <em class="coral">90-Day Guarantee</em></div>
+</div>
+
+<!-- SLIDE 137 — Guarantee detail -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="quote-block animate-on-active">
+      <div class="quote-text">Your first profitable Airbnb in 90 days.</div>
+    </div>
+    <div class="hl animate-on-active delay-800" style="margin-top:3vh;color:var(--white-muted);">Or we keep working with you.</div>
+    <div class="hl animate-on-active delay-1100" style="color:var(--coral);">Free. Until you do.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-bookshelf.jpg" alt="Terry trustworthy" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 138 — Why we can offer this -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">We can offer this because</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">the <em class="coral">system works.</em></div>
+  <div class="hl-sm animate-on-active delay-1100" style="text-align:center;margin-top:2vh;">25 students have already proved it. Multiple times over.</div>
+</div>
+
+<!-- SLIDE 139 — Book your strategy call -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="animation:pulseGlow 3s ease-in-out infinite;">The next step</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;">Book Your Free</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--coral);">30-Minute Strategy Call</div>
+  <div class="hl-sm animate-on-active delay-1000" style="text-align:center;margin-top:2vh;color:var(--white-muted);">We map out your plan. You decide if Property Labs is right for you. Zero pressure.</div>
+</div>
+
+<!-- SLIDE 140 — QR/Link -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="animation:pulseGlow 3s ease-in-out infinite;">Scan or go to</div>
+  <div class="animate-on-active delay-400" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(28px,4vw,60px);font-weight:800;color:var(--white);margin-top:1vh;text-align:center;">propertylabs.co.uk/call</div>
+  <div class="cta-btn animate-on-active delay-900">Book Free Strategy Call →</div>
+  <div class="animate-on-active delay-1300" style="font-family:'Inter',sans-serif;font-size:clamp(12px,1.1vw,15px);color:var(--white-dim);margin-top:2.5vh;text-align:center;">Limited spots available. First come, first served.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ACT 9 · OBJECTION HANDLING (Slides 141–175)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 141 — Objections intro -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Before you decide, let me answer</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">what you're <em class="coral">really</em> thinking.</div>
+</div>
+
+<!-- SLIDE 142 — Objection: No money -->
+<div class="slide left-stack" style="background:var(--base);position:relative;">
+  <div class="objection-q animate-on-active delay-200">"I don't have the money to invest."</div>
+  <div class="h-rule animate-on-active delay-600"></div>
+  <div class="objection-a animate-on-active delay-800">Capital raising <em class="coral">IS</em> the system. That's literally what we teach first.</div>
+  <div style="position:absolute;bottom:4vh;right:4vw;width:120px;height:120px;border-radius:12px;overflow:hidden;border:2px solid rgba(62,207,160,0.3);"><img src="deck-images/ihab.jpg" style="width:100%;height:100%;object-fit:cover;" loading="lazy" alt="Ihab proof"></div>
+</div>
+
+<!-- SLIDE 143 — Objection: Will it work for me -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="objection-q animate-on-active delay-200">"Will this actually work for someone like me?"</div>
+  <div class="h-rule animate-on-active delay-600"></div>
+  <div class="objection-a animate-on-active delay-800">Ihab. Andrew. Dylan. Elite Kleans. <em class="coral">25 different people.</em> Different backgrounds. Same system. Same results.</div>
+</div>
+
+<!-- SLIDE 144 — Objection: Scared -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="objection-q animate-on-active delay-200">"I'm scared of making the wrong move."</div>
+  <div class="h-rule animate-on-active delay-600"></div>
+  <div class="objection-a animate-on-active delay-800">Educated risk with <em class="coral">structured support</em> is not reckless. Staying stuck forever is.</div>
+</div>
+
+<!-- SLIDE 145 — Objection: I'll start later -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="objection-q animate-on-active delay-200">"I'll think about it and maybe start later."</div>
+  <div class="h-rule animate-on-active delay-600"></div>
+  <div class="objection-a animate-on-active delay-800">Every month you wait = <em class="gold">£2,000–£4,000 of income lost.</em> 6 months = £12,000 gone.</div>
+</div>
+
+<!-- SLIDE 146 — Cost of waiting -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">The cost of waiting</div>
+  <div class="big-number animate-on-active delay-400" style="font-size:clamp(60px,9vw,140px);">£12,000</div>
+  <div class="big-number-label animate-on-active delay-900">lost in 6 months of inaction.</div>
+</div>
+
+<!-- SLIDE 147 — Objection: Airbnb saturated -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="objection-q animate-on-active delay-200">"Isn't Airbnb saturated by now?"</div>
+  <div class="h-rule animate-on-active delay-600"></div>
+  <div class="objection-a animate-on-active delay-800">Airbnb growing at <em class="gold">2x the rate of hotels.</em> 11% vs 5% growth. Hotel revenues declining. £5.7bn UK economy contribution. Saturated? The opposite.</div>
+</div>
+
+<!-- SLIDE 148 — Objection: Not experienced enough -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="objection-q animate-on-active delay-200">"I'm not experienced enough."</div>
+    <div class="h-rule animate-on-active delay-600"></div>
+    <div class="objection-a animate-on-active delay-800">I started with <em class="coral">one conversation and £8,500.</em> Ihab had zero property experience. Experience isn't the entry requirement.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-apartment.jpg" alt="Terry started from nothing" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 149 — Objection: Need to think about it -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="objection-q animate-on-active delay-200">"I just need a bit more time to think."</div>
+  <div class="h-rule animate-on-active delay-600"></div>
+  <div class="objection-a animate-on-active delay-800">Pain of discipline is temporary. <em class="coral">Pain of regret</em> is permanent. The people who acted last year are cash flowing today.</div>
+</div>
+
+<!-- SLIDE 150 — Objection: Can't do it with my job -->
+<div class="slide left-stack" style="background:var(--base);position:relative;">
+  <div class="objection-q animate-on-active delay-200">"I can't fit this around my job."</div>
+  <div class="h-rule animate-on-active delay-600"></div>
+  <div class="objection-a animate-on-active delay-800">Andrew. Masters student. Accountant. <em class="gold">3 units running.</em> 5–10 hours per week. The system is built around your life.</div>
+  <div style="position:absolute;bottom:4vh;right:4vw;width:120px;height:120px;border-radius:12px;overflow:hidden;border:2px solid rgba(62,207,160,0.3);"><img src="deck-images/andrew.jpg" style="width:100%;height:100%;object-fit:cover;" loading="lazy" alt="Andrew"></div>
+</div>
+
+<!-- SLIDE 151 — One more question -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;color:var(--white-muted);">Any other question you have</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">ask it on the <em class="coral">strategy call.</em></div>
+</div>
+
+<!-- SLIDE 152 — CTA repeat -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="animation:pulseGlow 3s ease-in-out infinite;">Right now — while you still feel it</div>
+  <div class="hl-lg animate-on-active delay-300" style="text-align:center;color:var(--coral);">Book Your Free Strategy Call</div>
+  <div class="animate-on-active delay-700" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(22px,2.8vw,40px);font-weight:700;color:var(--white);margin-top:2vh;text-align:center;">propertylabs.co.uk/call</div>
+  <div class="cta-btn animate-on-active delay-1100">Book Now →</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ACT 10 · CLOSE (Slides 153–185)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 153 — Two pictures intro -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Before you decide,</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">let me paint you <em class="coral">two pictures.</em></div>
+</div>
+
+<!-- SLIDE 154 — Picture One header -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="color:var(--white-muted);">Picture One</div>
+  <div class="hl-lg animate-on-active delay-400" style="text-align:center;color:var(--white-muted);">April 2027.</div>
+</div>
+
+<!-- SLIDE 155 — Picture One detail -->
+<div class="slide left-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="color:var(--white-muted);">April 2027 — Path One</div>
+  <div class="prediction-line muted animate-on-active delay-300">Same salary.</div>
+  <div class="prediction-line muted animate-on-active delay-600">Same rent.</div>
+  <div class="prediction-line muted animate-on-active delay-900">Same Sunday dread.</div>
+  <div class="prediction-line coral animate-on-active delay-1200">Same scroll. Wondering what if.</div>
+</div>
+
+<!-- SLIDE 156 — Picture Two header -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="color:var(--gold);">Picture Two</div>
+  <div class="hl-lg animate-on-active delay-400" style="text-align:center;color:var(--gold);">April 2027.</div>
+</div>
+
+<!-- SLIDE 157 — Picture Two: 3 Airbnb units -->
+<div class="slide slide-with-image" style="background:var(--base);">
+  <div class="slide-text">
+    <div class="label animate-on-active" style="color:var(--gold);">April 2027 — Path Two</div>
+    <div class="prediction-line white animate-on-active delay-300">3 Airbnb units live.</div>
+    <div class="prediction-line animate-on-active delay-600" style="color:var(--gold);">£2,000 each. £6,000/month profit.</div>
+    <div class="prediction-line white animate-on-active delay-900">£72,000 a year in property income.</div>
+  </div>
+  <div class="slide-img animate-on-active delay-400">
+    <img src="deck-images/terry-lifestyle2.jpg" alt="This could be you" loading="lazy">
+  </div>
+</div>
+
+<!-- SLIDE 158 — Parents know -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">Your parents don't just think you've done well.</div>
+  <div class="hl-lg animate-on-active delay-700" style="text-align:center;color:var(--white);">They <em class="coral">know.</em></div>
+</div>
+
+<!-- SLIDE 159 — You feel free -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-lg animate-on-active" style="text-align:center;color:var(--white);">For the first time,</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--coral);">you feel free.</div>
+</div>
+
+<!-- SLIDE 160 — Final 3C recap -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active">The system that makes it possible</div>
+  <div class="animate-on-active delay-400" style="margin-top:1vh;">
+    <div class="three-c">
+      <div class="c-block"><div class="c-letter">C</div><div class="c-label">Credibility</div></div>
+      <div class="c-arrow">→</div>
+      <div class="c-block"><div class="c-letter">C</div><div class="c-label">Capital</div></div>
+      <div class="c-arrow">→</div>
+      <div class="c-block"><div class="c-letter">C</div><div class="c-label">Cash Flow</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 161 — Capital Follows Conviction (final) -->
+<div class="slide center-stack" style="background:var(--base);background-image:url('deck-images/terry-lifestyle1.jpg');background-size:cover;background-position:center;">
+  <div style="position:absolute;inset:0;background:rgba(10,15,13,0.88);z-index:0;"></div>
+  <div class="animate-on-active" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(36px,6vw,88px);font-weight:800;color:var(--coral);text-align:center;animation:pulseGlow 3s ease-in-out infinite;line-height:1.1;position:relative;z-index:1;">CAPITAL FOLLOWS<br>CONVICTION</div>
+</div>
+
+<!-- SLIDE 162 — The title -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl-sm animate-on-active" style="text-align:center;color:var(--white-muted);">Tonight's title was:</div>
+  <div class="hl animate-on-active delay-500" style="text-align:center;margin-top:1.5vh;color:var(--white);">"The 3C System: How Complete Beginners Are Launching Profitable Airbnbs in 90 Days…"</div>
+</div>
+
+<!-- SLIDE 163 — And How You Can Be Next -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">I've shown you it works for complete beginners.</div>
+  <div class="hl animate-on-active delay-500" style="text-align:center;color:var(--white);">I've shown you the system.</div>
+  <div class="hl-lg animate-on-active delay-1000" style="text-align:center;color:var(--coral);">The only missing piece is you.</div>
+</div>
+
+<!-- SLIDE 164 — Final CTA -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="portrait-circle animate-on-active" style="width:140px;height:140px;margin-bottom:2vh;">
+    <img src="deck-images/terry-hero.jpg" alt="Terry Dwobeng" loading="lazy">
+  </div>
+  <div class="animate-on-active delay-300" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(28px,4.5vw,68px);font-weight:800;color:var(--coral);text-align:center;animation:pulseGlow 3s ease-in-out infinite;">BOOK YOUR FREE STRATEGY CALL</div>
+  <div class="animate-on-active delay-500" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(20px,2.8vw,40px);font-weight:700;color:var(--white);margin-top:2vh;text-align:center;">propertylabs.co.uk/call</div>
+  <div class="cta-btn animate-on-active delay-900">Book Now — It's Free →</div>
+</div>
+
+<!-- SLIDE 165 — One year from now -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="quote-block animate-on-active" style="margin:0 auto;">
+    <div class="quote-text">"One year from now, you'll wish you'd started tonight."</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     FINAL: Q&A + End (Slides 166–175)
+     ═══════════════════════════════════════════════ -->
+
+<!-- SLIDE 166 — Q&A -->
+<div class="slide section-divider" style="background:var(--base);">
+  <div class="section-label animate-on-active">Let's talk</div>
+  <div class="section-title animate-on-active delay-400" style="font-size:clamp(40px,6.5vw,90px);">Q&A</div>
+  <div class="section-sub animate-on-active delay-900">Your questions, answered. Fire away.</div>
+</div>
+
+<!-- SLIDE 167 — While you think of questions -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="hl animate-on-active" style="text-align:center;color:var(--white-muted);">While you think of questions,</div>
+  <div class="hl-lg animate-on-active delay-600" style="text-align:center;color:var(--white);">remember — the strategy call is <em class="coral">free.</em></div>
+  <div class="hl-sm animate-on-active delay-1100" style="text-align:center;margin-top:2vh;">No commitment. No pressure. Just a plan.</div>
+</div>
+
+<!-- SLIDE 168 — The link again -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="label animate-on-active" style="animation:pulseGlow 3s ease-in-out infinite;">Book right now while we talk</div>
+  <div class="animate-on-active delay-300" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(26px,3.8vw,58px);font-weight:800;color:var(--white);text-align:center;margin-top:1.5vh;">propertylabs.co.uk/call</div>
+  <div class="cta-btn animate-on-active delay-700">Secure Your Spot →</div>
+</div>
+
+<!-- SLIDE 169 — Thank you -->
+<div class="slide center-stack" style="background:linear-gradient(170deg,var(--base) 0%,var(--base-light) 100%);">
+  <div class="portrait-circle animate-on-active" style="width:140px;height:140px;margin-bottom:2vh;">
+    <img src="deck-images/terry-bookshelf.jpg" alt="Terry Dwobeng" loading="lazy">
+  </div>
+  <div class="label animate-on-active delay-200" style="animation:pulseGlow 3s ease-in-out infinite;">Thank you for being here tonight</div>
+  <div class="hl-lg animate-on-active delay-400" style="text-align:center;color:var(--white);">Property Labs</div>
+  <div class="h-rule animate-on-active delay-800" style="margin:2.5vh auto;"></div>
+  <div class="hl-sm animate-on-active delay-1000" style="text-align:center;color:var(--white-muted);">Terry Dwobeng</div>
+  <div class="animate-on-active delay-1200" style="font-family:'Inter',sans-serif;font-size:clamp(11px,1vw,14px);font-weight:700;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.12);margin-top:4vh;">PROPERTY LABS · propertylabs.co.uk</div>
+</div>
+
+<!-- SLIDE 170 — Final link slide -->
+<div class="slide center-stack" style="background:var(--base);">
+  <div class="animate-on-active" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(30px,4.5vw,68px);font-weight:800;color:var(--coral);text-align:center;animation:pulseGlow 3s ease-in-out infinite;">Book Your Free Strategy Call</div>
+  <div class="animate-on-active delay-400" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(22px,3vw,46px);font-weight:700;color:var(--white);text-align:center;margin-top:2vh;">propertylabs.co.uk/call</div>
+  <div class="animate-on-active delay-800" style="font-family:'Inter',sans-serif;font-size:clamp(13px,1.1vw,16px);color:var(--white-dim);margin-top:3vh;text-align:center;">14 units. £50k/month. Zero own capital. The system is proven. Your turn.</div>
+</div>
+
+</div><!-- end slides-wrapper -->
+
+<!-- Slide Counter -->
+<div class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">170</span></div>
+
+<!-- Navigation Hint -->
+<div class="nav-hint" id="navHint">Arrow keys or click to navigate &nbsp;·&nbsp; Backspace / ← to go back</div>
+
+<script>
+(function () {
+  var slides = document.querySelectorAll('.slide');
+  var counter = document.getElementById('currentSlide');
+  var totalEl = document.getElementById('totalSlides');
+  var navHint = document.getElementById('navHint');
+  var total = slides.length;
+  var current = 0;
+  var transitioning = false;
+
+  // Set accurate total
+  totalEl.textContent = total;
+
+  function goTo(index) {
+    if (index < 0 || index >= total || index === current || transitioning) return;
+    transitioning = true;
+
+    var targetSlide = slides[index];
+    var animatedEls = targetSlide.querySelectorAll('.animate-on-active, .animate-fade');
+    animatedEls.forEach(function (el) {
+      el.style.opacity = '0';
+      el.style.animation = 'none';
+    });
+
+    slides[current].classList.remove('active');
+    slides[index].classList.add('active');
+
+    // Force reflow
+    void targetSlide.offsetWidth;
+
+    animatedEls.forEach(function (el) {
+      el.style.animation = '';
+      el.style.opacity = '';
+    });
+
+    current = index;
+    counter.textContent = current + 1;
+
+    setTimeout(function () { transitioning = false; }, 750);
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  // Keyboard
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault(); next();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'Backspace') {
+      e.preventDefault(); prev();
+    }
+  });
+
+  // Click
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('.slide-counter') || e.target.closest('.nav-hint')) return;
+    next();
+  });
+
+  // Touch swipe
+  var touchStartX = 0;
+  var touchStartY = 0;
+  document.addEventListener('touchstart', function (e) {
+    touchStartX = e.changedTouches[0].clientX;
+    touchStartY = e.changedTouches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx < 0) { next(); } else { prev(); }
+    }
+  }, { passive: true });
+
+  // Fade nav hint after 5 seconds
+  setTimeout(function () {
+    navHint.style.opacity = '0';
+  }, 5000);
+})();
+</script>
+</body>
+</html>

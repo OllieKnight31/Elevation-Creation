@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>90-Day Airbnb Launch Planner | Property Labs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-card: #141414;
+  --bg-card-hover: #1a1a1a;
+  --border: #222;
+  --text: #f0f0f0;
+  --text-muted: #888;
+  --coral: #3ECFA0;
+  --coral-dark: #2BB88A;
+  --green: #22c55e;
+  --green-bg: rgba(34,197,94,0.12);
+  --blue: #3b82f6;
+  --blue-bg: rgba(59,130,246,0.12);
+  --purple: #a855f7;
+  --purple-bg: rgba(168,85,247,0.12);
+  --amber: #3ECFA0;
+  --amber-bg: rgba(245,158,11,0.12);
+  --coral-bg: rgba(62,207,160,0.12);
+  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* EMAIL GATE OVERLAY */
+.email-gate {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 10000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+.email-gate.hidden { display: none; }
+.email-gate-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px 40px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+.email-gate-card h2 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.email-gate-card p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+.email-gate-card input {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.email-gate-card input:focus { border-color: var(--coral); }
+.email-gate-card button {
+  width: 100%;
+  padding: 14px;
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 4px;
+}
+.email-gate-card button:hover { background: var(--coral-dark); }
+.email-gate-skip {
+  display: block;
+  margin-top: 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  text-decoration: underline;
+  font-family: var(--font-body);
+}
+
+/* LAYOUT */
+.app-container {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 32px;
+  padding: 32px 24px 100px;
+}
+
+/* DASHBOARD */
+.dashboard {
+  grid-column: 1 / -1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+}
+.dashboard h1 {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+.dashboard h1 span { color: var(--coral); }
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.dash-stat {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.dash-stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.dash-stat-value {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 800;
+}
+.dash-stat-value.coral { color: var(--coral); }
+.progress-bar-outer {
+  width: 100%;
+  height: 14px;
+  background: var(--bg);
+  border-radius: 99px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--coral), #ff8a8e);
+  border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  width: 0%;
+  position: relative;
+}
+.progress-bar-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* DATE PICKER */
+.date-picker-section {
+  grid-column: 1 / -1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 40px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.date-picker-section h3 {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+}
+.date-picker-section input[type="date"] {
+  padding: 12px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  outline: none;
+  cursor: pointer;
+}
+.date-picker-section input[type="date"]:focus { border-color: var(--coral); }
+.date-info {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.date-info strong { color: var(--text); }
+
+/* VIEW TOGGLE */
+.view-toggle-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.view-toggle-bar span {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-right: 8px;
+}
+.view-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.view-btn.active {
+  background: var(--coral);
+  color: #fff;
+  border-color: var(--coral);
+}
+
+/* MAIN CONTENT */
+.main-content { min-width: 0; }
+
+/* PHASES */
+.phase-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.phase-card:hover { border-color: #333; }
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 28px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+.phase-header:hover { background: var(--bg-card-hover); }
+.phase-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.phase-header-text { flex: 1; }
+.phase-header-text h3 {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+}
+.phase-header-text .phase-weeks {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.phase-progress-mini {
+  width: 80px;
+  height: 6px;
+  background: var(--bg);
+  border-radius: 99px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.phase-progress-mini-inner {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  width: 0%;
+}
+.phase-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+  min-width: 40px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.phase-chevron {
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+.phase-card.open .phase-chevron { transform: rotate(180deg); }
+.phase-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.phase-card.open .phase-body { max-height: 1200px; }
+.phase-body-inner { padding: 0 28px 28px; }
+.phase-description {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* TASK ITEMS */
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.task-item:last-child { border-bottom: none; }
+.task-checkbox {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #444;
+  border-radius: 6px;
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s;
+  margin-top: 1px;
+  position: relative;
+}
+.task-checkbox:hover { border-color: #666; }
+.task-checkbox.checked {
+  border-color: var(--green);
+  background: var(--green);
+}
+.task-checkbox.checked::after {
+  content: '';
+  width: 6px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+  animation: checkPop 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+@keyframes checkPop {
+  0% { transform: rotate(45deg) scale(0); }
+  60% { transform: rotate(45deg) scale(1.2); }
+  100% { transform: rotate(45deg) scale(1) translateY(-1px); }
+}
+.task-label {
+  font-size: 14.5px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex: 1;
+}
+.task-item.completed .task-label {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+.task-deadline {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg);
+  padding: 3px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+
+/* PHASE PROGRESS BAR */
+.phase-progress-bar {
+  margin-bottom: 20px;
+}
+.phase-progress-bar .progress-bar-outer { height: 8px; }
+.phase-progress-bar .progress-bar-inner::after { display: none; }
+
+/* MILESTONES */
+.milestone-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.4s;
+  opacity: 0.5;
+}
+.milestone-card.unlocked {
+  opacity: 1;
+  border-color: var(--green);
+  background: var(--green-bg);
+}
+.milestone-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+  transition: all 0.4s;
+}
+.milestone-card.unlocked .milestone-icon {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+.milestone-icon svg { width: 20px; height: 20px; }
+.milestone-text h4 {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.milestone-text p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.milestone-card.unlocked .milestone-text p { color: var(--green); }
+
+/* SIDEBAR */
+.sidebar {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+}
+.sidebar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px;
+  margin-bottom: 16px;
+}
+.sidebar-card h3 {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--coral);
+}
+.rule-item {
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+.rule-item:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+.rule-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.rule-number {
+  background: var(--coral);
+  color: #fff;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.rule-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  flex: 1;
+  line-height: 1.4;
+}
+.rule-expand-icon {
+  color: var(--text-muted);
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.rule-item.open .rule-expand-icon { transform: rotate(45deg); }
+.rule-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s;
+}
+.rule-item.open .rule-detail { max-height: 100px; }
+.rule-detail p {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 8px 0 0 32px;
+  line-height: 1.5;
+}
+
+/* CTA */
+.cta-card {
+  background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+  border: none;
+  text-align: center;
+}
+.cta-card h3 { color: #fff !important; }
+.cta-card p { color: rgba(255,255,255,0.85); font-size: 14px; margin-bottom: 16px; }
+.cta-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #fff;
+  color: var(--coral);
+  border-radius: 10px;
+  text-decoration: none;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 8px;
+}
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.cta-webinar {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+}
+.cta-webinar a { color: #fff; text-decoration: underline; }
+
+/* EXPORT BAR */
+.export-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.export-btn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.export-btn:hover { border-color: var(--coral); color: var(--coral); }
+.export-btn svg { width: 16px; height: 16px; }
+
+/* WEEK VIEW */
+.week-view { display: none; }
+.week-view.active { display: block; }
+.phase-view.active { display: block; }
+.phase-view { display: none; }
+.week-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 12px;
+}
+.week-card h4 {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.week-card h4 .week-phase-tag {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-family: var(--font-body);
+}
+
+/* CONFETTI */
+.confetti-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  top: -10px;
+  width: 10px;
+  height: 10px;
+  opacity: 0;
+  animation: confettiFall 2.5s ease-in forwards;
+}
+@keyframes confettiFall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(100vh) rotate(720deg) scale(0.3); }
+}
+
+/* SHARE MODAL */
+.share-modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+}
+.share-modal.active { display: flex; }
+.share-modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px;
+  max-width: 480px;
+  width: 100%;
+}
+.share-modal-card h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+.share-text {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+}
+.share-modal-btns {
+  display: flex;
+  gap: 12px;
+}
+.share-modal-btns button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.share-copy-btn { background: var(--coral); color: #fff; border-color: var(--coral) !important; }
+.share-close-btn { background: var(--bg); color: var(--text); }
+
+/* MOBILE BOTTOM DRAWER */
+.mobile-drawer {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  border-radius: 16px 16px 0 0;
+  z-index: 5000;
+  transform: translateY(calc(100% - 56px));
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.mobile-drawer.open { transform: translateY(0); }
+.mobile-drawer-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  cursor: pointer;
+}
+.mobile-drawer-handle span {
+  width: 36px;
+  height: 4px;
+  background: #444;
+  border-radius: 99px;
+  display: block;
+  margin-bottom: 8px;
+}
+.mobile-drawer-handle p {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--coral);
+}
+.mobile-drawer-body { padding: 0 20px 24px; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .app-container {
+    grid-template-columns: 1fr;
+    padding: 16px 16px 120px;
+    gap: 16px;
+  }
+  .sidebar { display: none; }
+  .mobile-drawer { display: block; }
+  .dashboard { padding: 28px 20px; }
+  .dashboard h1 { font-size: 24px; }
+  .dash-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .dash-stat { padding: 16px; }
+  .dash-stat-value { font-size: 22px; }
+  .date-picker-section { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+  .phase-header { padding: 20px; }
+  .phase-body-inner { padding: 0 20px 20px; }
+}
+
+@media print {
+  .sidebar, .mobile-drawer, .export-bar, .view-toggle-bar, .date-picker-section, .email-gate { display: none !important; }
+  body { background: #fff; color: #000; }
+  .app-container { display: block; max-width: 100%; }
+  .dashboard, .phase-card, .milestone-card, .week-card { background: #fff; border-color: #ddd; break-inside: avoid; }
+  .phase-body { max-height: none !important; }
+  .task-checkbox.checked { border-color: #000; background: #000; }
+  .progress-bar-inner::after { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- EMAIL GATE -->
+<div class="email-gate" id="emailGate">
+  <div class="email-gate-card">
+    <h2>Save Your Progress</h2>
+    <p>Enter your details to save your checklist progress across devices and never lose your place.</p>
+    <input type="text" id="gateFirstName" placeholder="First name" autocomplete="given-name">
+    <input type="email" id="gateEmail" placeholder="Email address" autocomplete="email">
+    <button onclick="submitEmailGate()">Save Progress</button>
+    <button class="email-gate-skip" onclick="skipEmailGate()">Skip for now</button>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="share-modal" id="shareModal">
+  <div class="share-modal-card">
+    <h3>Share Your Progress</h3>
+    <div class="share-text" id="shareText"></div>
+    <div class="share-modal-btns">
+      <button class="share-copy-btn" onclick="copyShareText()">Copy to Clipboard</button>
+      <button class="share-close-btn" onclick="closeShareModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFETTI CONTAINER -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- APP -->
+<div class="app-container">
+
+  <!-- DASHBOARD -->
+  <div class="dashboard">
+    <h1>Your <span>90-Day</span> Plan</h1>
+    <div class="dash-stats">
+      <div class="dash-stat">
+        <div class="dash-stat-label">Overall Progress</div>
+        <div class="dash-stat-value coral" id="overallPercent">0%</div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-label">Launch Date</div>
+        <div class="dash-stat-value" id="launchDate" style="font-size:20px;">--</div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-label">Days Remaining</div>
+        <div class="dash-stat-value" id="daysRemaining">90</div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-label">Current Phase</div>
+        <div class="dash-stat-value" id="currentPhase" style="font-size:16px;">--</div>
+      </div>
+    </div>
+    <div class="progress-bar-outer">
+      <div class="progress-bar-inner" id="overallBar"></div>
+    </div>
+    <div class="progress-label">
+      <span id="tasksCompletedLabel">0 of 29 tasks complete</span>
+      <span id="overallPercentLabel">0%</span>
+    </div>
+  </div>
+
+  <!-- DATE PICKER -->
+  <div class="date-picker-section">
+    <h3>When do you want to start?</h3>
+    <input type="date" id="startDatePicker">
+    <div class="date-info" id="dateInfo">Pick your Day 1 and all deadlines will calculate automatically.</div>
+  </div>
+
+  <!-- VIEW TOGGLE -->
+  <div class="view-toggle-bar">
+    <span>View:</span>
+    <button class="view-btn active" id="phaseViewBtn" onclick="setView('phase')">Phase View</button>
+    <button class="view-btn" id="weekViewBtn" onclick="setView('week')">Week View</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- PHASE VIEW -->
+    <div class="phase-view active" id="phaseView"></div>
+
+    <!-- WEEK VIEW -->
+    <div class="week-view" id="weekView"></div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-card">
+      <h3>The Property Labs Rules</h3>
+      <div id="rulesContainer"></div>
+    </div>
+    <div class="sidebar-card cta-card">
+      <h3>Need Help?</h3>
+      <p>Get hands-on guidance to complete this plan in half the time.</p>
+      <a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" target="_blank" class="cta-btn">Book a Free Call</a>
+      <span class="cta-webinar">Or <a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" target="_blank">join the free live training</a><br>April 13, 2026</span>
+    </div>
+  </div>
+
+  <!-- EXPORT BAR -->
+  <div class="export-bar">
+    <button class="export-btn" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Download as PDF
+    </button>
+    <button class="export-btn" onclick="openShareModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share Your Progress
+    </button>
+  </div>
+
+</div>
+
+<!-- MOBILE BOTTOM DRAWER -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <div class="mobile-drawer-handle" onclick="toggleMobileDrawer()">
+    <div>
+      <span></span>
+      <p>The Property Labs Rules</p>
+    </div>
+  </div>
+  <div class="mobile-drawer-body" id="mobileRulesContainer"></div>
+</div>
+
+<script>
+// DATA
+const PHASES = [
+  {
+    id: 'credibility',
+    name: 'CREDIBILITY',
+    label: 'Phase 1: Credibility',
+    weeks: 'Weeks 1-2',
+    weekStart: 1, weekEnd: 2,
+    color: 'var(--green)',
+    colorBg: 'var(--green-bg)',
+    tagColor: '#166534',
+    tagBg: '#dcfce7',
+    description: 'Before you touch a property, you need to know your stuff and look like you know your stuff.',
+    tasks: [
+      'Research your target area (shortlist 3 cities or boroughs)',
+      'Analyse 10 existing Airbnb listings in each area (note pricing, photos, reviews)',
+      'Calculate average nightly rates and occupancy for your target areas',
+      'Complete a property management basics course (free ones count)',
+      'Set up your business Instagram or social media presence',
+      'Create your investor credibility one-pager (who you are, what you do, your plan)',
+      'Join 3 local property networking groups (Facebook, Meetup, or in-person)',
+      'Attend at least 1 property meetup or event (show your face, collect contacts)'
+    ],
+    checkpoint: 'You can confidently explain your Airbnb strategy to anyone in under 2 minutes.'
+  },
+  {
+    id: 'capital',
+    name: 'CAPITAL',
+    label: 'Phase 2: Capital',
+    weeks: 'Weeks 3-5',
+    weekStart: 3, weekEnd: 5,
+    color: 'var(--blue)',
+    colorBg: 'var(--blue-bg)',
+    tagColor: '#1e40af',
+    tagBg: '#dbeafe',
+    description: 'You don\'t need a mortgage. You need a plan and the right conversations.',
+    tasks: [
+      'List 20 people in your network who might invest or lend',
+      'Practise your pitch with a trusted friend (get honest feedback)',
+      'Approach your first 5 potential investors',
+      'Follow up with everyone who said "let me think about it"',
+      'Secure your first investment commitment',
+      'Open a business bank account (keep everything separate from personal)',
+      'Get a basic legal agreement template (joint venture or loan agreement)',
+      'Total capital target: GBP 5k-25k secured'
+    ],
+    checkpoint: 'Money is committed and sitting in a business account, ready to deploy.'
+  },
+  {
+    id: 'property',
+    name: 'PROPERTY',
+    label: 'Phase 3: Property',
+    weeks: 'Weeks 6-8',
+    weekStart: 6, weekEnd: 8,
+    color: 'var(--purple)',
+    colorBg: 'var(--purple-bg)',
+    tagColor: '#6b21a8',
+    tagBg: '#f3e8ff',
+    description: 'This is where most people stall. Don\'t overthink it. Run the numbers, make a decision, move.',
+    tasks: [
+      'Contact 10 letting agents in your target area',
+      'View at least 5 properties',
+      'Run each one through the Deal Analyser (if it doesn\'t stack, move on)',
+      'Negotiate terms (rent-to-rent or management agreement)',
+      'Secure your first property',
+      'Get landlord permission for short-term lets (in writing)',
+      'Check local council regulations and any licensing requirements',
+      'Arrange insurance (short-term let cover, not standard landlord insurance)'
+    ],
+    checkpoint: 'You have keys in your hand and a signed agreement.'
+  },
+  {
+    id: 'launch',
+    name: 'LAUNCH',
+    label: 'Phase 4: Launch',
+    weeks: 'Weeks 9-11',
+    weekStart: 9, weekEnd: 11,
+    color: 'var(--amber)',
+    colorBg: 'var(--amber-bg)',
+    tagColor: '#92400e',
+    tagBg: '#fef3c7',
+    description: 'Speed matters here. The faster you go live, the faster you earn. Don\'t wait for perfect.',
+    tasks: [
+      'Furnish the property (budget: GBP 2k-4k, no more)',
+      'Professional photography -- or use your iPhone with good natural lighting',
+      'Write a compelling Airbnb listing title and description',
+      'Set competitive pricing (first 5 bookings at a discount to build reviews)',
+      'Create a house manual and guest welcome pack',
+      'Set up your cleaning system (reliable cleaner on speed dial)',
+      'Automate messaging (check-in instructions, check-out reminders)',
+      'Go live on Airbnb + Booking.com'
+    ],
+    checkpoint: 'Your listing is live and bookable. You\'re in business.'
+  },
+  {
+    id: 'cashflow',
+    name: 'CASH FLOW',
+    label: 'Phase 5: Cash Flow',
+    weeks: 'Week 12',
+    weekStart: 12, weekEnd: 12,
+    color: 'var(--coral)',
+    colorBg: 'var(--coral-bg)',
+    tagColor: '#9f1239',
+    tagBg: '#ffe4e6',
+    description: 'Now prove the model works. Track everything.',
+    tasks: [
+      'First booking confirmed',
+      'First 5-star review received',
+      'Monthly P&L tracked in a spreadsheet (revenue minus all costs)',
+      'Systems documented so someone else could run it',
+      'Plan for unit #2 started'
+    ],
+    checkpoint: 'You have a profitable, running Airbnb and a clear path to the next one.'
+  }
+];
+
+const RULES = [
+  { title: 'Never spend more than GBP 4k furnishing a 2-bed.', detail: 'You\'re not designing a show home. You\'re building a business.' },
+  { title: 'Target minimum 65% occupancy.', detail: 'Below that, your numbers won\'t work long-term.' },
+  { title: 'If the deal doesn\'t make GBP 500/month profit, walk away.', detail: 'There are plenty of deals. Don\'t force one that\'s marginal.' },
+  { title: 'Always have a 3-month cash reserve.', detail: 'Things break. Bookings dip. Be ready.' },
+  { title: 'Your first unit is the hardest -- it gets easier after that.', detail: 'The skills, systems, and confidence you build on unit one carry straight into unit two.' }
+];
+
+const TOTAL_TASKS = PHASES.reduce((sum, p) => sum + p.tasks.length, 0);
+
+// STATE
+let state = {
+  checked: {},
+  startDate: null,
+  email: null,
+  firstName: null,
+  gateCompleted: false,
+  view: 'phase',
+  openPhases: { credibility: true },
+  celebratedPhases: {}
+};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('planner_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('planner_state', JSON.stringify(state));
+  } catch(e) {}
+}
+
+function taskKey(phaseId, taskIdx) { return phaseId + '_' + taskIdx; }
+
+// DATES
+function formatDate(d) {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function addDays(d, n) {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+
+function getStartDate() {
+  if (state.startDate) return new Date(state.startDate);
+  return new Date();
+}
+
+function getLaunchDate() {
+  return addDays(getStartDate(), 90);
+}
+
+function getDaysRemaining() {
+  const launch = getLaunchDate();
+  const now = new Date();
+  const diff = Math.ceil((launch - now) / (1000 * 60 * 60 * 24));
+  return Math.max(0, diff);
+}
+
+function getWeekDeadline(weekNum) {
+  return addDays(getStartDate(), weekNum * 7);
+}
+
+// PROGRESS
+function getOverallProgress() {
+  let done = 0;
+  PHASES.forEach(p => {
+    p.tasks.forEach((_, i) => { if (state.checked[taskKey(p.id, i)]) done++; });
+  });
+  return done;
+}
+
+function getPhaseProgress(phase) {
+  let done = 0;
+  phase.tasks.forEach((_, i) => { if (state.checked[taskKey(phase.id, i)]) done++; });
+  return done;
+}
+
+function getCurrentPhase() {
+  for (let p of PHASES) {
+    if (getPhaseProgress(p) < p.tasks.length) return p;
+  }
+  return PHASES[PHASES.length - 1];
+}
+
+// RENDER
+function renderDashboard() {
+  const done = getOverallProgress();
+  const pct = Math.round((done / TOTAL_TASKS) * 100);
+  document.getElementById('overallPercent').textContent = pct + '%';
+  document.getElementById('overallBar').style.width = pct + '%';
+  document.getElementById('tasksCompletedLabel').textContent = done + ' of ' + TOTAL_TASKS + ' tasks complete';
+  document.getElementById('overallPercentLabel').textContent = pct + '%';
+  document.getElementById('launchDate').textContent = formatDate(getLaunchDate());
+  document.getElementById('daysRemaining').textContent = getDaysRemaining();
+  const cp = getCurrentPhase();
+  document.getElementById('currentPhase').textContent = cp.label;
+}
+
+function renderDatePicker() {
+  const picker = document.getElementById('startDatePicker');
+  if (state.startDate) {
+    picker.value = state.startDate;
+  } else {
+    const today = new Date();
+    picker.value = today.toISOString().split('T')[0];
+  }
+  updateDateInfo();
+  picker.addEventListener('change', function() {
+    state.startDate = this.value;
+    saveState();
+    updateDateInfo();
+    renderDashboard();
+    renderPhaseView();
+    renderWeekView();
+  });
+}
+
+function updateDateInfo() {
+  const sd = getStartDate();
+  const ld = getLaunchDate();
+  document.getElementById('dateInfo').innerHTML =
+    'Day 1: <strong>' + formatDate(sd) + '</strong>  |  Launch: <strong>' + formatDate(ld) + '</strong>';
+}
+
+function chevronSVG() {
+  return '<svg class="phase-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+}
+
+function lockSVG() {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>';
+}
+
+function checkSVG() {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+}
+
+function renderPhaseView() {
+  const container = document.getElementById('phaseView');
+  let html = '';
+
+  PHASES.forEach((phase, pi) => {
+    const done = getPhaseProgress(phase);
+    const total = phase.tasks.length;
+    const pct = Math.round((done / total) * 100);
+    const isOpen = state.openPhases[phase.id] ? 'open' : '';
+
+    html += '<div class="phase-card ' + isOpen + '" data-phase="' + phase.id + '">';
+    html += '<div class="phase-header" onclick="togglePhase(\'' + phase.id + '\')">';
+    html += '<div class="phase-indicator" style="background:' + phase.color + '"></div>';
+    html += '<div class="phase-header-text"><h3>' + phase.label + '</h3><span class="phase-weeks">' + phase.weeks + '</span></div>';
+    html += '<div class="phase-progress-mini"><div class="phase-progress-mini-inner" style="width:' + pct + '%;background:' + phase.color + '"></div></div>';
+    html += '<span class="phase-count">' + done + '/' + total + '</span>';
+    html += chevronSVG();
+    html += '</div>';
+
+    html += '<div class="phase-body"><div class="phase-body-inner">';
+    html += '<p class="phase-description">' + phase.description + '</p>';
+
+    html += '<div class="phase-progress-bar"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:' + pct + '%;background:' + phase.color + '"></div></div></div>';
+
+    phase.tasks.forEach((task, ti) => {
+      const key = taskKey(phase.id, ti);
+      const checked = state.checked[key];
+      const completedClass = checked ? 'completed' : '';
+      const checkedClass = checked ? 'checked' : '';
+      const deadline = getWeekDeadline(phase.weekEnd);
+
+      html += '<div class="task-item ' + completedClass + '">';
+      html += '<div class="task-checkbox ' + checkedClass + '" onclick="toggleTask(\'' + phase.id + '\',' + ti + ')"></div>';
+      html += '<span class="task-label" onclick="toggleTask(\'' + phase.id + '\',' + ti + '\')">' + task + '</span>';
+      html += '<span class="task-deadline">by ' + formatDate(deadline) + '</span>';
+      html += '</div>';
+    });
+
+    html += '</div></div></div>';
+
+    // MILESTONE after each phase
+    const milestoneUnlocked = done === total;
+    const unlockedClass = milestoneUnlocked ? 'unlocked' : '';
+    html += '<div class="milestone-card ' + unlockedClass + '" data-milestone="' + phase.id + '">';
+    html += '<div class="milestone-icon">' + (milestoneUnlocked ? checkSVG() : lockSVG()) + '</div>';
+    html += '<div class="milestone-text"><h4>Checkpoint: ' + phase.name + '</h4>';
+    html += '<p>' + (milestoneUnlocked ? phase.checkpoint : 'Complete all tasks above to unlock') + '</p></div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function renderWeekView() {
+  const container = document.getElementById('weekView');
+  let html = '';
+
+  // Build tasks by week
+  const weekMap = {};
+  PHASES.forEach(phase => {
+    const weeksSpan = phase.weekEnd - phase.weekStart + 1;
+    const tasksPerWeek = Math.ceil(phase.tasks.length / weeksSpan);
+    phase.tasks.forEach((task, ti) => {
+      const weekOffset = Math.min(Math.floor(ti / tasksPerWeek), weeksSpan - 1);
+      const week = phase.weekStart + weekOffset;
+      if (!weekMap[week]) weekMap[week] = [];
+      weekMap[week].push({ task, phaseId: phase.id, taskIdx: ti, phase });
+    });
+  });
+
+  for (let w = 1; w <= 12; w++) {
+    const tasks = weekMap[w] || [];
+    if (tasks.length === 0) continue;
+    const phase = tasks[0].phase;
+    const deadline = getWeekDeadline(w);
+    html += '<div class="week-card">';
+    html += '<h4>Week ' + w + ' <span class="week-phase-tag" style="background:' + phase.tagBg + ';color:' + phase.tagColor + '">' + phase.name + '</span> <span style="margin-left:auto;font-size:12px;color:var(--text-muted);font-weight:500;font-family:var(--font-body)">by ' + formatDate(deadline) + '</span></h4>';
+    tasks.forEach(t => {
+      const key = taskKey(t.phaseId, t.taskIdx);
+      const checked = state.checked[key];
+      const completedClass = checked ? 'completed' : '';
+      const checkedClass = checked ? 'checked' : '';
+      html += '<div class="task-item ' + completedClass + '">';
+      html += '<div class="task-checkbox ' + checkedClass + '" onclick="toggleTask(\'' + t.phaseId + '\',' + t.taskIdx + ')"></div>';
+      html += '<span class="task-label" onclick="toggleTask(\'' + t.phaseId + '\',' + t.taskIdx + '\')">' + t.task + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function renderRules() {
+  let html = '';
+  RULES.forEach((rule, i) => {
+    html += '<div class="rule-item" onclick="this.classList.toggle(\'open\')">';
+    html += '<div class="rule-header">';
+    html += '<span class="rule-number">' + (i + 1) + '</span>';
+    html += '<span class="rule-title">' + rule.title + '</span>';
+    html += '<span class="rule-expand-icon">+</span>';
+    html += '</div>';
+    html += '<div class="rule-detail"><p>' + rule.detail + '</p></div>';
+    html += '</div>';
+  });
+  document.getElementById('rulesContainer').innerHTML = html;
+  document.getElementById('mobileRulesContainer').innerHTML = html;
+}
+
+// INTERACTIONS
+function togglePhase(phaseId) {
+  state.openPhases[phaseId] = !state.openPhases[phaseId];
+  saveState();
+  const card = document.querySelector('.phase-card[data-phase="' + phaseId + '"]');
+  if (card) card.classList.toggle('open');
+}
+
+function toggleTask(phaseId, taskIdx) {
+  const key = taskKey(phaseId, taskIdx);
+  state.checked[key] = !state.checked[key];
+  saveState();
+
+  // Check if phase just completed
+  const phase = PHASES.find(p => p.id === phaseId);
+  if (phase) {
+    const done = getPhaseProgress(phase);
+    if (done === phase.tasks.length && !state.celebratedPhases[phaseId]) {
+      state.celebratedPhases[phaseId] = true;
+      saveState();
+      triggerConfetti();
+    }
+    if (done < phase.tasks.length && state.celebratedPhases[phaseId]) {
+      state.celebratedPhases[phaseId] = false;
+      saveState();
+    }
+  }
+
+  renderDashboard();
+  renderPhaseView();
+  renderWeekView();
+}
+
+function setView(view) {
+  state.view = view;
+  saveState();
+  document.getElementById('phaseViewBtn').classList.toggle('active', view === 'phase');
+  document.getElementById('weekViewBtn').classList.toggle('active', view === 'week');
+  document.getElementById('phaseView').classList.toggle('active', view === 'phase');
+  document.getElementById('weekView').classList.toggle('active', view === 'week');
+}
+
+// CONFETTI
+function triggerConfetti() {
+  const container = document.getElementById('confettiContainer');
+  const colors = ['#3ECFA0', '#22c55e', '#3b82f6', '#a855f7', '#3ECFA0', '#fff'];
+  const shapes = ['square', 'circle'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    const left = Math.random() * 100;
+    const delay = Math.random() * 0.8;
+    const size = 6 + Math.random() * 10;
+    piece.style.cssText =
+      'left:' + left + '%;' +
+      'background:' + color + ';' +
+      'width:' + size + 'px;height:' + size + 'px;' +
+      'border-radius:' + (shape === 'circle' ? '50%' : '2px') + ';' +
+      'animation-delay:' + delay + 's;';
+    container.appendChild(piece);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 3500);
+}
+
+// EMAIL GATE
+function submitEmailGate() {
+  const fn = document.getElementById('gateFirstName').value.trim();
+  const em = document.getElementById('gateEmail').value.trim();
+  if (!fn || !em) return;
+  state.firstName = fn;
+  state.email = em;
+  state.gateCompleted = true;
+  saveState();
+  document.getElementById('emailGate').classList.add('hidden');
+}
+
+function skipEmailGate() {
+  state.gateCompleted = true;
+  saveState();
+  document.getElementById('emailGate').classList.add('hidden');
+}
+
+// SHARE
+function openShareModal() {
+  const done = getOverallProgress();
+  const pct = Math.round((done / TOTAL_TASKS) * 100);
+  const cp = getCurrentPhase();
+  let phaseBreakdown = PHASES.map(p => {
+    const d = getPhaseProgress(p);
+    return p.label + ': ' + d + '/' + p.tasks.length;
+  }).join('\n');
+
+  const text =
+    '90-Day Airbnb Launch Planner\n' +
+    '----------------------------\n' +
+    'Overall Progress: ' + pct + '% (' + done + '/' + TOTAL_TASKS + ' tasks)\n' +
+    'Current Phase: ' + cp.label + '\n' +
+    'Launch Date: ' + formatDate(getLaunchDate()) + '\n\n' +
+    phaseBreakdown + '\n\n' +
+    'Start your plan at propertylabs.co.uk';
+
+  document.getElementById('shareText').textContent = text;
+  document.getElementById('shareModal').classList.add('active');
+}
+
+function closeShareModal() {
+  document.getElementById('shareModal').classList.remove('active');
+}
+
+function copyShareText() {
+  const text = document.getElementById('shareText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.share-copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy to Clipboard'; }, 2000);
+  });
+}
+
+// MOBILE DRAWER
+function toggleMobileDrawer() {
+  document.getElementById('mobileDrawer').classList.toggle('open');
+}
+
+// INIT
+function init() {
+  loadState();
+
+  // Email gate
+  if (state.gateCompleted) {
+    document.getElementById('emailGate').classList.add('hidden');
+  }
+
+  // Set default start date if none
+  if (!state.startDate) {
+    state.startDate = new Date().toISOString().split('T')[0];
+    saveState();
+  }
+
+  // View
+  setView(state.view || 'phase');
+
+  renderDatePicker();
+  renderDashboard();
+  renderPhaseView();
+  renderWeekView();
+  renderRules();
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capital Raising Script Generator | Property Labs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0a;--coral:#FF5A5F;--coral-dark:#e04e52;--surface:#141414;--surface-2:#1e1e1e;--surface-3:#282828;--border:#2a2a2a;--text:#f0f0f0;--text-muted:#999;--text-dim:#666;--radius:12px;--radius-lg:16px;--transition:0.3s cubic-bezier(0.4,0,0.2,1)}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden}
+h1,h2,h3,h4{font-family:'Plus Jakarta Sans',sans-serif;line-height:1.2}
+
+/* Layout */
+.container{max-width:720px;margin:0 auto;padding:0 20px}
+.app{min-height:100vh;display:flex;flex-direction:column}
+
+/* Header */
+.header{padding:24px 0;border-bottom:1px solid var(--border)}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:14px;letter-spacing:0.5px;color:var(--text-muted);text-transform:uppercase}
+.logo span{color:var(--coral)}
+
+/* Progress */
+.progress-bar{padding:24px 0 0}
+.progress-track{height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--coral);border-radius:2px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1);width:0}
+.progress-steps{display:flex;justify-content:space-between;margin-top:12px}
+.progress-step{font-size:11px;color:var(--text-dim);font-weight:500;transition:color var(--transition)}
+.progress-step.active{color:var(--coral)}
+.progress-step.completed{color:var(--text-muted)}
+
+/* Steps */
+.step{display:none;padding:48px 0 80px;animation:fadeUp 0.5s ease}
+.step.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.step-label{font-size:12px;color:var(--coral);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.step-title{font-size:32px;font-weight:800;margin-bottom:8px}
+.step-subtitle{color:var(--text-muted);font-size:15px;margin-bottom:40px}
+
+/* Form elements */
+.form-group{margin-bottom:32px}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px}
+.form-input{width:100%;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:16px;font-family:'Inter',sans-serif;transition:border-color var(--transition);outline:none}
+.form-input:focus{border-color:var(--coral)}
+.form-input::placeholder{color:var(--text-dim)}
+
+/* Slider */
+.slider-container{position:relative;padding:8px 0}
+.slider-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:800;color:var(--coral);margin-bottom:16px;text-align:center}
+.slider{-webkit-appearance:none;width:100%;height:6px;background:var(--surface-2);border-radius:3px;outline:none;cursor:pointer}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;background:var(--coral);border-radius:50%;cursor:pointer;box-shadow:0 2px 8px rgba(255,90,95,0.4)}
+.slider::-moz-range-thumb{width:24px;height:24px;background:var(--coral);border-radius:50%;cursor:pointer;border:none}
+.slider-labels{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--text-dim)}
+
+/* Option cards */
+.option-grid{display:flex;flex-direction:column;gap:12px}
+.option-card{padding:16px 20px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all var(--transition);display:flex;align-items:center;gap:16px}
+.option-card:hover{border-color:var(--surface-3);background:var(--surface-2)}
+.option-card.selected{border-color:var(--coral);background:rgba(255,90,95,0.06)}
+.option-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
+.option-card.selected .option-radio{border-color:var(--coral)}
+.option-radio::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--coral);transform:scale(0);transition:transform var(--transition)}
+.option-card.selected .option-radio::after{transform:scale(1)}
+.option-text h4{font-size:15px;font-weight:600;margin-bottom:2px}
+.option-text p{font-size:13px;color:var(--text-muted)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 32px;border-radius:var(--radius);font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;border:none;cursor:pointer;transition:all var(--transition);text-decoration:none}
+.btn-primary{background:var(--coral);color:#fff;width:100%}
+.btn-primary:hover{background:var(--coral-dark);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-secondary{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface-3)}
+.btn-copy{padding:8px 16px;font-size:12px;background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-weight:600}
+.btn-copy:hover{background:var(--surface-3);color:var(--text)}
+.btn-copy.copied{background:rgba(255,90,95,0.1);color:var(--coral);border-color:var(--coral)}
+.btn-row{display:flex;gap:12px;margin-top:40px}
+.btn-row .btn{flex:1}
+.btn-back{background:transparent;color:var(--text-muted);border:1px solid var(--border)}
+.btn-back:hover{color:var(--text);border-color:var(--surface-3)}
+
+/* Script output */
+.script-section{margin-bottom:32px}
+.script-section-title{font-size:13px;font-weight:600;color:var(--coral);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.chat-bubble{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:20px 24px;margin-bottom:12px;font-size:14px;line-height:1.7;position:relative;white-space:pre-line}
+.chat-bubble.outgoing{border-radius:16px 16px 4px 16px;background:rgba(255,90,95,0.06);border-color:rgba(255,90,95,0.15)}
+.chat-bubble strong{color:var(--coral);font-weight:600}
+.chat-label{font-size:11px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+
+/* One-pager preview */
+.one-pager{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;margin-bottom:32px}
+.one-pager h3{font-size:18px;margin-bottom:4px}
+.one-pager .subtitle{color:var(--coral);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:24px}
+.one-pager-section{margin-bottom:20px}
+.one-pager-section h4{font-size:13px;color:var(--coral);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-weight:700}
+.one-pager-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:14px}
+.one-pager-row .label{color:var(--text-muted)}
+.one-pager-row .value{font-weight:600}
+.one-pager-row .value.blank{color:var(--text-dim);font-style:italic;font-weight:400}
+
+/* Flip cards */
+.flip-grid{display:flex;flex-direction:column;gap:16px;margin-bottom:32px}
+.flip-card{perspective:1000px;cursor:pointer}
+.flip-card-inner{position:relative;transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);transform-style:preserve-3d;min-height:80px}
+.flip-card.flipped .flip-card-inner{transform:rotateX(180deg)}
+.flip-card-front,.flip-card-back{border-radius:var(--radius);padding:20px 24px;backface-visibility:hidden;position:relative}
+.flip-card-front{background:var(--surface);border:1px solid var(--border)}
+.flip-card-back{background:var(--surface-2);border:1px solid rgba(255,90,95,0.2);transform:rotateX(180deg);position:absolute;top:0;left:0;right:0}
+.flip-card-front h4{font-size:15px;margin-bottom:4px}
+.flip-card-front p{font-size:12px;color:var(--text-muted)}
+.flip-card-back p{font-size:14px;line-height:1.7}
+.flip-hint{font-size:11px;color:var(--text-dim);margin-top:8px;font-style:italic}
+
+/* Email gate */
+.gate-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px 32px;text-align:center;margin-bottom:32px}
+.gate-box h3{font-size:24px;margin-bottom:8px}
+.gate-box p{color:var(--text-muted);font-size:14px;margin-bottom:24px}
+.gate-form{display:flex;flex-direction:column;gap:12px;max-width:400px;margin:0 auto}
+
+/* Timeline */
+.timeline{margin:32px 0}
+.timeline-item{display:flex;gap:20px;padding-bottom:32px;position:relative}
+.timeline-item:last-child{padding-bottom:0}
+.timeline-line{position:absolute;left:15px;top:32px;bottom:0;width:2px;background:var(--border)}
+.timeline-item:last-child .timeline-line{display:none}
+.timeline-dot{width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:2px solid var(--coral);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--coral);flex-shrink:0;position:relative;z-index:1}
+.timeline-content h4{font-size:15px;font-weight:700;margin-bottom:4px}
+.timeline-content p{font-size:13px;color:var(--text-muted);line-height:1.6}
+.timeline-content .highlight{color:var(--coral);font-weight:600}
+
+/* CTA */
+.cta-box{background:linear-gradient(135deg,rgba(255,90,95,0.1) 0%,rgba(255,90,95,0.03) 100%);border:1px solid rgba(255,90,95,0.2);border-radius:var(--radius-lg);padding:40px 32px;text-align:center;margin-top:40px}
+.cta-box h3{font-size:22px;margin-bottom:8px}
+.cta-box p{color:var(--text-muted);font-size:14px;margin-bottom:24px}
+.cta-box .btn{max-width:360px;margin:0 auto}
+
+/* Footer */
+.footer{padding:32px 0;border-top:1px solid var(--border);margin-top:auto;text-align:center;font-size:12px;color:var(--text-dim)}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface-2);color:var(--text);padding:12px 24px;border-radius:var(--radius);font-size:13px;font-weight:600;border:1px solid var(--border);transition:transform 0.3s ease;z-index:100;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Responsive */
+@media(max-width:600px){
+  .step-title{font-size:24px}
+  .slider-value{font-size:28px}
+  .chat-bubble{padding:16px 18px;font-size:13px}
+  .one-pager{padding:24px 20px}
+  .gate-box{padding:32px 20px}
+  .cta-box{padding:32px 20px}
+  .btn-row{flex-direction:column}
+  .btn-row .btn{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Header -->
+<header class="header">
+<div class="container">
+<div class="header-inner">
+<div class="logo"><span>Property Labs</span> Script Generator</div>
+</div>
+<div class="progress-bar">
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+<div class="progress-steps">
+  <span class="progress-step active" data-step="1">About You</span>
+  <span class="progress-step" data-step="2">Your Approach</span>
+  <span class="progress-step" data-step="3">Your Scripts</span>
+  <span class="progress-step" data-step="4">Save &amp; Go</span>
+</div>
+</div>
+</div>
+</header>
+
+<!-- STEP 1 -->
+<section class="step active" id="step1">
+<div class="container">
+<div class="step-label">Step 1 of 4</div>
+<h2 class="step-title">Tell us about you</h2>
+<p class="step-subtitle">We will personalise your scripts based on your answers.</p>
+
+<div class="form-group">
+  <label class="form-label">Your first name</label>
+  <input type="text" class="form-input" id="userName" placeholder="e.g. James" autocomplete="given-name">
+</div>
+
+<div class="form-group">
+  <label class="form-label">Your target raise amount</label>
+  <div class="slider-container">
+    <div class="slider-value" id="sliderValue">&pound;10,000</div>
+    <input type="range" class="slider" id="raiseAmount" min="5000" max="50000" step="1000" value="10000">
+    <div class="slider-labels"><span>&pound;5k</span><span>&pound;25k</span><span>&pound;50k</span></div>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="form-label">Your Airbnb experience level</label>
+  <div class="option-grid" id="experienceOptions">
+    <div class="option-card" data-value="none">
+      <div class="option-radio"></div>
+      <div class="option-text"><h4>None</h4><p>Completely new to Airbnb</p></div>
+    </div>
+    <div class="option-card" data-value="research">
+      <div class="option-radio"></div>
+      <div class="option-text"><h4>Some research</h4><p>Looked into it but not started</p></div>
+    </div>
+    <div class="option-card" data-value="owner">
+      <div class="option-radio"></div>
+      <div class="option-text"><h4>Own property</h4><p>Have a property, exploring Airbnb</p></div>
+    </div>
+    <div class="option-card" data-value="running">
+      <div class="option-radio"></div>
+      <div class="option-text"><h4>Run an Airbnb</h4><p>Currently operating a short-let</p></div>
+    </div>
+  </div>
+</div>
+
+<button class="btn btn-primary" id="step1Next" disabled>Continue</button>
+</div>
+</section>
+
+<!-- STEP 2 -->
+<section class="step" id="step2">
+<div class="container">
+<div class="step-label">Step 2 of 4</div>
+<h2 class="step-title">Who are you approaching?</h2>
+<p class="step-subtitle">Choose the script that best fits your situation. We will generate the right words for you.</p>
+
+<div class="option-grid" id="approachOptions">
+  <div class="option-card" data-value="warm">
+    <div class="option-radio"></div>
+    <div class="option-text">
+      <h4>Friend or family member</h4>
+      <p>Warm Approach -- for people who already know and trust you</p>
+    </div>
+  </div>
+  <div class="option-card" data-value="professional">
+    <div class="option-radio"></div>
+    <div class="option-text">
+      <h4>Business contact or professional</h4>
+      <p>Professional Pitch -- for accountants, investors, business contacts</p>
+    </div>
+  </div>
+  <div class="option-card" data-value="social">
+    <div class="option-radio"></div>
+    <div class="option-text">
+      <h4>Social media followers</h4>
+      <p>Social Media Approach -- attract investors without being salesy</p>
+    </div>
+  </div>
+</div>
+
+<div class="btn-row">
+  <button class="btn btn-back" id="step2Back">Back</button>
+  <button class="btn btn-primary" id="step2Next" disabled>Generate My Scripts</button>
+</div>
+</div>
+</section>
+
+<!-- STEP 3 -->
+<section class="step" id="step3">
+<div class="container">
+<div class="step-label">Step 3 of 4</div>
+<h2 class="step-title">Your Personalised Scripts</h2>
+<p class="step-subtitle">Ready to use -- just copy, paste, and send.</p>
+
+<div id="scriptsOutput"></div>
+
+<!-- Credibility One-Pager -->
+<div class="script-section">
+<div class="script-section-title">
+  <span>Your Credibility One-Pager</span>
+  <button class="btn btn-copy" onclick="copyOnePager()">Copy</button>
+</div>
+<div class="one-pager" id="onePager"></div>
+</div>
+
+<!-- Objection Handling -->
+<div class="script-section">
+<div class="script-section-title"><span>Objection Handling Cards</span></div>
+<p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Click any card to reveal the response.</p>
+<div class="flip-grid" id="objectionCards"></div>
+</div>
+
+<div class="btn-row">
+  <button class="btn btn-back" id="step3Back">Back</button>
+  <button class="btn btn-primary" id="step3Next">Save My Scripts</button>
+</div>
+</div>
+</section>
+
+<!-- STEP 4 -->
+<section class="step" id="step4">
+<div class="container">
+<div class="step-label">Step 4 of 4</div>
+<h2 class="step-title">Save Your Scripts</h2>
+<p class="step-subtitle">Enter your details to save your personalised scripts and get Ehab's full case study.</p>
+
+<div class="gate-box" id="emailGate">
+  <h3>Get Ehab's Full Case Study</h3>
+  <p>See exactly how one student raised 25,000 pounds in 5 weeks using these scripts -- plus keep your personalised scripts saved.</p>
+  <div class="gate-form">
+    <input type="text" class="form-input" id="gateName" placeholder="First name">
+    <input type="email" class="form-input" id="gateEmail" placeholder="Email address">
+    <button class="btn btn-primary" id="gateSubmit" disabled>Send Me The Case Study</button>
+  </div>
+</div>
+
+<div id="caseStudyReveal" style="display:none">
+<h3 style="font-size:22px;margin-bottom:8px">How Ehab Raised &pound;25k in 5 Weeks</h3>
+<p style="color:var(--text-muted);font-size:14px;margin-bottom:32px">A step-by-step breakdown of exactly what he did.</p>
+
+<div class="timeline" id="timeline">
+  <div class="timeline-item">
+    <div class="timeline-line"></div>
+    <div class="timeline-dot">1</div>
+    <div class="timeline-content">
+      <h4>Week 1: Foundation</h4>
+      <p>Ehab identified a 2-bed property in Birmingham, worked out setup costs (7,500 pounds), projected returns, and built his Credibility One-Pager. He started posting on Instagram -- nothing fancy, just sharing that he was learning about the Airbnb business model. <span class="highlight">He did not ask anyone for money yet. He built the foundation first.</span></p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-line"></div>
+    <div class="timeline-dot">2</div>
+    <div class="timeline-content">
+      <h4>Week 2: Warm Outreach</h4>
+      <p>Made a list of 15 people. Sent the Warm Approach text to 8. <span class="highlight">5 replied positively. 2 did not reply. 1 said "not for me right now."</span> Booked coffee meetings with 3 of them that week. Focused on the people most likely to say yes first.</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-line"></div>
+    <div class="timeline-dot">3</div>
+    <div class="timeline-content">
+      <h4>Week 3: First Meetings</h4>
+      <p>Three sit-down conversations using the meeting script (practised out loud 10 times). <span class="highlight">Person 1: "let me think about it." Person 2: Yes in principle -- 10,000 pounds. Person 3: Loved it, introduced Ehab to his uncle.</span></p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-line"></div>
+    <div class="timeline-dot">4</div>
+    <div class="timeline-content">
+      <h4>Week 4: Social Media Kicks In</h4>
+      <p>6 posts on Instagram. A mix of journey updates, education, and behind-the-scenes. <span class="highlight">Someone he had not spoken to in 2 years DM'd him. That person invested 7,500 pounds.</span> Person 1 from Week 3 also came back and confirmed 7,500 pounds.</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-dot">5</div>
+    <div class="timeline-content">
+      <h4>Week 5: Closed</h4>
+      <p>Three confirmed investors. Former colleague: 7,500 pounds. Family friend: 10,000 pounds. Instagram contact: 7,500 pounds. <span class="highlight">Total raised: 25,000 pounds. Five weeks. Zero of his own money.</span> Both units were cash-flow positive within 45 days.</p>
+    </div>
+  </div>
+</div>
+
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:24px;font-size:14px;line-height:1.7;color:var(--text-muted);font-style:italic">
+"The hardest part was sending the first text. Literally my hands were shaking. But once I got that first yes, everything changed. The scripts gave me something to actually say instead of just winging it. And people were way more receptive than I expected -- most of them were actually grateful I brought it to them because they were bored of their savings account giving them nothing."
+<div style="margin-top:12px;font-style:normal;font-weight:600;color:var(--text)">-- Ehab, Property Labs Student</div>
+</div>
+
+<div class="cta-box">
+  <h3>Ready to Launch Your First Airbnb in 90 Days?</h3>
+  <p>Book a free 30-minute Strategy Call with the Property Labs team. No hard sell. No pressure. Just a real conversation about whether this is right for you.</p>
+  <a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" target="_blank" class="btn btn-primary" style="display:inline-flex">Book Your Free Strategy Call</a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Footer -->
+<footer class="footer">
+<div class="container">
+  Property Labs by Terry Dwobeng
+</div>
+</footer>
+
+</div>
+
+<script>
+// State
+const state = { name:'', amount:10000, experience:'', approach:'' };
+
+// DOM
+const steps = document.querySelectorAll('.step');
+const progressFill = document.getElementById('progressFill');
+const progressSteps = document.querySelectorAll('.progress-step');
+
+// Slider
+const slider = document.getElementById('raiseAmount');
+const sliderValue = document.getElementById('sliderValue');
+slider.addEventListener('input', () => {
+  state.amount = parseInt(slider.value);
+  sliderValue.textContent = '\u00A3' + state.amount.toLocaleString('en-GB');
+  updateSliderTrack();
+  validateStep1();
+});
+function updateSliderTrack(){
+  const pct = ((slider.value - slider.min)/(slider.max - slider.min))*100;
+  slider.style.background = `linear-gradient(to right, #FF5A5F 0%, #FF5A5F ${pct}%, #1e1e1e ${pct}%, #1e1e1e 100%)`;
+}
+updateSliderTrack();
+
+// Name
+const nameInput = document.getElementById('userName');
+nameInput.addEventListener('input', () => { state.name = nameInput.value.trim(); validateStep1(); });
+
+// Experience
+document.querySelectorAll('#experienceOptions .option-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('#experienceOptions .option-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.experience = card.dataset.value;
+    validateStep1();
+  });
+});
+
+// Approach
+document.querySelectorAll('#approachOptions .option-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('#approachOptions .option-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.approach = card.dataset.value;
+    document.getElementById('step2Next').disabled = false;
+  });
+});
+
+function validateStep1(){
+  document.getElementById('step1Next').disabled = !(state.name && state.experience);
+}
+
+// Navigation
+function goToStep(n){
+  steps.forEach(s => s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  const pcts = [0, 25, 50, 75, 100];
+  progressFill.style.width = pcts[n]+'%';
+  progressSteps.forEach(s => {
+    const sn = parseInt(s.dataset.step);
+    s.classList.remove('active','completed');
+    if(sn === n) s.classList.add('active');
+    else if(sn < n) s.classList.add('completed');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n === 3) generateScripts();
+}
+
+document.getElementById('step1Next').addEventListener('click', () => goToStep(2));
+document.getElementById('step2Back').addEventListener('click', () => goToStep(1));
+document.getElementById('step2Next').addEventListener('click', () => goToStep(3));
+document.getElementById('step3Back').addEventListener('click', () => goToStep(2));
+document.getElementById('step3Next').addEventListener('click', () => goToStep(4));
+
+// Generate scripts
+function generateScripts(){
+  const name = state.name;
+  const amt = '\u00A3' + state.amount.toLocaleString('en-GB');
+  const out = document.getElementById('scriptsOutput');
+  let html = '';
+
+  if(state.approach === 'warm'){
+    html += scriptSection('Step 1: The Setup Text', 'warm-text', `
+      <div class="chat-label">Send this message</div>
+      <div class="chat-bubble outgoing">Hey [Name], hope you're well! Quick one -- there's something quite exciting happening on the property side, specifically short-let Airbnb properties. Through a programme run by someone who built a portfolio of 14 units as a uni student with none of his own money, a first deal is now being put together. Not asking for anything right now, but you came to mind because you're smart with your money. Would you be up for a quick coffee/call this week? Would love to get your thoughts on it. No pressure at all.
+
+-- ${name}</div>
+    `);
+    html += scriptSection('Step 2: The Meeting Script', 'warm-meeting', `
+      <div class="chat-label">Opening (2 minutes)</div>
+      <div class="chat-bubble">"Thanks for taking the time, really appreciate it. So basically, the short-let property space has been the focus -- Airbnb, Booking.com, that side of things. There's a programme run by a guy called Terry Dwobeng -- he built 14 Airbnb units while he was at uni, no money of his own, was making around 16k a month at his peak. And he's taught over 25 students who've done similar things. Following his system, a first unit is now being put together."</div>
+
+      <div class="chat-label">The Opportunity (3 minutes)</div>
+      <div class="chat-bubble">"Here's what the research shows -- there are properties out there where you can take a lease or a management agreement, furnish them, list them on Airbnb, and generate really strong cash flow. We're talking net profits of 1,000 to 2,000 pounds per unit per month once it's up and running. The setup cost for a unit is usually somewhere between 3,000 to 8,000 pounds depending on the property -- that's furniture, photos, listing setup, the lot. And you can be cash-flow positive within the first 30-60 days."</div>
+
+      <div class="chat-label">The Ask (2 minutes)</div>
+      <div class="chat-bubble">"So here's where your thoughts would be valuable. To get the first unit up, around <strong>${amt}</strong> is needed for setup costs. The plan is to work with a small number of people who want to put their money to work and get a proper return on it -- way better than what a savings account gives you. No need to decide anything now. You're hearing about it first because you're someone who'd find it genuinely interesting."</div>
+
+      <div class="chat-label">Close</div>
+      <div class="chat-bubble">"Have a think about it. No rush. A one-page breakdown of the numbers can be sent over if that would help? And if it's not for you, absolutely no hard feelings -- any advice you've got would still be appreciated."</div>
+    `);
+    html += scriptSection('Step 3: Follow-Up Script', 'warm-followup', `
+      <div class="chat-label">If they say "let me think about it"</div>
+      <div class="chat-bubble">"Of course, take your time. Genuinely no pressure. Would it help to receive a one-page summary to look at in your own time? And would it be alright to check back in with you in a few days?"</div>
+
+      <div class="chat-label">3-4 days later</div>
+      <div class="chat-bubble outgoing">Hey [Name], just following up from our chat. Did you get a chance to look at that summary that was sent over? Happy to answer any questions. Also just to let you know, the plan is to get started within the next few weeks so if it's something you're interested in, it would be great to have a chat this week. But again, no pressure -- our relationship is valued way more than any deal.
+
+-- ${name}</div>
+    `);
+
+  } else if(state.approach === 'professional'){
+    html += scriptSection('The Approach Email', 'pro-email', `
+      <div class="chat-label">Send this email</div>
+      <div class="chat-bubble outgoing"><strong>Subject:</strong> Short-Let Property Investment Opportunity -- Quick Overview
+
+Hi [Name],
+
+Hope this finds you well. This message is to share a short-let property venture (Airbnb/serviced accommodation) currently being put together, and given your background, you might find the opportunity interesting -- either for yourself or for anyone in your network.
+
+Quick summary:
+- The short-let market is growing rapidly, with nightly rates significantly outperforming traditional BTL yields
+- The venture follows a proven system developed by Terry Dwobeng (Property Labs), who built a 14-unit portfolio from scratch with zero personal capital -- his students have collectively raised over 200k using the same model
+- A first property is currently being sourced, and an investment partner is needed for the setup costs (${amt})
+- Projected returns available in the attached one-pager
+
+Attached is a one-page overview with the numbers. Would you have 15 minutes this week for a quick call? Your perspective would be valued.
+
+Best regards,
+${name}</div>
+    `);
+    html += scriptSection('The Meeting Structure', 'pro-meeting', `
+      <div class="chat-label">1. Credibility (2 minutes)</div>
+      <div class="chat-bubble">"Thanks for your time. This will be kept tight. This venture follows Terry Dwobeng's Property Labs programme -- Terry built 14 Airbnb units as a university student, zero personal capital, generating 16k per month at peak. He's since trained over 25 students who've replicated the model. The same system is now being applied here."</div>
+
+      <div class="chat-label">2. Market Context (2 minutes)</div>
+      <div class="chat-bubble">"The short-let market in [your area] is performing strongly. Compared to traditional buy-to-let yields of 4-6%, we're looking at significantly higher returns with lower capital commitment because we're not purchasing property -- we're operating them."</div>
+
+      <div class="chat-label">3. The Deal Structure (3 minutes)</div>
+      <div class="chat-bubble">"Here's the specific opportunity. The setup cost is <strong>${amt}</strong>. Based on conservative projections, the investment would be returned within [timeframe], with ongoing returns. A one-page breakdown has been prepared -- may we walk you through it?"</div>
+
+      <div class="chat-label">4. Risk Mitigation (2 minutes)</div>
+      <div class="chat-bubble">"Understandably, you'll want to know about downside protection. Here's how risk is managed: guaranteed rent agreements, insurance, diversified booking platforms, and ongoing mentorship and support from the Property Labs team. This isn't zero risk -- nothing is. But the structure is designed to protect your capital."</div>
+
+      <div class="chat-label">5. Next Steps (1 minute)</div>
+      <div class="chat-bubble">"Here's the suggestion: take the one-pager away, do your own due diligence, and let's reconvene in a few days. If it makes sense for you, brilliant. If not, that's completely respected and any feedback you have would still be appreciated."</div>
+    `);
+
+  } else if(state.approach === 'social'){
+    html += scriptSection('Post 1: The Journey Post', 'social-post1', `
+      <div class="chat-label">Instagram / Facebook caption</div>
+      <div class="chat-bubble outgoing">3 weeks ago a decision was made that was genuinely scary.
+
+Signing up to learn how to build an Airbnb business -- with none of your own money.
+
+Sounds mad, right? That was the first thought too.
+
+But then came Terry (@propertylabsuk) who did exactly that -- 14 units, 16k/month, started as a uni student with zero capital.
+
+Now a first unit is being put together. Finding the property, getting it furnished, listing it. Following the exact same system.
+
+The journey will be shared here. The wins, the lessons, all of it.
+
+If you've ever thought about getting into property but felt like you needed loads of money to start -- watch this space.
+
+More coming soon.</div>
+    `);
+    html += scriptSection('Post 2: The Education Post', 'social-post2', `
+      <div class="chat-label">Instagram / Facebook caption</div>
+      <div class="chat-bubble outgoing">Something most people don't realise about Airbnb:
+
+You don't need to OWN a property to make money from it.
+
+There's a model called Rent-to-SA (serviced accommodation) where you lease a property, furnish it, and list it on Airbnb and Booking.com.
+
+Setup costs? Usually 3k-8k.
+Monthly profit? 1,000-2,000 per unit once it's running.
+
+No mortgage. No deposit. No property purchase.
+
+A first one is currently being set up and everything is being documented.
+
+Drop a message if you want to know more -- happy to share the learnings.</div>
+    `);
+    html += scriptSection('Post 3: The Social Proof Post', 'social-post3', `
+      <div class="chat-label">Instagram / Facebook caption</div>
+      <div class="chat-bubble outgoing">Just had a call with mentor Terry (@propertylabsuk) and the energy is through the roof.
+
+The property is locked in. The furniture is being ordered. The listing goes live soon.
+
+This time last month it was just an idea. Now it's actually happening.
+
+The thing that changed everything? Realising you don't need your own money to start. Someone believed in the opportunity and wanted a better return than their savings account was giving them.
+
+If you're sitting on savings earning 2% and want to hear about what's happening -- DMs are open. Not selling anything. Just sharing the journey.</div>
+    `);
+    html += scriptSection('DM Follow-Up Script', 'social-dm', `
+      <div class="chat-label">When someone says "This looks interesting, tell me more"</div>
+      <div class="chat-bubble outgoing">Hey! Thanks for reaching out. Yeah so basically, Airbnb units are being set up using a system learned from a guy called Terry Dwobeng -- he built 14 units with zero of his own money. The same thing is happening now and one or two people are needed who want to invest a small amount (around ${amt}) for a really solid return. Way better than a savings account. Fancy a quick call this week to go over the numbers? No pressure, just an informal chat.
+
+-- ${name}</div>
+
+      <div class="chat-label">When they say "Yeah go on then"</div>
+      <div class="chat-bubble outgoing">Brilliant. What day works for you? A one-page overview will be sent before the call so you can see the opportunity. Looking forward to it.
+
+-- ${name}</div>
+
+      <div class="chat-label">When they say "Maybe, I'll think about it"</div>
+      <div class="chat-bubble outgoing">No rush at all. A one-page breakdown will be sent over and you can have a look in your own time. If it's interesting, we can jump on a quick call. If not, no worries at all -- appreciate you even considering it.
+
+-- ${name}</div>
+    `);
+  }
+
+  out.innerHTML = html;
+
+  // One-pager
+  generateOnePager();
+
+  // Objection cards
+  generateObjections();
+}
+
+function scriptSection(title, id, content){
+  return `<div class="script-section">
+    <div class="script-section-title">
+      <span>${title}</span>
+      <button class="btn btn-copy" onclick="copySection('${id}')">Copy</button>
+    </div>
+    <div id="${id}">${content}</div>
+  </div>`;
+}
+
+function generateOnePager(){
+  const name = state.name;
+  const amt = '\u00A3' + state.amount.toLocaleString('en-GB');
+  document.getElementById('onePager').innerHTML = `
+    <h3>${name.toUpperCase()} -- SHORT-LET PROPERTY INVESTMENT OPPORTUNITY</h3>
+    <div class="subtitle">Credibility One-Pager</div>
+
+    <div class="one-pager-section">
+      <h4>Overview</h4>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.6">This is a short-let / serviced accommodation business, operating properties on platforms including Airbnb, Booking.com, and direct bookings. The venture follows the Property Labs system developed by Terry Dwobeng, who built a portfolio of 14 units with no personal capital, generating 16,000 pounds per month at peak revenue.</p>
+    </div>
+
+    <div class="one-pager-section">
+      <h4>The Opportunity</h4>
+      <div class="one-pager-row"><span class="label">Property type</span><span class="value blank">To be confirmed</span></div>
+      <div class="one-pager-row"><span class="label">Location</span><span class="value blank">To be confirmed</span></div>
+      <div class="one-pager-row"><span class="label">Bedrooms</span><span class="value blank">To be confirmed</span></div>
+      <div class="one-pager-row"><span class="label">Setup cost</span><span class="value blank">To be confirmed</span></div>
+      <div class="one-pager-row"><span class="label">Total investment required</span><span class="value">${amt}</span></div>
+    </div>
+
+    <div class="one-pager-section">
+      <h4>Projected Returns</h4>
+      <div class="one-pager-row"><span class="label">Average nightly rate</span><span class="value blank">To be confirmed</span></div>
+      <div class="one-pager-row"><span class="label">Projected occupancy</span><span class="value blank">To be confirmed</span></div>
+      <div class="one-pager-row"><span class="label">Projected monthly revenue</span><span class="value blank">To be confirmed</span></div>
+      <div class="one-pager-row"><span class="label">Monthly operating costs</span><span class="value blank">To be confirmed</span></div>
+      <div class="one-pager-row"><span class="label">Projected monthly net profit</span><span class="value blank">To be confirmed</span></div>
+    </div>
+
+    <div class="one-pager-section">
+      <h4>Investment Structure</h4>
+      <div class="one-pager-row"><span class="label">Investment amount</span><span class="value">${amt}</span></div>
+      <div class="one-pager-row"><span class="label">Return structure</span><span class="value blank">To be confirmed</span></div>
+      <div class="one-pager-row"><span class="label">Investment term</span><span class="value blank">To be confirmed</span></div>
+      <div class="one-pager-row"><span class="label">Exit mechanism</span><span class="value blank">To be confirmed</span></div>
+    </div>
+
+    <div class="one-pager-section">
+      <h4>About</h4>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.6">${name} is currently training with Property Labs under Terry Dwobeng's mentorship. [Add 1-2 more sentences about your background and why you are pursuing this.]</p>
+    </div>
+
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);font-style:italic">This document is for informational purposes only and does not constitute financial advice. All projections are estimates based on market research and comparable properties.</div>
+  `;
+}
+
+function generateObjections(){
+  const amt = '\u00A3' + state.amount.toLocaleString('en-GB');
+  const objections = [
+    {
+      q: '"Sounds risky"',
+      a: "That's actually a good sign -- it means you're thinking about it properly. Here's the thing though -- everything has risk. Leaving your money in a savings account has risk -- inflation is eating it alive. Property has been one of the most reliable asset classes in the UK for decades. And with short-lets specifically, we're not buying a property -- so there's no mortgage risk. The setup cost is relatively small, the income starts within weeks, and there's a mentor who's done this 14 times over guiding every step. It's not zero risk -- nothing is. But it's calculated, it's structured, and honestly, the bigger risk might be leaving your money where it is doing nothing."
+    },
+    {
+      q: '"I don\'t know anything about Airbnb"',
+      a: "That's actually perfect -- because you don't need to. You're not running the Airbnb. The operator handles that. Your role is the investor. You put in the capital, the operator does all the work -- finding the property, furnishing it, managing the guests, handling the day-to-day. You just receive your return. Think of it like investing in a restaurant -- you don't need to know how to cook. You just need to trust the chef. And in this case, the operator is following a recipe from someone who's already done it 14 times."
+    },
+    {
+      q: '"What if it doesn\'t work?"',
+      a: "Good question. Let's talk about what 'not working' actually looks like. Worst case scenario -- the property doesn't perform as well as projected. Even at 50% of our conservative estimates, we'd still be covering costs and generating some return. But the Property Labs system has been used by over 25 students successfully. Terry Dwobeng has done it 14 times. This isn't inventing something new -- it's following a proven playbook. And starting with one unit specifically means the model gets proved before scaling. If for whatever reason we needed to wind it down, the exit is straightforward -- we end the lease, sell the furniture, and return your capital. It's not like buying a house where you're locked in."
+    },
+    {
+      q: '"How do I get my money back?"',
+      a: `Great question, and this has been thought about carefully. Here's the structure: your initial investment of ${amt} will be returned to you from the profits. Once your capital is returned, we move into the ongoing profit share. If at any point you want to exit completely, we agree a notice period -- say 30 or 60 days -- wind down that unit, sell the furniture, and you're out. All of this goes in a simple written agreement before you put in a penny so everything is clear from day one. Your money isn't locked away. It's flexible and transparent.`
+    },
+    {
+      q: '"Why should I trust you with my money?"',
+      a: "Honestly? That's the most important question you could ask, and it's respected. Here's why: this isn't being done alone. The venture follows a system from Terry Dwobeng at Property Labs -- he built 14 Airbnb units as a university student, zero of his own money, 16k a month at peak. His students have collectively raised over 200k and set up units across the UK. The operator is trained, mentored, and accountable. You'll get full transparency -- monthly reports, access to booking data, everything. And it's all going in a written agreement so it's documented. But beyond all that -- you know the person behind this. You know their character. Reputation is on the line here, and that matters more than anything."
+    }
+  ];
+
+  const container = document.getElementById('objectionCards');
+  container.innerHTML = objections.map((obj, i) => `
+    <div class="flip-card" onclick="this.classList.toggle('flipped')">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <h4>Objection ${i+1}: ${obj.q}</h4>
+          <p class="flip-hint">Click to reveal the response</p>
+        </div>
+        <div class="flip-card-back">
+          <p>${obj.a}</p>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Size the flip cards properly after render
+  setTimeout(sizeFlipCards, 50);
+  window.addEventListener('resize', sizeFlipCards);
+}
+
+function sizeFlipCards(){
+  document.querySelectorAll('.flip-card').forEach(card => {
+    const front = card.querySelector('.flip-card-front');
+    const back = card.querySelector('.flip-card-back');
+    const inner = card.querySelector('.flip-card-inner');
+    // Reset
+    inner.style.minHeight = '';
+    // Measure
+    const fh = front.offsetHeight;
+    const bh = back.offsetHeight;
+    inner.style.minHeight = Math.max(fh, bh) + 'px';
+  });
+}
+
+// Copy functionality
+function copySection(id){
+  const el = document.getElementById(id);
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+}
+
+function copyOnePager(){
+  const el = document.getElementById('onePager');
+  navigator.clipboard.writeText(el.innerText).then(() => showToast('One-pager copied to clipboard'));
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// Email gate
+const gateName = document.getElementById('gateName');
+const gateEmail = document.getElementById('gateEmail');
+const gateSubmit = document.getElementById('gateSubmit');
+
+function validateGate(){
+  gateSubmit.disabled = !(gateName.value.trim() && gateEmail.value.trim() && gateEmail.value.includes('@'));
+}
+gateName.addEventListener('input', validateGate);
+gateEmail.addEventListener('input', validateGate);
+
+// Pre-fill gate name
+const nameObserver = new MutationObserver(() => {
+  if(state.name) gateName.value = state.name;
+});
+
+gateSubmit.addEventListener('click', () => {
+  document.getElementById('emailGate').style.display = 'none';
+  document.getElementById('caseStudyReveal').style.display = 'block';
+  showToast('Case study unlocked');
+});
+
+// Pre-fill name when reaching step 4
+const step4Observer = new MutationObserver(() => {
+  if(document.getElementById('step4').classList.contains('active') && state.name){
+    gateName.value = state.name;
+    validateGate();
+  }
+});
+step4Observer.observe(document.getElementById('step4'), {attributes:true, attributeFilter:['class']});
+
+// Init
+goToStep(1);
+</script>
+</body>
+</html>

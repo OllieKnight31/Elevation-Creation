@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 1080px;
+    height: 1350px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0a0f0d;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .container {
+    width: 1080px;
+    height: 1350px;
+    display: flex;
+    position: relative;
+  }
+  .left-half {
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(180deg, #0d1210 0%, #111916 40%, #0a0f0d 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .left-half::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, transparent 20%, rgba(10,15,13,0.6) 100%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 40px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 60px);
+  }
+  .left-half::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    background:
+      linear-gradient(0deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.04) 60%, transparent 60%) 10% 100% / 80px 500px no-repeat,
+      linear-gradient(0deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.03) 70%, transparent 70%) 30% 100% / 60px 600px no-repeat,
+      linear-gradient(0deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.05) 50%, transparent 50%) 55% 100% / 100px 450px no-repeat,
+      linear-gradient(0deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.03) 65%, transparent 65%) 75% 100% / 70px 550px no-repeat,
+      linear-gradient(0deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.04) 55%, transparent 55%) 90% 100% / 50px 400px no-repeat;
+  }
+  .left-label {
+    position: absolute;
+    bottom: 140px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(255,255,255,0.3);
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+  .right-half {
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a2e24 0%, #2a4a3a 30%, #1e3a2c 60%, #3ECFA0 200%);
+    position: relative;
+    overflow: hidden;
+  }
+  .right-half::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 40%, rgba(62,207,160,0.15) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(62,207,160,0.1) 0%, transparent 40%);
+  }
+  .right-half::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,200,100,0.08) 0%, transparent 60%),
+      linear-gradient(180deg, transparent 60%, rgba(62,207,160,0.05) 100%);
+  }
+  .right-label {
+    position: absolute;
+    bottom: 140px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(255,255,255,0.3);
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+  .divider {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(62,207,160,0.4) 30%, rgba(62,207,160,0.4) 70%, transparent 100%);
+    z-index: 5;
+  }
+  .headline {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+    width: 80%;
+  }
+  .headline h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 88px;
+    color: #FFFFFF;
+    line-height: 1.05;
+    text-shadow: 0 4px 40px rgba(0,0,0,0.8), 0 2px 10px rgba(0,0,0,0.5);
+  }
+  .bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 110px;
+    background: linear-gradient(180deg, transparent 0%, rgba(10,15,13,0.95) 40%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 10;
+    padding-bottom: 10px;
+  }
+  .bottom-bar .training {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: #3ECFA0;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .bottom-bar .brand {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="left-half">
+    <div class="left-label">THE 9-5</div>
+  </div>
+  <div class="right-half">
+    <div class="right-label">FREEDOM</div>
+  </div>
+  <div class="divider"></div>
+  <div class="headline">
+    <h1>Which Side Are You Building?</h1>
+  </div>
+  <div class="bottom-bar">
+    <div class="training">FREE LIVE TRAINING — APRIL 13</div>
+    <div class="brand">PROPERTY LABS</div>
+  </div>
+</div>
+</body>
+</html>

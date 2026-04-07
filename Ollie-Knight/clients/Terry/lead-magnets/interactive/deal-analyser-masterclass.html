@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Deal Analysis Masterclass | Property Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--bg4:#222;
+  --coral:#FF5A5F;--coral-dark:#e04e52;--coral-glow:rgba(255,90,95,.15);
+  --text:#f0f0f0;--text2:#aaa;--text3:#666;
+  --green:#2ecc71;--red:#e74c3c;--amber:#f39c12;
+  --radius:12px;--radius-sm:8px;
+  --heading:'Plus Jakarta Sans',sans-serif;
+  --body:'Inter',sans-serif;
+  --transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);background:var(--bg);color:var(--text);
+  line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--heading);font-weight:700;line-height:1.2}
+
+/* PROGRESS BAR */
+.progress-bar-fixed{
+  position:fixed;top:0;left:0;right:0;height:4px;z-index:1000;background:var(--bg3);
+}
+.progress-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--coral),#ff8a5c);
+  width:0;transition:width .5s ease;
+}
+
+/* SCREEN CONTAINER */
+.screen{
+  display:none;min-height:100vh;padding:24px 20px 100px;
+  max-width:640px;margin:0 auto;
+  animation:fadeIn .4s ease;
+}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes flipIn{from{transform:rotateY(90deg);opacity:0}to{transform:rotateY(0);opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes scoreCount{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+
+/* INTRO SCREEN */
+.intro-badge{
+  display:inline-block;padding:6px 14px;border-radius:20px;
+  background:var(--coral-glow);color:var(--coral);
+  font-size:13px;font-weight:600;letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:24px;
+}
+.intro-title{
+  font-size:clamp(28px,6vw,42px);margin-bottom:16px;
+  background:linear-gradient(135deg,#fff,#ccc);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.intro-sub{color:var(--text2);font-size:16px;margin-bottom:32px}
+.intro-author{
+  display:flex;align-items:center;gap:12px;
+  padding:16px;background:var(--bg3);border-radius:var(--radius);margin-bottom:32px;
+}
+.author-avatar{
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,var(--coral),#ff8a5c);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--heading);font-weight:800;font-size:18px;color:#fff;
+}
+.author-name{font-weight:600;font-size:15px}
+.author-role{font-size:13px;color:var(--text2)}
+
+/* LESSON DOTS */
+.lesson-dots{
+  display:flex;gap:8px;margin-bottom:32px;justify-content:center;
+}
+.lesson-dot{
+  width:40px;height:6px;border-radius:3px;background:var(--bg4);
+  transition:var(--transition);position:relative;
+}
+.lesson-dot.completed{background:var(--coral)}
+.lesson-dot.current{background:var(--coral);animation:pulse 1.5s infinite}
+.lesson-dot-label{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  font-size:10px;color:var(--text3);white-space:nowrap;
+}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 28px;border:none;border-radius:var(--radius);
+  font-family:var(--body);font-size:15px;font-weight:600;
+  cursor:pointer;transition:var(--transition);
+  text-decoration:none;
+}
+.btn-primary{
+  background:var(--coral);color:#fff;width:100%;
+}
+.btn-primary:hover{background:var(--coral-dark);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{
+  background:var(--bg3);color:var(--text);border:1px solid var(--bg4);
+}
+.btn-secondary:hover{border-color:var(--coral);color:var(--coral)}
+.btn-ghost{background:transparent;color:var(--text2);font-size:14px;padding:10px}
+.btn-ghost:hover{color:var(--coral)}
+
+/* NAV */
+.nav-row{
+  display:flex;gap:12px;margin-top:32px;
+}
+.nav-row .btn{flex:1}
+
+/* CARDS */
+.card{
+  background:var(--bg3);border:1px solid var(--bg4);border-radius:var(--radius);
+  padding:20px;margin-bottom:12px;transition:var(--transition);
+}
+.card:hover{border-color:#333}
+.card-clickable{cursor:pointer}
+.card-clickable:hover{border-color:var(--coral);background:var(--bg4)}
+
+/* EXPANDABLE CARD */
+.expand-card{cursor:pointer}
+.expand-card .expand-header{
+  display:flex;align-items:center;justify-content:space-between;
+}
+.expand-card .expand-icon{
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  color:var(--text3);transition:var(--transition);font-size:18px;
+}
+.expand-card.open .expand-icon{transform:rotate(45deg);color:var(--coral)}
+.expand-card .expand-body{
+  max-height:0;overflow:hidden;transition:max-height .4s ease,opacity .3s ease;opacity:0;
+}
+.expand-card.open .expand-body{max-height:600px;opacity:1;margin-top:16px}
+
+/* FLASHCARD */
+.flashcard-container{perspective:800px;margin-bottom:16px}
+.flashcard{
+  position:relative;width:100%;min-height:180px;
+  transform-style:preserve-3d;transition:transform .6s ease;cursor:pointer;
+}
+.flashcard.flipped{transform:rotateY(180deg)}
+.flashcard-face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border-radius:var(--radius);padding:24px;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.flashcard-front{
+  background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid var(--bg4);
+}
+.flashcard-back{
+  background:linear-gradient(135deg,#1a1215,#1f1518);
+  border:1px solid rgba(255,90,95,.2);
+  transform:rotateY(180deg);
+}
+.flashcard-tap{
+  font-size:12px;color:var(--text3);margin-top:12px;
+}
+.flashcard-rule{
+  font-family:var(--heading);font-size:18px;font-weight:700;color:var(--coral);
+}
+
+/* ACCORDION */
+.accordion-item{
+  border:1px solid var(--bg4);border-radius:var(--radius-sm);
+  margin-bottom:8px;overflow:hidden;background:var(--bg3);
+}
+.accordion-header{
+  padding:14px 16px;cursor:pointer;display:flex;
+  align-items:center;justify-content:space-between;
+  font-weight:600;font-size:14px;transition:var(--transition);
+}
+.accordion-header:hover{background:var(--bg4)}
+.accordion-arrow{
+  transition:var(--transition);color:var(--text3);font-size:14px;
+}
+.accordion-item.open .accordion-arrow{transform:rotate(90deg);color:var(--coral)}
+.accordion-body{
+  max-height:0;overflow:hidden;transition:max-height .4s ease;
+}
+.accordion-item.open .accordion-body{max-height:500px}
+.accordion-content{padding:0 16px 16px;font-size:14px;color:var(--text2);line-height:1.7}
+.accordion-content .pro-tip{
+  margin-top:10px;padding:10px 12px;border-radius:var(--radius-sm);
+  background:var(--coral-glow);border-left:3px solid var(--coral);
+  font-size:13px;color:var(--coral);
+}
+
+/* SWIPE CARDS (MISTAKES) */
+.swipe-container{position:relative;overflow:hidden;touch-action:pan-y}
+.swipe-track{
+  display:flex;transition:transform .4s cubic-bezier(.25,.8,.25,1);
+}
+.swipe-card{
+  min-width:100%;padding:0 4px;
+}
+.swipe-card-inner{
+  background:var(--bg3);border:1px solid var(--bg4);border-radius:var(--radius);
+  padding:24px;min-height:300px;display:flex;flex-direction:column;justify-content:center;
+}
+.mistake-number{
+  font-size:13px;font-weight:600;color:var(--coral);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;
+}
+.mistake-title{font-family:var(--heading);font-size:20px;margin-bottom:16px}
+.mistake-section{margin-bottom:12px}
+.mistake-label{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.mistake-text{font-size:14px;color:var(--text2);line-height:1.6}
+.swipe-dots{
+  display:flex;justify-content:center;gap:6px;margin-top:16px;
+}
+.swipe-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--bg4);
+  transition:var(--transition);
+}
+.swipe-dot.active{background:var(--coral);width:24px;border-radius:4px}
+.swipe-nav{
+  display:flex;justify-content:space-between;margin-top:16px;
+}
+.swipe-btn{
+  background:var(--bg3);border:1px solid var(--bg4);color:var(--text2);
+  padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;
+  font-family:var(--body);font-size:13px;font-weight:500;transition:var(--transition);
+}
+.swipe-btn:hover{border-color:var(--coral);color:var(--coral)}
+.swipe-btn:disabled{opacity:.3;cursor:default;border-color:var(--bg4);color:var(--text3)}
+
+/* WORKED EXAMPLE */
+.step-block{
+  border-left:2px solid var(--bg4);padding:0 0 24px 20px;
+  margin-left:8px;position:relative;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+.step-block.visible{opacity:1;transform:translateY(0)}
+.step-block::before{
+  content:'';position:absolute;left:-6px;top:0;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--bg4);border:2px solid var(--bg3);
+  transition:var(--transition);
+}
+.step-block.visible::before{background:var(--coral);border-color:var(--coral)}
+.step-block:last-child{border-left-color:transparent}
+.step-label{font-size:12px;font-weight:600;color:var(--coral);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.step-title{font-family:var(--heading);font-size:16px;margin-bottom:8px}
+.step-detail{font-size:14px;color:var(--text2);line-height:1.6}
+.step-calc{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-top:8px;padding:12px;background:var(--bg);border-radius:var(--radius-sm);
+  font-family:'Inter',monospace;font-size:14px;
+}
+.step-calc .val{color:var(--coral);font-weight:600}
+.step-calc .op{color:var(--text3)}
+.step-calc .result{color:var(--green);font-weight:700}
+.step-reveal-btn{
+  margin-top:16px;background:var(--bg3);border:1px dashed var(--bg4);
+  color:var(--text2);padding:10px 20px;border-radius:var(--radius-sm);
+  cursor:pointer;font-family:var(--body);font-size:13px;font-weight:500;
+  transition:var(--transition);display:block;
+}
+.step-reveal-btn:hover{border-color:var(--coral);color:var(--coral)}
+.verdict-card{
+  padding:24px;border-radius:var(--radius);text-align:center;
+  border:2px solid var(--amber);background:rgba(243,156,18,.05);
+}
+.verdict-label{font-size:14px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:1px}
+.verdict-title{font-family:var(--heading);font-size:28px;margin-top:8px}
+.verdict-text{font-size:14px;color:var(--text2);margin-top:12px;line-height:1.6}
+
+/* QUIZ / PRACTICE */
+.quiz-option{
+  padding:14px 16px;border:1px solid var(--bg4);border-radius:var(--radius-sm);
+  margin-bottom:8px;cursor:pointer;font-size:14px;transition:var(--transition);
+  background:var(--bg3);
+}
+.quiz-option:hover{border-color:#444}
+.quiz-option.selected{border-color:var(--coral);background:var(--coral-glow)}
+.quiz-option.correct{border-color:var(--green);background:rgba(46,204,113,.08)}
+.quiz-option.wrong{border-color:var(--red);background:rgba(231,76,60,.08)}
+.quiz-reveal{
+  margin-top:12px;padding:14px;border-radius:var(--radius-sm);
+  background:var(--bg);font-size:13px;color:var(--text2);line-height:1.6;
+  display:none;
+}
+.quiz-reveal.show{display:block;animation:slideUp .3s ease}
+
+/* PRACTICE INPUTS */
+.practice-field{margin-bottom:16px}
+.practice-label{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.practice-hint{font-size:12px;color:var(--text3);margin-bottom:6px}
+.practice-input{
+  width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--bg4);
+  border-radius:var(--radius-sm);color:var(--text);font-family:var(--body);
+  font-size:15px;transition:var(--transition);
+}
+.practice-input:focus{outline:none;border-color:var(--coral)}
+.practice-input.correct-input{border-color:var(--green)}
+.practice-input.wrong-input{border-color:var(--red)}
+.practice-feedback{font-size:12px;margin-top:4px;display:none}
+.practice-feedback.show{display:block}
+.practice-feedback.correct-fb{color:var(--green)}
+.practice-feedback.wrong-fb{color:var(--red)}
+
+/* SLIDER */
+.range-demo{margin:16px 0}
+.range-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:6px}
+.range-bar{
+  position:relative;height:8px;border-radius:4px;
+  background:linear-gradient(90deg,var(--red) 0%,var(--amber) 45%,var(--green) 100%);
+}
+.range-marker{
+  position:absolute;top:-6px;width:20px;height:20px;border-radius:50%;
+  background:#fff;border:3px solid var(--coral);
+  transform:translateX(-50%);transition:left .3s ease;
+}
+.range-value{
+  text-align:center;margin-top:10px;font-size:14px;font-weight:600;
+}
+
+/* EMAIL GATE */
+.gate-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
+  z-index:2000;align-items:center;justify-content:center;padding:20px;
+}
+.gate-overlay.show{display:flex}
+.gate-card{
+  background:var(--bg2);border:1px solid var(--bg4);border-radius:16px;
+  padding:32px 24px;max-width:420px;width:100%;animation:slideUp .4s ease;
+}
+.gate-title{font-family:var(--heading);font-size:22px;margin-bottom:8px;text-align:center}
+.gate-sub{font-size:14px;color:var(--text2);text-align:center;margin-bottom:24px}
+.gate-input{
+  width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--bg4);
+  border-radius:var(--radius-sm);color:var(--text);font-family:var(--body);
+  font-size:15px;margin-bottom:12px;
+}
+.gate-input:focus{outline:none;border-color:var(--coral)}
+.gate-error{color:var(--red);font-size:12px;margin-bottom:8px;display:none}
+
+/* COMPLETION */
+.cert-card{
+  background:linear-gradient(135deg,#1a1215 0%,#1f1518 50%,#1a1215 100%);
+  border:2px solid var(--coral);border-radius:16px;padding:32px 24px;
+  text-align:center;position:relative;overflow:hidden;
+}
+.cert-card::before{
+  content:'';position:absolute;inset:-2px;
+  background:linear-gradient(135deg,var(--coral),#ff8a5c,var(--coral));
+  border-radius:18px;z-index:-1;
+}
+.cert-badge{
+  display:inline-block;padding:8px 20px;border-radius:20px;
+  background:var(--coral);color:#fff;font-size:13px;
+  font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  margin-bottom:16px;
+}
+.cert-title{font-family:var(--heading);font-size:24px;margin-bottom:8px}
+.cert-name{font-size:16px;color:var(--coral);font-weight:600;margin-bottom:4px}
+.cert-date{font-size:13px;color:var(--text3)}
+.score-circle{
+  width:120px;height:120px;border-radius:50%;
+  border:4px solid var(--coral);margin:24px auto;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  animation:scoreCount .6s ease;
+}
+.score-number{font-family:var(--heading);font-size:36px;font-weight:800;color:var(--coral)}
+.score-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+
+/* TAG */
+.tag{
+  display:inline-block;padding:3px 10px;border-radius:4px;
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;
+}
+.tag-green{background:rgba(46,204,113,.1);color:var(--green)}
+.tag-red{background:rgba(231,76,60,.1);color:var(--red)}
+.tag-amber{background:rgba(243,156,18,.1);color:var(--amber)}
+
+/* SECTION HEADER */
+.section-num{font-size:12px;font-weight:600;color:var(--coral);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.section-title{font-family:var(--heading);font-size:clamp(22px,5vw,28px);margin-bottom:8px}
+.section-desc{font-size:14px;color:var(--text2);margin-bottom:24px;line-height:1.6}
+
+/* MISC */
+.divider{height:1px;background:var(--bg4);margin:24px 0}
+.spacer{height:24px}
+.text-center{text-align:center}
+.text-coral{color:var(--coral)}
+.text-muted{color:var(--text2)}
+.text-sm{font-size:14px}
+.text-xs{font-size:12px}
+.fw-600{font-weight:600}
+.mt-8{margin-top:8px}
+.mt-16{margin-top:16px}
+.mt-24{margin-top:24px}
+.mb-8{margin-bottom:8px}
+.mb-16{margin-bottom:16px}
+.mb-24{margin-bottom:24px}
+
+/* MOBILE */
+@media(max-width:480px){
+  .screen{padding:20px 16px 100px}
+  .flashcard-face{padding:20px}
+  .swipe-card-inner{padding:20px;min-height:260px}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar-fixed"><div class="progress-bar-fill" id="progressFill"></div></div>
+
+<!-- ========== INTRO SCREEN ========== -->
+<div class="screen active" id="screen-intro">
+  <div class="spacer"></div>
+  <div class="intro-badge">Free Masterclass</div>
+  <h1 class="intro-title">Master Airbnb Deal Analysis in 10 Minutes</h1>
+  <p class="intro-sub">6 interactive lessons. One practice deal. Everything you need to know before signing a lease.</p>
+  <div class="intro-author">
+    <div class="author-avatar">TD</div>
+    <div>
+      <div class="author-name">Terry Dwobeng</div>
+      <div class="author-role">Property Labs</div>
+    </div>
+  </div>
+  <div class="lesson-dots" id="introDots">
+    <div class="lesson-dot"><span class="lesson-dot-label">1</span></div>
+    <div class="lesson-dot"><span class="lesson-dot-label">2</span></div>
+    <div class="lesson-dot"><span class="lesson-dot-label">3</span></div>
+    <div class="lesson-dot"><span class="lesson-dot-label">4</span></div>
+    <div class="lesson-dot"><span class="lesson-dot-label">5</span></div>
+    <div class="lesson-dot"><span class="lesson-dot-label">6</span></div>
+  </div>
+  <button class="btn btn-primary" onclick="goToScreen('screen-lesson1')">Start the Masterclass</button>
+</div>
+
+<!-- ========== LESSON 1 ========== -->
+<div class="screen" id="screen-lesson1">
+  <div class="section-num">Lesson 1 of 6</div>
+  <h2 class="section-title">The 3 Numbers That Make or Break a Deal</h2>
+  <p class="section-desc">Every deal comes down to three numbers. Get these right and you will be profitable. Get any one wrong and you will struggle.</p>
+
+  <!-- Card 1 -->
+  <div class="expand-card card card-clickable" onclick="toggleExpand(this)">
+    <div class="expand-header">
+      <div>
+        <div class="text-xs text-coral fw-600 mb-8">NUMBER 1</div>
+        <div class="fw-600">Rent-to-Revenue Ratio</div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="expand-body">
+      <p class="text-sm text-muted mb-16">Your rent should be no more than 40-45% of your projected monthly revenue. If rent is 50%+ of revenue, the deal is dead before it starts.</p>
+      <p class="text-sm text-muted mb-16"><strong class="text-coral">Formula:</strong> Monthly Rent / Monthly Revenue x 100</p>
+      <div class="range-demo">
+        <div class="range-labels"><span>60% (Danger)</span><span>45%</span><span>30% (Ideal)</span></div>
+        <div class="range-bar"><div class="range-marker" style="left:70%"></div></div>
+        <div class="range-value">Sweet spot: <span class="text-coral">35-40%</span></div>
+      </div>
+      <p class="text-xs text-muted">Example: 1,100 rent / 2,592 revenue = 42.4% -- right on the edge.</p>
+    </div>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="expand-card card card-clickable" onclick="toggleExpand(this)">
+    <div class="expand-header">
+      <div>
+        <div class="text-xs text-coral fw-600 mb-8">NUMBER 2</div>
+        <div class="fw-600">Effective Nightly Rate</div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="expand-body">
+      <p class="text-sm text-muted mb-16">This is your actual revenue per night, not your listed price. You need to account for weekday dips, seasonal drops, gaps between bookings, and longer-stay discounts.</p>
+      <p class="text-sm text-muted mb-16"><strong class="text-coral">Formula:</strong> Monthly Revenue / 30</p>
+      <div class="card" style="background:var(--bg);border-color:var(--bg4)">
+        <p class="text-sm"><span class="text-coral fw-600">Listed rate:</span> 120/night</p>
+        <p class="text-sm"><span class="text-muted fw-600">Effective rate:</span> 86/night</p>
+        <p class="text-xs text-muted mt-8">That is a very different deal. Always run your analysis at 85-90% of the listed comparable rate.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3 -->
+  <div class="expand-card card card-clickable" onclick="toggleExpand(this)">
+    <div class="expand-header">
+      <div>
+        <div class="text-xs text-coral fw-600 mb-8">NUMBER 3</div>
+        <div class="fw-600">Cost Per Turnover</div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="expand-body">
+      <p class="text-sm text-muted mb-16">How much it costs every time a guest checks out and a new one checks in. Cleaning (40-70), laundry (10-20), consumables top-up (5-10), plus your time.</p>
+      <p class="text-sm text-muted mb-16">If turnover cost is 70 and you get 10 turnovers/month, that is 700/month on turnovers alone.</p>
+      <div class="card" style="background:var(--bg);border-color:var(--bg4)">
+        <p class="text-sm fw-600 text-coral mb-8">The Fix:</p>
+        <p class="text-sm text-muted">Aim for average stay of 2.5+ nights. Set 2-night minimums. Offer weekly discounts. Every extra night a guest stays is almost pure profit.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mini Quiz -->
+  <div class="divider"></div>
+  <p class="fw-600 mb-16">Quick Check: Which ratio matters most for initial screening?</p>
+  <div class="quiz-option" onclick="revealQuiz(this,'correct','quiz1reveal')">Rent-to-Revenue Ratio</div>
+  <div class="quiz-option" onclick="revealQuiz(this,'wrong','quiz1reveal')">Effective Nightly Rate</div>
+  <div class="quiz-option" onclick="revealQuiz(this,'wrong','quiz1reveal')">Cost Per Turnover</div>
+  <div class="quiz-reveal" id="quiz1reveal">
+    <strong>Rent-to-Revenue Ratio.</strong> This is the single most important number. If rent is more than 50% of projected revenue, the deal is dead before you even look at anything else. It is your first filter.
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" onclick="goToScreen('screen-intro')">Back</button>
+    <button class="btn btn-primary" onclick="goToScreen('screen-lesson2')">Next Lesson</button>
+  </div>
+</div>
+
+<!-- ========== LESSON 2 ========== -->
+<div class="screen" id="screen-lesson2">
+  <div class="section-num">Lesson 2 of 6</div>
+  <h2 class="section-title">The Property Labs Rules of Thumb</h2>
+  <p class="section-desc">5 benchmarks used on every deal. If a property does not hit these, it does not get touched. Tap each card to flip it.</p>
+
+  <div class="flashcard-container">
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-face flashcard-front">
+        <div class="flashcard-rule">Minimum Monthly Profit: 500</div>
+        <div class="flashcard-tap">Tap to see why</div>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <p class="text-sm text-muted">If you are making 200-300/month, one bad month wipes you out. You need a buffer. 500 minimum gives you breathing room for quiet months, unexpected repairs, and cancellations.</p>
+        <p class="text-sm text-coral fw-600 mt-16">Real example: A Manchester 2-bed making 444/month looked OK until a boiler repair in month 3 ate two months of profit.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flashcard-container">
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-face flashcard-front">
+        <div class="flashcard-rule">Profit Margin: At Least 25%</div>
+        <div class="flashcard-tap">Tap to see why</div>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <p class="text-sm text-muted">Below 25%, you are working too hard for too little. A 17% margin means nearly all your revenue goes to costs. One rent increase or occupancy dip pushes you into loss.</p>
+        <p class="text-sm text-coral fw-600 mt-16">Real example: 2,592 revenue with 2,148 costs = 17.1% margin. Technically profitable, but no room for error.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flashcard-container">
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-face flashcard-front">
+        <div class="flashcard-rule">Break-Even Within 3-4 Months</div>
+        <div class="flashcard-tap">Tap to see why</div>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <p class="text-sm text-muted">If it takes 6+ months to recoup setup costs, the deal is too thin. Your money is locked up for half a year before you see real profit. Negotiate harder on rent or find cheaper furnishing.</p>
+        <p class="text-sm text-coral fw-600 mt-16">Real example: 3,500 setup / 444 profit = 7.9 months to break even. That is a marginal deal.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flashcard-container">
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-face flashcard-front">
+        <div class="flashcard-rule">Start at 65% Occupancy</div>
+        <div class="flashcard-tap">Tap to see why</div>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <p class="text-sm text-muted">65% is conservative but realistic for your first analysis. 75% is good and achievable. 85%+ is exceptional and only realistic in prime locations. Below 55% is a red flag for low demand.</p>
+        <p class="text-sm text-coral fw-600 mt-16">Rule: If the deal does not work at 65% occupancy, it is not a deal.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flashcard-container">
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-face flashcard-front">
+        <div class="flashcard-rule">Rent Must Be Under 50% of Revenue</div>
+        <div class="flashcard-tap">Tap to see why</div>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <p class="text-sm text-muted">If rent exceeds 50% of projected revenue at 65% occupancy, walk away immediately. There is almost no room for costs and profit. The sweet spot is 35-40%.</p>
+        <p class="text-sm text-coral fw-600 mt-16">Red flag: Also walk away if the area has 100+ listings within 1 mile with low occupancy, or if setup costs exceed 5,000.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" onclick="goToScreen('screen-lesson1')">Back</button>
+    <button class="btn btn-primary" onclick="goToScreen('screen-lesson3')">Next Lesson</button>
+  </div>
+</div>
+
+<!-- ========== LESSON 3 ========== -->
+<div class="screen" id="screen-lesson3">
+  <div class="section-num">Lesson 3 of 6</div>
+  <h2 class="section-title">The Field Guide</h2>
+  <p class="section-desc">Every field in the analyser, where to find the data, and a pro tip for each one. Tap to expand.</p>
+
+  <h3 class="text-sm fw-600 text-coral mb-16" style="text-transform:uppercase;letter-spacing:1px">Property Details</h3>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Property Address <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>The full address of the property you are analysing.</p>
+      <p><strong>Source:</strong> The listing or directly from the landlord.</p>
+      <div class="pro-tip">Pro tip: Google the address to check for planning restrictions, nearby construction, or noise complaints that could affect guest reviews.</div>
+    </div></div>
+  </div>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Monthly Rent <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>What you will pay the landlord each month.</p>
+      <p><strong>Source:</strong> Tenancy agreement, or search Rightmove/OpenRent for the listing.</p>
+      <div class="pro-tip">Pro tip: Always negotiate. Most landlords will drop 50-100/month for a reliable tenant on a 12+ month lease. That 100 saving is 1,200/year straight to your bottom line.</div>
+    </div></div>
+  </div>
+
+  <h3 class="text-sm fw-600 text-coral mb-16 mt-24" style="text-transform:uppercase;letter-spacing:1px">Revenue Projection</h3>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Average Nightly Rate <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>What you will charge guests per night on average.</p>
+      <p><strong>Source:</strong> AirDNA, Mashvisor, or comparable listings on Airbnb. Filter by same bedroom count and similar quality. Average 5-10 comparable listings.</p>
+      <div class="pro-tip">Pro tip: Run at 85-90% of listed comps. The listed price is not what people actually earn after gaps, discounts, and quiet periods.</div>
+    </div></div>
+  </div>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Expected Occupancy Rate <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>Percentage of nights you will actually book.</p>
+      <p><strong>Source:</strong> AirDNA gives area averages. Use 65-70% for a decent area as your first estimate. Never assume above 80% without real data.</p>
+      <div class="pro-tip">Pro tip: Check seasonality. A city with 75% annual average might drop to 45% in January. Model your worst month alongside the average.</div>
+    </div></div>
+  </div>
+
+  <h3 class="text-sm fw-600 text-coral mb-16 mt-24" style="text-transform:uppercase;letter-spacing:1px">Monthly Costs</h3>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Council Tax <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>Monthly council tax payment.</p>
+      <p><strong>Source:</strong> Local council website. Search "[city] council tax bands". The landlord can also confirm the band.</p>
+      <div class="pro-tip">Pro tip: Band D or above is a red flag. It eats into margins significantly. Bands A-C are much more workable.</div>
+    </div></div>
+  </div>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Utilities <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>Gas, electric, water, and wifi combined.</p>
+      <p><strong>Source:</strong> Call suppliers for exact quotes. Budget 120-180/month for a 2-bed. Wifi is typically 25-35/month.</p>
+      <div class="pro-tip">Pro tip: Smart meters help you track usage. Guests leave heating on and lights running. Budget for it.</div>
+    </div></div>
+  </div>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Insurance <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>Short-let or serviced accommodation insurance.</p>
+      <p><strong>Source:</strong> Get quotes from Guardhog, Pikl, or Proper Insurance. Budget 50-80/month.</p>
+      <div class="pro-tip">Pro tip: Standard landlord insurance does NOT cover short-lets. You need specific SA insurance. Do not skip this.</div>
+    </div></div>
+  </div>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Cleaning Costs <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>Cost per clean multiplied by number of turnovers per month.</p>
+      <p><strong>Source:</strong> Local cleaning companies. Typically 40-70 per clean for a 2-bed. Average stay is 2-3 nights, so roughly 8-10 turnovers/month.</p>
+      <div class="pro-tip">Pro tip: This is almost always your second biggest cost after rent. Short stays (1-2 nights) will eat you alive on cleaning. Set minimum 2-night stays.</div>
+    </div></div>
+  </div>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Platform Fees <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>Airbnb charges hosts approximately 3% per booking.</p>
+      <p><strong>Source:</strong> 3% of Monthly Revenue. The analyser calculates this automatically.</p>
+      <div class="pro-tip">Pro tip: On 2,500/month revenue, that is 75/month or 900/year. Small percentages add up. Factor it in every time.</div>
+    </div></div>
+  </div>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Maintenance Reserve <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>Money set aside for repairs and replacements. Budget 5% of monthly revenue.</p>
+      <p><strong>Source:</strong> 5% of Monthly Revenue.</p>
+      <div class="pro-tip">Pro tip: Things break. Guests are not always careful. A broken bed frame, stained sofa, or faulty appliance will come up. Budget for it or it comes out of profit.</div>
+    </div></div>
+  </div>
+
+  <h3 class="text-sm fw-600 text-coral mb-16 mt-24" style="text-transform:uppercase;letter-spacing:1px">Setup Costs</h3>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Furniture and Furnishing <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>Everything the guest sees and uses.</p>
+      <p><strong>Source:</strong> IKEA, Facebook Marketplace, B&M, Dunelm. Budget 2,000-4,000 for a 2-bed.</p>
+      <div class="pro-tip">Pro tip: Do not overspend. Guests do not care about designer furniture. Clean, functional, and photogenic is what matters. Facebook Marketplace can save you 50%+.</div>
+    </div></div>
+  </div>
+
+  <div class="accordion-item" onclick="toggleAccordion(this)">
+    <div class="accordion-header">Professional Photography <span class="accordion-arrow">&#9654;</span></div>
+    <div class="accordion-body"><div class="accordion-content">
+      <p>Professional listing photos. Budget 100-200.</p>
+      <p><strong>Source:</strong> Local property photographers.</p>
+      <div class="pro-tip">Pro tip: This is NOT optional. Professional photos can increase bookings by 20-40%. It is the single best ROI spend in your entire setup budget.</div>
+    </div></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" onclick="goToScreen('screen-lesson2')">Back</button>
+    <button class="btn btn-primary" onclick="tryAdvanceToLesson4()">Next Lesson</button>
+  </div>
+</div>
+
+<!-- ========== EMAIL GATE ========== -->
+<div class="gate-overlay" id="emailGate">
+  <div class="gate-card">
+    <div class="gate-title">Continue the Masterclass</div>
+    <div class="gate-sub">Enter your details to unlock the remaining 3 lessons, including a worked example and practice deal.</div>
+    <input class="gate-input" type="text" id="gateName" placeholder="First Name" autocomplete="given-name">
+    <input class="gate-input" type="email" id="gateEmail" placeholder="Email Address" autocomplete="email">
+    <div class="gate-error" id="gateError">Please enter both your name and a valid email address.</div>
+    <button class="btn btn-primary" onclick="submitGate()" style="margin-top:8px">Unlock Lessons 4-6</button>
+    <button class="btn btn-ghost" onclick="closeGate()" style="width:100%;margin-top:4px">Maybe later</button>
+  </div>
+</div>
+
+<!-- ========== LESSON 4 ========== -->
+<div class="screen" id="screen-lesson4">
+  <div class="section-num">Lesson 4 of 6</div>
+  <h2 class="section-title">Worked Example: Manchester 2-Bed</h2>
+  <p class="section-desc">Follow along step by step as we analyse a real deal. Tap "Reveal" to see each calculation.</p>
+
+  <div class="card mb-16" style="border-color:var(--coral);background:var(--coral-glow)">
+    <p class="text-sm fw-600">The Property</p>
+    <p class="text-sm text-muted mt-8">2-bedroom flat, Dale Street, Northern Quarter, Manchester. Modern build, walking distance from Piccadilly Station. Landlord is fine with short-lets.</p>
+  </div>
+
+  <div id="workedSteps">
+    <div class="step-block visible" data-step="1">
+      <div class="step-label">Step 1</div>
+      <div class="step-title">Property Details</div>
+      <div class="step-detail">Monthly Rent: 1,100 | 2 Bed Flat | Manchester</div>
+    </div>
+
+    <div class="step-block" data-step="2">
+      <div class="step-label">Step 2</div>
+      <div class="step-title">Revenue Projection</div>
+      <div class="step-detail">
+        Nightly rate: 120 (from comparable listings on AirDNA).<br>
+        Occupancy: 72% (Manchester average for a well-managed 2-bed).
+      </div>
+      <div class="step-calc">
+        <span class="val">72%</span><span class="op">x</span><span class="val">30 nights</span><span class="op">=</span><span class="result">21.6 nights/month</span>
+      </div>
+      <div class="step-calc">
+        <span class="val">21.6</span><span class="op">x</span><span class="val">120</span><span class="op">=</span><span class="result">2,592/month</span>
+      </div>
+    </div>
+
+    <div class="step-block" data-step="3">
+      <div class="step-label">Step 3</div>
+      <div class="step-title">Monthly Costs Breakdown</div>
+      <div class="step-detail">
+        <table style="width:100%;font-size:13px;color:var(--text2)">
+          <tr><td>Rent</td><td style="text-align:right">1,100</td></tr>
+          <tr><td>Council Tax (Band B)</td><td style="text-align:right">110</td></tr>
+          <tr><td>Utilities</td><td style="text-align:right">150</td></tr>
+          <tr><td>Insurance</td><td style="text-align:right">60</td></tr>
+          <tr><td>Cleaning (60 x 8)</td><td style="text-align:right">480</td></tr>
+          <tr><td>Consumables</td><td style="text-align:right">40</td></tr>
+          <tr><td>Platform Fees (3%)</td><td style="text-align:right">78</td></tr>
+          <tr><td>Maintenance (5%)</td><td style="text-align:right">130</td></tr>
+          <tr style="font-weight:700;color:var(--text)"><td>Total Costs</td><td style="text-align:right">2,148</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="step-block" data-step="4">
+      <div class="step-label">Step 4</div>
+      <div class="step-title">Setup Costs</div>
+      <div class="step-detail">
+        <table style="width:100%;font-size:13px;color:var(--text2)">
+          <tr><td>Furniture</td><td style="text-align:right">3,000</td></tr>
+          <tr><td>Photography</td><td style="text-align:right">150</td></tr>
+          <tr><td>Initial Supplies</td><td style="text-align:right">300</td></tr>
+          <tr><td>Listing Setup</td><td style="text-align:right">50</td></tr>
+          <tr style="font-weight:700;color:var(--text)"><td>Total Setup</td><td style="text-align:right">3,500</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="step-block" data-step="5">
+      <div class="step-label">Step 5</div>
+      <div class="step-title">Profitability Analysis</div>
+      <div class="step-calc">
+        <span class="val">2,592</span><span class="op">-</span><span class="val">2,148</span><span class="op">=</span><span class="result">444/month profit</span>
+      </div>
+      <div class="step-calc">
+        <span class="val">444</span><span class="op">/</span><span class="val">2,592</span><span class="op">=</span><span class="result">17.1% margin</span>
+      </div>
+      <div class="step-calc">
+        <span class="val">3,500</span><span class="op">/</span><span class="val">444</span><span class="op">=</span><span class="result">7.9 months to break even</span>
+      </div>
+    </div>
+
+    <div class="step-block" data-step="6">
+      <div class="step-label">The Verdict</div>
+      <div class="step-title"></div>
+      <div class="verdict-card">
+        <div class="verdict-label">Verdict</div>
+        <div class="verdict-title">MARGINAL</div>
+        <div class="verdict-text">
+          444/month sounds alright, but 17.1% margin and 8-month break-even is outside the comfort zone.<br><br>
+          <strong>What if we push nightly rate to 130?</strong> Revenue = 2,808. Profit = 624. Margin = 22.2%. Getting closer.<br><br>
+          <strong>What if we negotiate rent to 1,000?</strong> Profit = 544. Margin = 21%.<br><br>
+          This is exactly why you run the numbers BEFORE you sign anything.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="step-reveal-btn" id="revealNextStep" onclick="revealNextStep()">Reveal Next Step</button>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" onclick="goToScreen('screen-lesson3')">Back</button>
+    <button class="btn btn-primary" onclick="goToScreen('screen-lesson5')">Next Lesson</button>
+  </div>
+</div>
+
+<!-- ========== LESSON 5 ========== -->
+<div class="screen" id="screen-lesson5">
+  <div class="section-num">Lesson 5 of 6</div>
+  <h2 class="section-title">7 Mistakes That Kill Deals</h2>
+  <p class="section-desc">Every one of these has cost someone real money. Swipe through to learn from their pain.</p>
+
+  <div class="swipe-container" id="mistakeSwiper">
+    <div class="swipe-track" id="mistakeTrack">
+
+      <div class="swipe-card">
+        <div class="swipe-card-inner">
+          <div class="mistake-number">Mistake 1 of 7</div>
+          <div class="mistake-title">Using Best-Case Occupancy</div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Mistake</div>
+            <div class="mistake-text">"Just assume 85% occupancy." Not in your first 3 months. Not in January. Not without reviews.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Cost</div>
+            <div class="mistake-text">Overestimating revenue by 20-30%, turning a losing deal into a fake winner on paper.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Fix</div>
+            <div class="mistake-text">Start at 65% and work up. If the deal does not work at 65%, it is not a deal.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swipe-card">
+        <div class="swipe-card-inner">
+          <div class="mistake-number">Mistake 2 of 7</div>
+          <div class="mistake-title">Forgetting About Seasonality</div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Mistake</div>
+            <div class="mistake-text">Analysing based on summer numbers and assuming that is the annual average.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Cost</div>
+            <div class="mistake-text">A property making 2,500/month in summer might make 1,200 in winter. That gap can drain your reserves.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Fix</div>
+            <div class="mistake-text">Model a "worst month" scenario alongside the average. Your deal must survive January and February.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swipe-card">
+        <div class="swipe-card-inner">
+          <div class="mistake-number">Mistake 3 of 7</div>
+          <div class="mistake-title">Ignoring Platform Fees</div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Mistake</div>
+            <div class="mistake-text">"3% is nothing." But on 2,500/month revenue, it is 75/month or 900/year.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Cost</div>
+            <div class="mistake-text">900/year straight off your bottom line. Over 3 properties, that is 2,700 you did not account for.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Fix</div>
+            <div class="mistake-text">Always include 3% platform fees in your cost calculations. The analyser does this automatically.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swipe-card">
+        <div class="swipe-card-inner">
+          <div class="mistake-number">Mistake 4 of 7</div>
+          <div class="mistake-title">Underestimating Cleaning Costs</div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Mistake</div>
+            <div class="mistake-text">Not factoring in how cleaning scales with turnover frequency. Short stays mean more cleans.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Cost</div>
+            <div class="mistake-text">10 turnovers at 60 each = 600/month. That can be your second largest cost after rent.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Fix</div>
+            <div class="mistake-text">Set 2-night minimums. Offer weekly discounts. Calculate cleaning based on realistic turnover rates, not best case.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swipe-card">
+        <div class="swipe-card-inner">
+          <div class="mistake-number">Mistake 5 of 7</div>
+          <div class="mistake-title">Not Accounting for Void Periods</div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Mistake</div>
+            <div class="mistake-text">Assuming the property will be booked every available night with zero gaps between bookings.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Cost</div>
+            <div class="mistake-text">Gaps, maintenance days, and cancellations can add up to 5-10% lost revenue on top of your occupancy estimate.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Fix</div>
+            <div class="mistake-text">Build in a 5-10% void buffer on top of your occupancy estimate. Better to be pleasantly surprised than caught out.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swipe-card">
+        <div class="swipe-card-inner">
+          <div class="mistake-number">Mistake 6 of 7</div>
+          <div class="mistake-title">Skipping Setup Cost Recovery</div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Mistake</div>
+            <div class="mistake-text">"It will come back eventually." When? Month 3? Month 12? Month 24? You need to know.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Cost</div>
+            <div class="mistake-text">Capital tied up for months with no clear return timeline. Multiple properties compound this problem.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Fix</div>
+            <div class="mistake-text">Calculate your break-even point. If more than 4 months, negotiate harder on rent or furnish for less.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="swipe-card">
+        <div class="swipe-card-inner">
+          <div class="mistake-number">Mistake 7 of 7</div>
+          <div class="mistake-title">Analysing Only One Deal</div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Mistake</div>
+            <div class="mistake-text">Falling in love with the first property you find and trying to force the numbers to work.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Cost</div>
+            <div class="mistake-text">Committing to a mediocre deal when a great one was two postcodes away. Opportunity cost is real.</div>
+          </div>
+          <div class="mistake-section">
+            <div class="mistake-label">The Fix</div>
+            <div class="mistake-text">Analyse at least 5-10 properties before committing. The more deals you run, the better your instinct gets.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="swipe-dots" id="mistakeDots">
+    <div class="swipe-dot active"></div>
+    <div class="swipe-dot"></div>
+    <div class="swipe-dot"></div>
+    <div class="swipe-dot"></div>
+    <div class="swipe-dot"></div>
+    <div class="swipe-dot"></div>
+    <div class="swipe-dot"></div>
+  </div>
+
+  <div class="swipe-nav">
+    <button class="swipe-btn" id="mistakePrev" onclick="swipeTo('mistake',-1)" disabled>Previous</button>
+    <button class="swipe-btn" id="mistakeNext" onclick="swipeTo('mistake',1)">Next</button>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" onclick="goToScreen('screen-lesson4')">Back</button>
+    <button class="btn btn-primary" onclick="goToScreen('screen-lesson6')">Final Lesson</button>
+  </div>
+</div>
+
+<!-- ========== LESSON 6 ========== -->
+<div class="screen" id="screen-lesson6">
+  <div class="section-num">Lesson 6 of 6</div>
+  <h2 class="section-title">Practice: Analyse This Deal</h2>
+  <p class="section-desc">Here is a property with raw data. Fill in your analysis below. We will check your answers and score you out of 100.</p>
+
+  <div class="card mb-24" style="border-color:var(--coral);background:var(--coral-glow)">
+    <p class="text-sm fw-600 mb-8">The Property</p>
+    <p class="text-sm text-muted">1-bedroom flat, Broad Street, Birmingham City Centre. Modern apartment, 5-minute walk from the Bullring and New Street Station.</p>
+    <div class="divider"></div>
+    <table style="width:100%;font-size:13px;color:var(--text2)">
+      <tr><td>Monthly Rent</td><td style="text-align:right;font-weight:600;color:var(--text)">850</td></tr>
+      <tr><td>Average Nightly Rate (comps)</td><td style="text-align:right;font-weight:600;color:var(--text)">95</td></tr>
+      <tr><td>Expected Occupancy</td><td style="text-align:right;font-weight:600;color:var(--text)">70%</td></tr>
+      <tr><td>Council Tax</td><td style="text-align:right;font-weight:600;color:var(--text)">90/month</td></tr>
+      <tr><td>Utilities</td><td style="text-align:right;font-weight:600;color:var(--text)">120/month</td></tr>
+      <tr><td>Insurance</td><td style="text-align:right;font-weight:600;color:var(--text)">55/month</td></tr>
+      <tr><td>Cleaning Cost</td><td style="text-align:right;font-weight:600;color:var(--text)">45 per clean</td></tr>
+      <tr><td>Expected Turnovers</td><td style="text-align:right;font-weight:600;color:var(--text)">9/month</td></tr>
+      <tr><td>Consumables</td><td style="text-align:right;font-weight:600;color:var(--text)">30/month</td></tr>
+      <tr><td>Setup Costs</td><td style="text-align:right;font-weight:600;color:var(--text)">2,800 total</td></tr>
+    </table>
+  </div>
+
+  <h3 class="text-sm fw-600 mb-16">Your Analysis</h3>
+
+  <div class="practice-field">
+    <div class="practice-label">Nights Per Month</div>
+    <div class="practice-hint">Occupancy x 30</div>
+    <input class="practice-input" type="number" step="any" id="p_nights" placeholder="Enter number">
+    <div class="practice-feedback" id="fb_nights"></div>
+  </div>
+
+  <div class="practice-field">
+    <div class="practice-label">Monthly Revenue</div>
+    <div class="practice-hint">Nights x Nightly Rate</div>
+    <input class="practice-input" type="number" step="any" id="p_revenue" placeholder="Enter number">
+    <div class="practice-feedback" id="fb_revenue"></div>
+  </div>
+
+  <div class="practice-field">
+    <div class="practice-label">Total Monthly Cleaning Cost</div>
+    <div class="practice-hint">Cost per clean x turnovers</div>
+    <input class="practice-input" type="number" step="any" id="p_cleaning" placeholder="Enter number">
+    <div class="practice-feedback" id="fb_cleaning"></div>
+  </div>
+
+  <div class="practice-field">
+    <div class="practice-label">Platform Fees (monthly)</div>
+    <div class="practice-hint">3% of monthly revenue</div>
+    <input class="practice-input" type="number" step="any" id="p_platform" placeholder="Enter number">
+    <div class="practice-feedback" id="fb_platform"></div>
+  </div>
+
+  <div class="practice-field">
+    <div class="practice-label">Maintenance Reserve (monthly)</div>
+    <div class="practice-hint">5% of monthly revenue</div>
+    <input class="practice-input" type="number" step="any" id="p_maintenance" placeholder="Enter number">
+    <div class="practice-feedback" id="fb_maintenance"></div>
+  </div>
+
+  <div class="practice-field">
+    <div class="practice-label">Total Monthly Costs</div>
+    <div class="practice-hint">All costs added together (rent + council tax + utilities + insurance + cleaning + consumables + platform fees + maintenance)</div>
+    <input class="practice-input" type="number" step="any" id="p_totalcosts" placeholder="Enter number">
+    <div class="practice-feedback" id="fb_totalcosts"></div>
+  </div>
+
+  <div class="practice-field">
+    <div class="practice-label">Monthly Profit</div>
+    <div class="practice-hint">Revenue minus total costs</div>
+    <input class="practice-input" type="number" step="any" id="p_profit" placeholder="Enter number">
+    <div class="practice-feedback" id="fb_profit"></div>
+  </div>
+
+  <div class="practice-field">
+    <div class="practice-label">Profit Margin (%)</div>
+    <div class="practice-hint">Profit / Revenue x 100</div>
+    <input class="practice-input" type="number" step="any" id="p_margin" placeholder="Enter percentage">
+    <div class="practice-feedback" id="fb_margin"></div>
+  </div>
+
+  <div class="practice-field">
+    <div class="practice-label">Rent-to-Revenue Ratio (%)</div>
+    <div class="practice-hint">Rent / Revenue x 100</div>
+    <input class="practice-input" type="number" step="any" id="p_ratio" placeholder="Enter percentage">
+    <div class="practice-feedback" id="fb_ratio"></div>
+  </div>
+
+  <div class="practice-field">
+    <div class="practice-label">Months to Break Even</div>
+    <div class="practice-hint">Setup costs / monthly profit (round up)</div>
+    <input class="practice-input" type="number" step="any" id="p_breakeven" placeholder="Enter number">
+    <div class="practice-feedback" id="fb_breakeven"></div>
+  </div>
+
+  <button class="btn btn-primary mt-16" onclick="checkPractice()">Check My Answers</button>
+
+  <div id="practiceResults" style="display:none" class="mt-24">
+    <div class="card" style="text-align:center;border-color:var(--coral)">
+      <div class="score-circle">
+        <div class="score-number" id="practiceScore">0</div>
+        <div class="score-label">out of 100</div>
+      </div>
+      <p class="text-sm text-muted" id="practiceMessage"></p>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" onclick="goToScreen('screen-lesson5')">Back</button>
+    <button class="btn btn-primary" onclick="goToScreen('screen-complete')">Complete Masterclass</button>
+  </div>
+</div>
+
+<!-- ========== COMPLETION ========== -->
+<div class="screen" id="screen-complete">
+  <div class="spacer"></div>
+  <div class="cert-card">
+    <div class="cert-badge">Completed</div>
+    <div class="cert-title">Deal Analysis Masterclass</div>
+    <div class="cert-name" id="certName">Graduate</div>
+    <div class="cert-date" id="certDate"></div>
+    <div class="score-circle" style="margin:24px auto">
+      <div class="score-number" id="finalScore">--</div>
+      <div class="score-label">Score</div>
+    </div>
+    <p class="text-sm text-muted">You have completed all 6 lessons and practised analysing a real deal. You are ready to run the numbers on your first property.</p>
+  </div>
+
+  <div class="spacer"></div>
+  <p class="text-center fw-600 mb-8">You are ready to analyse your first real deal.</p>
+  <p class="text-center text-sm text-muted mb-24">Want your first deal reviewed by a Property Labs strategist? Book a free 30-minute Strategy Call.</p>
+
+  <a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" target="_blank" rel="noopener" class="btn btn-primary" style="text-decoration:none;text-align:center">
+    Book a Free Strategy Call
+  </a>
+
+  <div class="spacer"></div>
+  <p class="text-center text-xs text-muted">Property Labs | propertylabs.co.uk</p>
+  <p class="text-center text-xs text-muted">Copyright 2026 Property Labs. All rights reserved.</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  // ===== STATE =====
+  const LESSONS = ['screen-lesson1','screen-lesson2','screen-lesson3','screen-lesson4','screen-lesson5','screen-lesson6'];
+  let currentScreen = 'screen-intro';
+  let gateUnlocked = false;
+  let workedStep = 1;
+  let mistakeIndex = 0;
+  let practiceScore = 0;
+  let userName = '';
+
+  // Restore from localStorage
+  try {
+    const saved = localStorage.getItem('plabs_masterclass');
+    if (saved) {
+      const data = JSON.parse(saved);
+      gateUnlocked = data.gateUnlocked || false;
+      userName = data.userName || '';
+      practiceScore = data.practiceScore || 0;
+    }
+  } catch(e){}
+
+  function saveState(){
+    try {
+      localStorage.setItem('plabs_masterclass', JSON.stringify({
+        gateUnlocked, userName, practiceScore
+      }));
+    } catch(e){}
+  }
+
+  // ===== NAVIGATION =====
+  window.goToScreen = function(id){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(id);
+    if(target){
+      target.classList.add('active');
+      currentScreen = id;
+      window.scrollTo({top:0,behavior:'smooth'});
+      updateProgress();
+      if(id === 'screen-lesson4') initWorkedExample();
+      if(id === 'screen-complete') showCompletion();
+    }
+  };
+
+  function updateProgress(){
+    const idx = LESSONS.indexOf(currentScreen);
+    const pct = idx < 0 ? 0 : ((idx+1)/LESSONS.length)*100;
+    document.getElementById('progressFill').style.width = pct+'%';
+    // Update dots
+    const dots = document.querySelectorAll('#introDots .lesson-dot');
+    dots.forEach((d,i) => {
+      d.classList.remove('completed','current');
+      if(i < idx) d.classList.add('completed');
+      else if(i === idx) d.classList.add('current');
+    });
+  }
+
+  // ===== EXPAND CARDS =====
+  window.toggleExpand = function(el){
+    el.classList.toggle('open');
+  };
+
+  // ===== ACCORDION =====
+  window.toggleAccordion = function(el){
+    el.classList.toggle('open');
+  };
+
+  // ===== QUIZ =====
+  window.revealQuiz = function(el, type, revealId){
+    const parent = el.parentElement;
+    const options = parent.querySelectorAll('.quiz-option');
+    if(options[0].classList.contains('correct') || options[0].classList.contains('wrong')) return;
+    options.forEach(o => {
+      o.classList.remove('selected');
+    });
+    el.classList.add('selected');
+    el.classList.add(type);
+    if(type === 'wrong'){
+      options.forEach(o => {
+        if(o !== el && !o.classList.contains('wrong')){
+          // highlight correct
+        }
+      });
+      // Mark the correct one
+      options[0].classList.add('correct');
+    }
+    const reveal = document.getElementById(revealId);
+    if(reveal) reveal.classList.add('show');
+  };
+
+  // ===== EMAIL GATE =====
+  window.tryAdvanceToLesson4 = function(){
+    if(gateUnlocked){
+      goToScreen('screen-lesson4');
+    } else {
+      document.getElementById('emailGate').classList.add('show');
+    }
+  };
+
+  window.submitGate = function(){
+    const name = document.getElementById('gateName').value.trim();
+    const email = document.getElementById('gateEmail').value.trim();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!name || !emailRe.test(email)){
+      document.getElementById('gateError').style.display = 'block';
+      return;
+    }
+    document.getElementById('gateError').style.display = 'none';
+    gateUnlocked = true;
+    userName = name;
+    saveState();
+    document.getElementById('emailGate').classList.remove('show');
+    goToScreen('screen-lesson4');
+  };
+
+  window.closeGate = function(){
+    document.getElementById('emailGate').classList.remove('show');
+  };
+
+  // ===== WORKED EXAMPLE =====
+  function initWorkedExample(){
+    workedStep = 1;
+    const steps = document.querySelectorAll('#workedSteps .step-block');
+    steps.forEach((s,i) => {
+      if(i === 0) s.classList.add('visible');
+      else s.classList.remove('visible');
+    });
+    document.getElementById('revealNextStep').style.display = 'block';
+  }
+
+  window.revealNextStep = function(){
+    workedStep++;
+    const steps = document.querySelectorAll('#workedSteps .step-block');
+    if(workedStep <= steps.length){
+      steps[workedStep-1].classList.add('visible');
+    }
+    if(workedStep >= steps.length){
+      document.getElementById('revealNextStep').style.display = 'none';
+    }
+  };
+
+  // ===== SWIPER (MISTAKES) =====
+  let swipers = { mistake: { index:0, total:7, track:'mistakeTrack', dots:'mistakeDots', prev:'mistakePrev', next:'mistakeNext' } };
+
+  window.swipeTo = function(name, dir){
+    const s = swipers[name];
+    s.index = Math.max(0, Math.min(s.total-1, s.index+dir));
+    updateSwiper(name);
+  };
+
+  function updateSwiper(name){
+    const s = swipers[name];
+    const track = document.getElementById(s.track);
+    track.style.transform = 'translateX(-'+(s.index*100)+'%)';
+    const dots = document.getElementById(s.dots).children;
+    for(let i=0;i<dots.length;i++){
+      dots[i].classList.toggle('active', i===s.index);
+    }
+    document.getElementById(s.prev).disabled = s.index===0;
+    document.getElementById(s.next).disabled = s.index===s.total-1;
+  }
+
+  // Touch swipe support for mistakes
+  (function(){
+    const container = document.getElementById('mistakeSwiper');
+    if(!container) return;
+    let startX=0, startY=0, isDragging=false;
+    container.addEventListener('touchstart', function(e){
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isDragging = true;
+    }, {passive:true});
+    container.addEventListener('touchend', function(e){
+      if(!isDragging) return;
+      isDragging = false;
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40){
+        if(dx < 0) swipeTo('mistake',1);
+        else swipeTo('mistake',-1);
+      }
+    }, {passive:true});
+  })();
+
+  // ===== PRACTICE EXERCISE =====
+  const CORRECT = {
+    p_nights: 21,
+    p_revenue: 1995,
+    p_cleaning: 405,
+    p_platform: 59.85,
+    p_maintenance: 99.75,
+    p_totalcosts: 1679.6,
+    p_profit: 315.4,
+    p_margin: 15.8,
+    p_ratio: 42.6,
+    p_breakeven: 9
+  };
+
+  const EXPLANATIONS = {
+    p_nights: '70% x 30 = 21 nights per month.',
+    p_revenue: '21 nights x 95/night = 1,995/month.',
+    p_cleaning: '45 per clean x 9 turnovers = 405/month.',
+    p_platform: '3% of 1,995 = 59.85/month.',
+    p_maintenance: '5% of 1,995 = 99.75/month.',
+    p_totalcosts: '850 + 90 + 120 + 55 + 405 + 30 + 59.85 + 99.75 = 1,709.60. Note: rounding variations are accepted.',
+    p_profit: '1,995 - 1,709.60 = 285.40. Note: rounding variations accepted.',
+    p_margin: '285.40 / 1,995 x 100 = 14.3%. Rounding variations accepted.',
+    p_ratio: '850 / 1,995 x 100 = 42.6%.',
+    p_breakeven: '2,800 / 285.40 = 9.8, rounded up to 10 months.'
+  };
+
+  // Recalculate correct answers precisely
+  // nights: 0.70 * 30 = 21
+  // revenue: 21 * 95 = 1995
+  // cleaning: 45 * 9 = 405
+  // platform: 1995 * 0.03 = 59.85
+  // maintenance: 1995 * 0.05 = 99.75
+  // totalcosts: 850 + 90 + 120 + 55 + 405 + 30 + 59.85 + 99.75 = 1709.60
+  // profit: 1995 - 1709.60 = 285.40
+  // margin: 285.40/1995*100 = 14.31
+  // ratio: 850/1995*100 = 42.61
+  // breakeven: 2800/285.40 = 9.81 -> 10
+
+  const CORRECT2 = {
+    p_nights: 21,
+    p_revenue: 1995,
+    p_cleaning: 405,
+    p_platform: 59.85,
+    p_maintenance: 99.75,
+    p_totalcosts: 1709.60,
+    p_profit: 285.40,
+    p_margin: 14.3,
+    p_ratio: 42.6,
+    p_breakeven: 10
+  };
+
+  const EXPLANATIONS2 = {
+    p_nights: '70% x 30 = 21 nights per month.',
+    p_revenue: '21 nights x 95/night = 1,995/month.',
+    p_cleaning: '45 per clean x 9 turnovers = 405/month.',
+    p_platform: '3% of 1,995 = 59.85/month.',
+    p_maintenance: '5% of 1,995 = 99.75/month.',
+    p_totalcosts: '850 + 90 + 120 + 55 + 405 + 30 + 59.85 + 99.75 = 1,709.60.',
+    p_profit: '1,995 - 1,709.60 = 285.40.',
+    p_margin: '285.40 / 1,995 x 100 = 14.3%.',
+    p_ratio: '850 / 1,995 x 100 = 42.6%.',
+    p_breakeven: '2,800 / 285.40 = 9.8, rounded up to 10 months.'
+  };
+
+  window.checkPractice = function(){
+    let score = 0;
+    const fields = Object.keys(CORRECT2);
+    const tolerance = {
+      p_nights: 0.5, p_revenue: 10, p_cleaning: 5, p_platform: 3,
+      p_maintenance: 5, p_totalcosts: 20, p_profit: 20,
+      p_margin: 1.5, p_ratio: 1.5, p_breakeven: 1
+    };
+
+    fields.forEach(id => {
+      const input = document.getElementById(id);
+      const fb = document.getElementById('fb_'+id.substring(2));
+      const val = parseFloat(input.value);
+      const correct = CORRECT2[id];
+      const tol = tolerance[id];
+      const diff = Math.abs(val - correct);
+
+      fb.classList.add('show');
+      input.classList.remove('correct-input','wrong-input');
+      fb.classList.remove('correct-fb','wrong-fb');
+
+      if(isNaN(val)){
+        input.classList.add('wrong-input');
+        fb.classList.add('wrong-fb');
+        fb.textContent = 'No answer. Correct: ' + correct + '. ' + EXPLANATIONS2[id];
+      } else if(diff <= tol){
+        score += 10;
+        input.classList.add('correct-input');
+        fb.classList.add('correct-fb');
+        fb.textContent = 'Correct. ' + EXPLANATIONS2[id];
+      } else {
+        input.classList.add('wrong-input');
+        fb.classList.add('wrong-fb');
+        fb.textContent = 'Your answer: ' + val + '. Correct: ' + correct + '. ' + EXPLANATIONS2[id];
+      }
+    });
+
+    practiceScore = score;
+    saveState();
+
+    document.getElementById('practiceResults').style.display = 'block';
+    document.getElementById('practiceScore').textContent = score;
+
+    let msg = '';
+    if(score === 100) msg = 'Perfect score. You have nailed every calculation. You are ready to analyse real deals.';
+    else if(score >= 70) msg = 'Strong performance. Review the ones you missed and you will be deal-ready.';
+    else if(score >= 40) msg = 'Good effort. Go back through lessons 1-3 to strengthen your fundamentals.';
+    else msg = 'Keep learning. Revisit the lessons and try again. Every expert started here.';
+    document.getElementById('practiceMessage').textContent = msg;
+
+    document.getElementById('practiceResults').scrollIntoView({behavior:'smooth'});
+  };
+
+  // ===== COMPLETION =====
+  function showCompletion(){
+    document.getElementById('certName').textContent = userName || 'Graduate';
+    document.getElementById('certDate').textContent = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+    document.getElementById('finalScore').textContent = practiceScore || '--';
+  }
+
+})();
+</script>
+</body>
+</html>

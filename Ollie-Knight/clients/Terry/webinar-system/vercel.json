@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "functions": {
+    "api/index.js": { "maxDuration": 30 }
+  },
+  "rewrites": [
+    { "source": "/api", "destination": "/api/index.js" },
+    { "source": "/register", "destination": "/register.html" },
+    { "source": "/register-organic", "destination": "/register-organic.html" },
+    { "source": "/booked", "destination": "/booked.html" },
+    { "source": "/booked-organic", "destination": "/booked-organic.html" },
+    { "source": "/privacy-policy", "destination": "/privacy-policy.html" },
+    { "source": "/terms-of-service", "destination": "/terms-of-service.html" },
+    { "source": "/readiness-quiz", "destination": "/propertylabs-readiness-quiz.html" },
+    { "source": "/deal-calculator", "destination": "/propertylabs-deal-calculator.html" },
+    { "source": "/capital-raising-scripts", "destination": "/propertylabs-capital-raising-scripts.html" },
+    { "source": "/hotspots-explorer", "destination": "/propertylabs-hotspots-explorer.html" },
+    { "source": "/case-study", "destination": "/propertylabs-case-study.html" },
+    { "source": "/90-day-planner", "destination": "/propertylabs-90-day-planner.html" },
+    { "source": "/deal-analyser", "destination": "/propertylabs-deal-analyser.html" }
+  ],
+  "headers": [
+    {
+      "source": "/api",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ]
+}

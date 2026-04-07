@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy | Property Labs</title>
+<meta name="description" content="Privacy Policy for Property Labs — how we collect, use, and protect your personal data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-surface: #111111;
+  --bg-card: #161616;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #3ECFA0;
+  --accent-dim: rgba(62, 207, 160, 0.15);
+  --text: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Navigation */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.nav-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(62, 207, 160, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--accent);
+  font-family: var(--font-display);
+}
+
+.nav-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-back:hover {
+  color: var(--accent);
+}
+
+/* Container */
+.container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.page-header .subtitle {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.page-header .subtitle strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Section Headings */
+h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 48px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent-dim);
+}
+
+h3 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 28px;
+  margin-bottom: 10px;
+}
+
+/* Body text */
+p {
+  margin-bottom: 16px;
+}
+
+ul, ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+li strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* Info box */
+.info-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 24px 0;
+}
+
+.info-box p {
+  margin-bottom: 0;
+  font-size: 15px;
+}
+
+/* Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--bg-card);
+}
+
+.data-table td {
+  color: var(--text-secondary);
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.footer-inner {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.footer-copy {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .page-header h1 {
+    font-size: 28px;
+  }
+  h2 {
+    font-size: 19px;
+  }
+  .container {
+    padding: 40px 20px 60px;
+  }
+  .data-table {
+    font-size: 13px;
+  }
+  .data-table th,
+  .data-table td {
+    padding: 10px 12px;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/register.html" class="nav-brand">
+    <div class="nav-logo">PL</div>
+    <span class="nav-text">Property Labs</span>
+  </a>
+  <a href="/register.html" class="nav-back">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Registration
+  </a>
+</nav>
+
+<main class="container">
+
+  <div class="page-header">
+    <h1>Privacy Policy</h1>
+    <p class="subtitle">Last updated: <strong>26 March 2026</strong></p>
+  </div>
+
+  <p>Property Labs ("we", "us", or "our"), operated by Terry Dwobeng, is committed to protecting your privacy. This Privacy Policy explains how we collect, use, store, and share your personal data when you visit our website at <a href="https://propertylabs.to">propertylabs.to</a>, register for our webinars, or engage with our coaching programmes.</p>
+
+  <p>We are based in the United Kingdom and comply with the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018.</p>
+
+  <div class="info-box">
+    <p>By using our website and services, you acknowledge that you have read and understood this Privacy Policy. If you do not agree with our practices, please do not use our services.</p>
+  </div>
+
+  <h2>1. Data Controller</h2>
+  <p>The data controller responsible for your personal data is:</p>
+  <ul>
+    <li><strong>Business Name:</strong> Property Labs</li>
+    <li><strong>Owner:</strong> Terry Dwobeng</li>
+    <li><strong>Email:</strong> <a href="mailto:founder@propertylabs.to">founder@propertylabs.to</a></li>
+    <li><strong>Website:</strong> <a href="https://propertylabs.to">propertylabs.to</a></li>
+    <li><strong>Location:</strong> United Kingdom</li>
+  </ul>
+
+  <h2>2. What Data We Collect</h2>
+  <p>We collect the following categories of personal data:</p>
+
+  <h3>Information you provide directly</h3>
+  <ul>
+    <li><strong>Registration data:</strong> Full name, email address, and phone number when you register for a webinar or book a consultation</li>
+    <li><strong>Payment data:</strong> Billing name, address, and payment card details (processed securely by Stripe — we do not store card numbers)</li>
+    <li><strong>Communication data:</strong> Any messages, questions, or feedback you send us via email, chat, or during webinars</li>
+  </ul>
+
+  <h3>Information collected automatically</h3>
+  <ul>
+    <li><strong>Device and browser data:</strong> IP address, browser type, operating system, screen resolution, and device identifiers</li>
+    <li><strong>Usage data:</strong> Pages visited, time spent on pages, click patterns, referring URLs, and webinar attendance</li>
+    <li><strong>Cookie data:</strong> Information collected through cookies and similar tracking technologies (see Section 5)</li>
+  </ul>
+
+  <h2>3. How We Use Your Data</h2>
+  <p>We use your personal data for the following purposes:</p>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Purpose</th>
+        <th>Legal Basis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Delivering webinar access and reminders</td>
+        <td>Performance of contract</td>
+      </tr>
+      <tr>
+        <td>Sending email communications about our programmes</td>
+        <td>Legitimate interest / Consent</td>
+      </tr>
+      <tr>
+        <td>Sending SMS reminders and follow-ups</td>
+        <td>Consent</td>
+      </tr>
+      <tr>
+        <td>Processing payments for coaching programmes</td>
+        <td>Performance of contract</td>
+      </tr>
+      <tr>
+        <td>Scheduling consultations and strategy calls</td>
+        <td>Legitimate interest</td>
+      </tr>
+      <tr>
+        <td>Improving our website and services</td>
+        <td>Legitimate interest</td>
+      </tr>
+      <tr>
+        <td>Running targeted advertising campaigns</td>
+        <td>Consent</td>
+      </tr>
+      <tr>
+        <td>Complying with legal obligations</td>
+        <td>Legal obligation</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>4. Third-Party Services</h2>
+  <p>We share your data with the following trusted third-party service providers, each of whom processes your data in accordance with their own privacy policies:</p>
+
+  <ul>
+    <li><strong>WebinarJam</strong> — Webinar hosting and delivery platform. Receives your name, email, and phone number to provide webinar access and reminders.</li>
+    <li><strong>GoHighLevel</strong> — Customer relationship management and marketing automation. Stores your contact details to manage email sequences, SMS campaigns, and pipeline tracking.</li>
+    <li><strong>Calendly</strong> — Appointment scheduling. Receives your name, email, and phone number when you book a strategy call.</li>
+    <li><strong>Stripe</strong> — Payment processing. Handles payment card data securely. We do not have access to your full card details.</li>
+    <li><strong>Google Analytics (GA4)</strong> — Website analytics. Collects anonymised usage data and device information to help us understand how visitors interact with our website.</li>
+    <li><strong>Meta (Facebook/Instagram)</strong> — Advertising and tracking via Meta Pixel. Collects browsing behaviour data to deliver and measure the performance of our advertisements.</li>
+  </ul>
+
+  <p>We do not sell your personal data to any third party. Data is only shared with the providers listed above for the specific purposes described.</p>
+
+  <h2>5. Cookies and Tracking</h2>
+  <p>Our website uses cookies and similar tracking technologies to enhance your experience and measure performance.</p>
+
+  <h3>Cookies we use</h3>
+  <ul>
+    <li><strong>Essential cookies:</strong> Required for the website to function properly (e.g., session management, form submissions). These cannot be disabled.</li>
+    <li><strong>Analytics cookies (Google Analytics / GA4):</strong> Help us understand website traffic, user behaviour, and page performance. Data is aggregated and does not personally identify you.</li>
+    <li><strong>Advertising cookies (Meta Pixel):</strong> Used to track conversions from our Facebook and Instagram advertisements, build retargeting audiences, and measure ad effectiveness.</li>
+  </ul>
+
+  <p>You can manage your cookie preferences through your browser settings. Disabling certain cookies may affect the functionality of our website.</p>
+
+  <h2>6. Data Retention</h2>
+  <p>We retain your personal data only for as long as necessary to fulfil the purposes described in this policy:</p>
+  <ul>
+    <li><strong>Webinar registration data:</strong> Retained for up to 24 months after your last interaction with us</li>
+    <li><strong>Customer and payment data:</strong> Retained for up to 7 years to comply with UK tax and accounting obligations</li>
+    <li><strong>Marketing data:</strong> Retained until you unsubscribe or request deletion</li>
+    <li><strong>Analytics data:</strong> Retained in accordance with Google Analytics and Meta data retention policies (typically 14–26 months)</li>
+  </ul>
+
+  <p>When data is no longer required, it is securely deleted or anonymised.</p>
+
+  <h2>7. Your Rights Under UK GDPR</h2>
+  <p>As a data subject, you have the following rights under the UK GDPR:</p>
+  <ul>
+    <li><strong>Right of access:</strong> Request a copy of the personal data we hold about you</li>
+    <li><strong>Right to rectification:</strong> Request correction of inaccurate or incomplete data</li>
+    <li><strong>Right to erasure:</strong> Request deletion of your personal data ("right to be forgotten")</li>
+    <li><strong>Right to restrict processing:</strong> Request that we limit how we use your data</li>
+    <li><strong>Right to data portability:</strong> Request your data in a structured, commonly used, and machine-readable format</li>
+    <li><strong>Right to object:</strong> Object to processing based on legitimate interest or direct marketing</li>
+    <li><strong>Right to withdraw consent:</strong> Where processing is based on consent, you may withdraw it at any time without affecting the lawfulness of prior processing</li>
+  </ul>
+
+  <p>To exercise any of these rights, please contact us at <a href="mailto:founder@propertylabs.to">founder@propertylabs.to</a>. We will respond to your request within 30 days.</p>
+
+  <p>If you are not satisfied with our response, you have the right to lodge a complaint with the Information Commissioner's Office (ICO) at <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a>.</p>
+
+  <h2>8. Data Security</h2>
+  <p>We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, alteration, disclosure, or destruction. These include:</p>
+  <ul>
+    <li>SSL/TLS encryption on all pages that collect personal data</li>
+    <li>Secure, access-controlled storage of customer records</li>
+    <li>Regular review of our data processing practices</li>
+    <li>Use of reputable third-party providers with their own security certifications</li>
+  </ul>
+  <p>While we take reasonable precautions, no method of transmission over the internet is completely secure. We cannot guarantee absolute security of your data.</p>
+
+  <h2>9. International Data Transfers</h2>
+  <p>Some of our third-party service providers (including WebinarJam, GoHighLevel, Calendly, Stripe, Google, and Meta) are based in the United States. Where personal data is transferred outside the UK, we ensure that appropriate safeguards are in place, such as Standard Contractual Clauses or the service provider's participation in recognised data protection frameworks.</p>
+
+  <h2>10. Children's Privacy</h2>
+  <p>Our services are not directed at individuals under the age of 18. We do not knowingly collect personal data from children. If you believe we have inadvertently collected data from a minor, please contact us immediately so we can delete it.</p>
+
+  <h2>11. Changes to This Policy</h2>
+  <p>We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated "Last updated" date. We encourage you to review this policy periodically. Continued use of our services after changes constitutes acceptance of the revised policy.</p>
+
+  <h2>12. Contact Us</h2>
+  <p>If you have any questions about this Privacy Policy or wish to exercise your data protection rights, please contact us:</p>
+  <ul>
+    <li><strong>Email:</strong> <a href="mailto:founder@propertylabs.to">founder@propertylabs.to</a></li>
+    <li><strong>Website:</strong> <a href="https://propertylabs.to">propertylabs.to</a></li>
+  </ul>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="/register.html">Register for Webinar</a>
+      <a href="/privacy-policy.html">Privacy Policy</a>
+      <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 Property Labs. All rights reserved. Operated by Terry Dwobeng, United Kingdom.</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14 Units, Zero Own Money — Property Labs Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --bg-card: #141414;
+    --bg-card-alt: #1a1a1a;
+    --bg-elevated: #1e1e1e;
+    --coral: #FF5A5F;
+    --coral-dim: rgba(255, 90, 95, 0.15);
+    --coral-glow: rgba(255, 90, 95, 0.08);
+    --white: #ffffff;
+    --gray-100: #f5f5f5;
+    --gray-200: #e0e0e0;
+    --gray-300: #b0b0b0;
+    --gray-400: #888888;
+    --gray-500: #666666;
+    --gray-600: #444444;
+    --gray-700: #2a2a2a;
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  html { font-size: 16px; scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--gray-200);
+    font-family: var(--font-body);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- PAGE / SECTION STRUCTURE ---------- */
+  .page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section {
+    padding: 80px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ---------- COVER PAGE ---------- */
+  .cover {
+    text-align: center;
+    position: relative;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: var(--coral-dim);
+    color: var(--coral);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 10px 28px;
+    border-radius: 100px;
+    margin-bottom: 40px;
+  }
+
+  .cover h1 {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
+    line-height: 1.08;
+    color: var(--white);
+    margin-bottom: 24px;
+    letter-spacing: -1.5px;
+  }
+
+  .cover h1 span {
+    color: var(--coral);
+  }
+
+  .cover .subtitle {
+    font-size: 1.2rem;
+    color: var(--gray-300);
+    max-width: 640px;
+    margin: 0 auto 48px;
+    line-height: 1.7;
+    font-weight: 400;
+  }
+
+  .cover-author {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--gray-400);
+    margin-bottom: 8px;
+  }
+
+  .cover-brand {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--coral);
+    letter-spacing: 0.5px;
+  }
+
+  .cover-line {
+    width: 60px;
+    height: 3px;
+    background: var(--coral);
+    margin: 32px auto;
+    border-radius: 2px;
+  }
+
+  .cover-quote {
+    font-style: italic;
+    color: var(--gray-400);
+    font-size: 1rem;
+    margin-top: 20px;
+  }
+
+  /* ---------- SECTION TITLES ---------- */
+  .section-label {
+    display: inline-block;
+    background: var(--coral-dim);
+    color: var(--coral);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: var(--white);
+    margin-bottom: 16px;
+    letter-spacing: -0.8px;
+    line-height: 1.15;
+  }
+
+  .section-subtitle {
+    font-size: 1.05rem;
+    color: var(--gray-400);
+    max-width: 620px;
+    margin-bottom: 48px;
+    line-height: 1.7;
+  }
+
+  /* ---------- DIVIDER ---------- */
+  .divider {
+    border: none;
+    height: 1px;
+    background: var(--gray-700);
+    margin: 0 auto;
+    max-width: 1100px;
+  }
+
+  /* ---------- STARTING POINT ---------- */
+  .story-text {
+    max-width: 700px;
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--gray-300);
+  }
+
+  .story-text p { margin-bottom: 20px; }
+
+  .story-text strong { color: var(--white); font-weight: 600; }
+
+  .story-highlight {
+    background: var(--coral-glow);
+    border-left: 3px solid var(--coral);
+    padding: 20px 28px;
+    border-radius: 0 8px 8px 0;
+    margin: 28px 0;
+    color: var(--gray-200);
+    font-size: 1.05rem;
+  }
+
+  /* ---------- TIMELINE ---------- */
+  .timeline {
+    position: relative;
+    padding-left: 48px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--coral), var(--gray-700));
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 56px;
+  }
+
+  .timeline-item:last-child { margin-bottom: 0; }
+
+  .timeline-marker {
+    position: absolute;
+    left: -48px;
+    top: 4px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 3px solid var(--coral);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .timeline-marker-inner {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--coral);
+  }
+
+  .timeline-period {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--coral);
+    margin-bottom: 8px;
+  }
+
+  .timeline-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .timeline-body {
+    color: var(--gray-300);
+    font-size: 0.98rem;
+    line-height: 1.8;
+  }
+
+  .timeline-body p { margin-bottom: 14px; }
+  .timeline-body strong { color: var(--white); font-weight: 600; }
+
+  .timeline-stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .timeline-stat {
+    background: var(--bg-card);
+    border: 1px solid var(--gray-700);
+    border-radius: 10px;
+    padding: 14px 20px;
+    min-width: 140px;
+  }
+
+  .timeline-stat-value {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--coral);
+  }
+
+  .timeline-stat-label {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .timeline-steps {
+    list-style: none;
+    margin-top: 16px;
+  }
+
+  .timeline-steps li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 10px;
+    color: var(--gray-300);
+    font-size: 0.95rem;
+  }
+
+  .timeline-steps li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--coral);
+  }
+
+  /* ---------- STAT CARDS (NUMBERS SECTION) ---------- */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--gray-700);
+    border-radius: 14px;
+    padding: 32px 28px;
+    text-align: center;
+    transition: border-color 0.3s;
+  }
+
+  .stat-card:hover { border-color: var(--coral); }
+
+  .stat-card-value {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 2.6rem;
+    color: var(--coral);
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .stat-card-label {
+    font-size: 0.82rem;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+  }
+
+  /* ---------- PORTFOLIO TABLE ---------- */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 14px;
+    border: 1px solid var(--gray-700);
+    background: var(--bg-card);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  thead th {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    padding: 16px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-700);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--gray-300);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  tbody tr:hover { background: rgba(255,90,95,0.03); }
+
+  td.profit {
+    color: var(--coral);
+    font-weight: 700;
+    font-family: var(--font-heading);
+  }
+
+  /* ---------- COST BREAKDOWN ---------- */
+  .cost-list {
+    list-style: none;
+    max-width: 600px;
+  }
+
+  .cost-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-700);
+    font-size: 0.95rem;
+  }
+
+  .cost-list li:last-child { border-bottom: none; }
+
+  .cost-label { color: var(--gray-300); }
+
+  .cost-value {
+    color: var(--white);
+    font-weight: 600;
+    font-family: var(--font-heading);
+  }
+
+  /* ---------- MISTAKE CARDS ---------- */
+  .mistake-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .mistake-card {
+    background: var(--bg-card);
+    border: 1px solid var(--gray-700);
+    border-radius: 14px;
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mistake-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--coral);
+  }
+
+  .mistake-number {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 3.5rem;
+    color: rgba(255, 90, 95, 0.12);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .mistake-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--white);
+    margin-bottom: 14px;
+  }
+
+  .mistake-body {
+    color: var(--gray-300);
+    font-size: 0.93rem;
+    line-height: 1.75;
+    margin-bottom: 18px;
+  }
+
+  .mistake-cost {
+    background: rgba(255, 90, 95, 0.08);
+    border: 1px solid rgba(255, 90, 95, 0.2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+  }
+
+  .mistake-cost-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--coral);
+    margin-bottom: 4px;
+  }
+
+  .mistake-cost-text {
+    font-size: 0.9rem;
+    color: var(--gray-200);
+    line-height: 1.6;
+  }
+
+  .mistake-fix {
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+
+  .mistake-fix-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 4px;
+  }
+
+  .mistake-fix-text {
+    font-size: 0.9rem;
+    color: var(--gray-300);
+    line-height: 1.6;
+  }
+
+  /* ---------- STUDENT RESULT CARDS ---------- */
+  .student-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+  }
+
+  .student-card {
+    background: var(--bg-card);
+    border: 1px solid var(--gray-700);
+    border-radius: 14px;
+    padding: 36px 28px;
+    text-align: center;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .student-card:hover {
+    border-color: var(--coral);
+    transform: translateY(-4px);
+  }
+
+  .student-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--coral-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--coral);
+  }
+
+  .student-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .student-context {
+    font-size: 0.82rem;
+    color: var(--gray-500);
+    margin-bottom: 20px;
+  }
+
+  .student-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .student-stat {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .student-stat-label {
+    font-size: 0.78rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .student-stat-value {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--coral);
+  }
+
+  /* ---------- NUMBERED LIST (What I'd Do Differently) ---------- */
+  .numbered-list {
+    list-style: none;
+    counter-reset: steps;
+    max-width: 720px;
+  }
+
+  .numbered-list li {
+    counter-increment: steps;
+    position: relative;
+    padding: 24px 0 24px 72px;
+    border-bottom: 1px solid var(--gray-700);
+  }
+
+  .numbered-list li:last-child { border-bottom: none; }
+
+  .numbered-list li::before {
+    content: counter(steps, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 24px;
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 1.6rem;
+    color: var(--coral);
+    opacity: 0.5;
+  }
+
+  .step-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .step-body {
+    font-size: 0.93rem;
+    color: var(--gray-400);
+    line-height: 1.7;
+  }
+
+  /* ---------- 3C SYSTEM ---------- */
+  .three-c-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .three-c-card {
+    background: var(--bg-card);
+    border: 1px solid var(--gray-700);
+    padding: 40px 32px;
+    text-align: center;
+    position: relative;
+  }
+
+  .three-c-card:first-child {
+    border-radius: 14px 0 0 14px;
+  }
+
+  .three-c-card:last-child {
+    border-radius: 0 14px 14px 0;
+  }
+
+  .three-c-card:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 14px solid var(--coral);
+    z-index: 2;
+  }
+
+  .three-c-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--coral-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: var(--coral);
+  }
+
+  .three-c-title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+
+  .three-c-body {
+    font-size: 0.88rem;
+    color: var(--gray-400);
+    line-height: 1.7;
+  }
+
+  .three-c-flow {
+    text-align: center;
+    margin-top: 32px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--gray-500);
+  }
+
+  .three-c-flow span { color: var(--coral); }
+
+  /* ---------- CTA ---------- */
+  .cta-page {
+    text-align: center;
+  }
+
+  .cta-question {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--gray-300);
+    margin-bottom: 48px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  .cta-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px;
+    max-width: 720px;
+    margin: 0 auto 56px;
+  }
+
+  .cta-box {
+    background: var(--bg-card);
+    border: 1px solid var(--gray-700);
+    border-radius: 14px;
+    padding: 36px 28px;
+  }
+
+  .cta-box-label {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--coral);
+    margin-bottom: 12px;
+  }
+
+  .cta-box-title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+
+  .cta-box-desc {
+    font-size: 0.9rem;
+    color: var(--gray-400);
+    line-height: 1.65;
+    margin-bottom: 24px;
+  }
+
+  .cta-button {
+    display: inline-block;
+    background: var(--coral);
+    color: var(--white);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 16px 36px;
+    border-radius: 10px;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    transition: background 0.25s, transform 0.25s;
+  }
+
+  .cta-button:hover {
+    background: #e04e52;
+    transform: translateY(-2px);
+  }
+
+  .cta-date {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--coral);
+    margin-top: 8px;
+  }
+
+  .cta-closing {
+    max-width: 560px;
+    margin: 0 auto;
+    font-style: italic;
+    color: var(--gray-500);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    border-top: 1px solid var(--gray-700);
+    padding-top: 40px;
+  }
+
+  .cta-closing strong {
+    display: block;
+    color: var(--gray-300);
+    font-style: normal;
+    margin-top: 12px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  .site-footer {
+    text-align: center;
+    padding: 48px 40px;
+    border-top: 1px solid var(--gray-700);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .footer-brand {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--coral);
+    margin-bottom: 4px;
+  }
+
+  .footer-url {
+    font-size: 0.82rem;
+    color: var(--gray-500);
+  }
+
+  /* ---------- PRINT ---------- */
+  @media print {
+    body { background: #fff; color: #222; }
+    .page, .section { padding: 40px 20px; }
+    .cover, .section { page-break-after: always; }
+    .stat-card, .mistake-card, .student-card, .three-c-card {
+      background: #f9f9f9;
+      border-color: #ddd;
+    }
+    .stat-card-value, .cover h1 span, .section-label, .timeline-period,
+    .mistake-number, .student-stat-value, .three-c-icon, .cta-button,
+    .footer-brand, .cover-badge, .cover-brand, .cta-box-label, .cta-date {
+      color: #d6333a !important;
+    }
+    .cover h1, .section-title, .timeline-title, .mistake-title,
+    .student-name, .three-c-title, .step-title, .cta-box-title {
+      color: #111 !important;
+    }
+    .story-text, .timeline-body, .mistake-body, .step-body,
+    .three-c-body, .cta-box-desc, .cost-label, tbody td {
+      color: #444 !important;
+    }
+    .timeline::before { background: #d6333a; }
+    .timeline-marker { border-color: #d6333a; }
+    .timeline-marker-inner { background: #d6333a; }
+    .cta-button { background: #d6333a !important; color: #fff !important; }
+    .table-wrap { border-color: #ddd; }
+    thead th { border-color: #ddd; color: #666 !important; }
+    tbody td { border-color: #eee; }
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 768px) {
+    .page, .section { padding: 56px 24px; }
+    .three-c-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .three-c-card { border-radius: 14px !important; }
+    .three-c-card:not(:last-child)::after { display: none; }
+    .mistake-cards { grid-template-columns: 1fr; }
+    .student-grid { grid-template-columns: 1fr 1fr; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .timeline { padding-left: 36px; }
+    .timeline-marker { left: -36px; width: 26px; height: 26px; }
+    .timeline-marker-inner { width: 8px; height: 8px; }
+    .timeline::before { left: 12px; }
+  }
+
+  @media (max-width: 480px) {
+    .student-grid { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: 1fr; }
+    .cta-options { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== COVER PAGE ========== -->
+<div class="page cover">
+  <div>
+    <div class="cover-badge">Case Study</div>
+    <h1>14 Units, <span>Zero Own Money</span></h1>
+    <p class="subtitle">How a Uni Student Built a &pound;16k/Month Airbnb Portfolio Without Using a Single Penny of His Own</p>
+    <div class="cover-line"></div>
+    <p class="cover-author">By Terry Dwobeng</p>
+    <p class="cover-brand">Property Labs</p>
+    <p class="cover-quote">The story they said was impossible.</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== THE STARTING POINT ========== -->
+<div class="section">
+  <span class="section-label">The Beginning</span>
+  <h2 class="section-title">The Starting Point</h2>
+  <p class="section-subtitle">No savings. No property experience. No family money. Just a phone, an internet connection, and a gut feeling.</p>
+
+  <div class="story-text">
+    <p>Let me take you back to where this all began.</p>
+    <p>I was a uni student. No savings. No property experience. No family money sitting in the background. No rich uncle. No trust fund. Nothing.</p>
+    <p>I had exactly what most people reading this have right now &mdash; a phone, an internet connection, and a feeling in my gut that the traditional path wasn't going to cut it.</p>
+    <p>Everyone around me was saying the same thing. <em>"Get your degree, Terry. Get a good job. Save up for a few years. Maybe buy a house when you're 30."</em></p>
+
+    <div class="story-highlight">
+      Graduate at 21. Start on maybe &pound;25k a year. Save &pound;300&ndash;&pound;400 a month. That's five, six, seven years before a deposit on <strong>one</strong> property. And by then, prices have gone up again. That wasn't a plan. That was a treadmill.
+    </div>
+
+    <p>So I refused to accept it. Not because I thought I was special. But because I genuinely believed there had to be another way &mdash; a way to build something real, right now, without waiting for permission or a payslip to catch up with the market.</p>
+    <p>This case study is the full breakdown of what happened next. Month by month. The real numbers. The real mistakes. And the real results.</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== TIMELINE ========== -->
+<div class="section">
+  <span class="section-label">The Journey</span>
+  <h2 class="section-title">Month-by-Month Timeline</h2>
+  <p class="section-subtitle">From zero to 14 profitable Airbnb units &mdash; every phase, laid bare.</p>
+
+  <div class="timeline">
+
+    <!-- Months 1-2 -->
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-marker-inner"></div></div>
+      <div class="timeline-period">Months 1&ndash;2</div>
+      <div class="timeline-title">Building Credibility (Before I Spent a Penny)</div>
+      <div class="timeline-body">
+        <p>Most people want to skip this bit. They want to jump straight to "how do I get a property?" But this phase is the reason everything else worked.</p>
+        <p><strong>Educated myself obsessively.</strong> Courses, YouTube, podcasts, books &mdash; anything on serviced accommodation, Airbnb, and short-term lets in the UK. Every spare hour went into understanding the model inside out.</p>
+        <p><strong>Learned the numbers.</strong> Average nightly rates, occupancy rates by season, cleaning turnaround costs, margins &mdash; that knowledge became my currency.</p>
+        <p><strong>Networked relentlessly.</strong> Property meetups, Facebook groups, LinkedIn. I put myself in rooms with people already doing what I wanted to do.</p>
+        <p><strong>Built a presence.</strong> Started posting on social media about what I was learning. Not flexing. Just sharing my journey honestly. That consistency made people see me as someone who knew what he was talking about.</p>
+        <p>By the end of month two, I still didn't have a property or any money. But I had something more valuable &mdash; <strong>credibility</strong>.</p>
+      </div>
+    </div>
+
+    <!-- Months 3-4 -->
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-marker-inner"></div></div>
+      <div class="timeline-period">Months 3&ndash;4</div>
+      <div class="timeline-title">First Capital Raised</div>
+      <div class="timeline-body">
+        <p>I'd built up enough knowledge and credibility that when I presented an opportunity to potential investors, they could see I'd done the work. I wasn't some random kid asking for a handout.</p>
+        <p>My first investor wasn't a millionaire. They were a regular person with savings sitting in a bank account earning basically nothing. I showed them what those savings could do in serviced accommodation.</p>
+        <p><strong>No banks. No mortgages in my name. No personal savings deployed.</strong> Just a solid proposal backed by real knowledge and genuine credibility.</p>
+      </div>
+    </div>
+
+    <!-- Months 5-6 -->
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-marker-inner"></div></div>
+      <div class="timeline-period">Months 5&ndash;6</div>
+      <div class="timeline-title">First Airbnb Secured</div>
+      <div class="timeline-body">
+        <p>I secured a 2-bedroom apartment through a rent-to-serviced-accommodation arrangement (rent-to-SA). The landlord got guaranteed rent, paid on time every month. I got the spread between rent and nightly bookings.</p>
+        <div class="timeline-stat-row">
+          <div class="timeline-stat">
+            <div class="timeline-stat-value">&pound;850</div>
+            <div class="timeline-stat-label">Monthly Rent</div>
+          </div>
+          <div class="timeline-stat">
+            <div class="timeline-stat-value">&pound;95</div>
+            <div class="timeline-stat-label">Avg Nightly Rate</div>
+          </div>
+          <div class="timeline-stat">
+            <div class="timeline-stat-value">78%</div>
+            <div class="timeline-stat-label">Occupancy</div>
+          </div>
+          <div class="timeline-stat">
+            <div class="timeline-stat-value">&pound;2,200</div>
+            <div class="timeline-stat-label">Monthly Revenue</div>
+          </div>
+          <div class="timeline-stat">
+            <div class="timeline-stat-value">&pound;800</div>
+            <div class="timeline-stat-label">Monthly Profit</div>
+          </div>
+        </div>
+        <p style="margin-top:16px">&pound;800 a month from one unit. While I was still at uni.</p>
+      </div>
+    </div>
+
+    <!-- Months 7-12 -->
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-marker-inner"></div></div>
+      <div class="timeline-period">Months 7&ndash;12</div>
+      <div class="timeline-title">Scaling to Multiple Units</div>
+      <div class="timeline-body">
+        <p>Once I had proof of concept &mdash; a live, profitable unit with real guest reviews and real income &mdash; everything accelerated. Raising capital became easier. Landlords were easier to approach.</p>
+        <p>Each new unit followed the same formula:</p>
+        <ol class="timeline-steps">
+          <li>Find the right property &mdash; location, layout, and numbers had to work</li>
+          <li>Secure the landlord with a professional guaranteed-rent proposal</li>
+          <li>Raise setup capital with a proven track record</li>
+          <li>Furnish and list &mdash; guest-ready and live within 2&ndash;3 weeks</li>
+          <li>Systemise &mdash; cleaning teams, automated messaging, dynamic pricing, SOPs</li>
+        </ol>
+        <p>The key shift: moving from doing everything myself to <strong>building systems</strong>. The business started to run like a business, not a side hustle.</p>
+      </div>
+    </div>
+
+    <!-- Year 2+ -->
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-marker-inner"></div></div>
+      <div class="timeline-period">Year 2+</div>
+      <div class="timeline-title">14 Units and &pound;16k/Month</div>
+      <div class="timeline-body">
+        <p>By the time I hit 14 units, the portfolio was generating <strong>&pound;16,000 per month at its peak</strong>. A team, systems, and processes let me focus on growth and strategy rather than being stuck in the weeds.</p>
+        <p>All of this &mdash; every single unit &mdash; built without using a single penny of my own money.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== THE NUMBERS ========== -->
+<div class="section">
+  <span class="section-label">Transparent Numbers</span>
+  <h2 class="section-title">The Portfolio Breakdown</h2>
+  <p class="section-subtitle">Real numbers from a typical strong month across all 14 units.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-card-value">14</div>
+      <div class="stat-card-label">Active Units</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value">&pound;31k</div>
+      <div class="stat-card-label">Monthly Revenue</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value">&pound;11.9k</div>
+      <div class="stat-card-label">Monthly Profit</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value">&pound;16k+</div>
+      <div class="stat-card-label">Peak Month Net Profit</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value">4</div>
+      <div class="stat-card-label">UK Cities</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value">&pound;0</div>
+      <div class="stat-card-label">Own Money Invested</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Unit</th>
+          <th>City</th>
+          <th>Type</th>
+          <th>Nightly Rate</th>
+          <th>Occupancy</th>
+          <th>Revenue</th>
+          <th>Costs</th>
+          <th>Profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Manchester</td><td>2-bed flat</td><td>&pound;105</td><td>82%</td><td>&pound;2,583</td><td>&pound;1,550</td><td class="profit">&pound;1,033</td></tr>
+        <tr><td>2</td><td>Manchester</td><td>1-bed flat</td><td>&pound;85</td><td>80%</td><td>&pound;2,040</td><td>&pound;1,200</td><td class="profit">&pound;840</td></tr>
+        <tr><td>3</td><td>Birmingham</td><td>2-bed flat</td><td>&pound;95</td><td>78%</td><td>&pound;2,223</td><td>&pound;1,400</td><td class="profit">&pound;823</td></tr>
+        <tr><td>4</td><td>Birmingham</td><td>2-bed house</td><td>&pound;100</td><td>75%</td><td>&pound;2,250</td><td>&pound;1,450</td><td class="profit">&pound;800</td></tr>
+        <tr><td>5</td><td>Leeds</td><td>2-bed flat</td><td>&pound;90</td><td>80%</td><td>&pound;2,160</td><td>&pound;1,300</td><td class="profit">&pound;860</td></tr>
+        <tr><td>6</td><td>Leeds</td><td>1-bed flat</td><td>&pound;75</td><td>82%</td><td>&pound;1,845</td><td>&pound;1,100</td><td class="profit">&pound;745</td></tr>
+        <tr><td>7</td><td>Nottingham</td><td>2-bed flat</td><td>&pound;88</td><td>77%</td><td>&pound;2,033</td><td>&pound;1,280</td><td class="profit">&pound;753</td></tr>
+        <tr><td>8</td><td>Nottingham</td><td>3-bed house</td><td>&pound;120</td><td>74%</td><td>&pound;2,664</td><td>&pound;1,700</td><td class="profit">&pound;964</td></tr>
+        <tr><td>9</td><td>Manchester</td><td>2-bed flat</td><td>&pound;110</td><td>81%</td><td>&pound;2,673</td><td>&pound;1,600</td><td class="profit">&pound;1,073</td></tr>
+        <tr><td>10</td><td>Sheffield</td><td>2-bed flat</td><td>&pound;82</td><td>76%</td><td>&pound;1,870</td><td>&pound;1,200</td><td class="profit">&pound;670</td></tr>
+        <tr><td>11</td><td>Birmingham</td><td>1-bed flat</td><td>&pound;78</td><td>79%</td><td>&pound;1,849</td><td>&pound;1,150</td><td class="profit">&pound;699</td></tr>
+        <tr><td>12</td><td>Manchester</td><td>2-bed flat</td><td>&pound;108</td><td>83%</td><td>&pound;2,689</td><td>&pound;1,580</td><td class="profit">&pound;1,109</td></tr>
+        <tr><td>13</td><td>Leeds</td><td>2-bed flat</td><td>&pound;92</td><td>78%</td><td>&pound;2,153</td><td>&pound;1,320</td><td class="profit">&pound;833</td></tr>
+        <tr><td>14</td><td>Nottingham</td><td>2-bed flat</td><td>&pound;90</td><td>76%</td><td>&pound;2,052</td><td>&pound;1,300</td><td class="profit">&pound;752</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-family:var(--font-heading);font-weight:700;font-size:1.1rem;color:var(--white);margin:48px 0 20px;">Typical Cost Breakdown Per Unit</h3>
+  <ul class="cost-list">
+    <li><span class="cost-label">Rent to landlord</span><span class="cost-value">&pound;650&ndash;&pound;950/mo</span></li>
+    <li><span class="cost-label">Utilities (electric, gas, water, wifi, council tax)</span><span class="cost-value">&pound;180&ndash;&pound;280/mo</span></li>
+    <li><span class="cost-label">Cleaning (per turnover)</span><span class="cost-value">&pound;40&ndash;&pound;65</span></li>
+    <li><span class="cost-label">Consumables (toiletries, linen, kitchen supplies)</span><span class="cost-value">&pound;50&ndash;&pound;80/mo</span></li>
+    <li><span class="cost-label">Platform fees (Airbnb/Booking.com)</span><span class="cost-value">3&ndash;15%</span></li>
+    <li><span class="cost-label">Insurance</span><span class="cost-value">&pound;30&ndash;&pound;50/mo</span></li>
+    <li><span class="cost-label">Maintenance reserve</span><span class="cost-value">&pound;50&ndash;&pound;100/mo</span></li>
+  </ul>
+</div>
+
+<hr class="divider">
+
+<!-- ========== 3 BIGGEST MISTAKES ========== -->
+<div class="section">
+  <span class="section-label">Lessons Learned</span>
+  <h2 class="section-title">The 3 Biggest Mistakes I Made</h2>
+  <p class="section-subtitle">I'm not here to paint a perfect picture. Some of these were expensive.</p>
+
+  <div class="mistake-cards">
+
+    <div class="mistake-card">
+      <div class="mistake-number">01</div>
+      <div class="mistake-title">Trying to Do Everything Alone</div>
+      <div class="mistake-body">Guest comms, cleaning coordination, listing optimisation, investor relations, landlord management &mdash; I was doing ALL of it.</div>
+      <div class="mistake-cost">
+        <div class="mistake-cost-label">What It Cost Me</div>
+        <div class="mistake-cost-text">Burnout, missed messages, slower response times that affected reviews, and nearly put me off the whole thing.</div>
+      </div>
+      <div class="mistake-fix">
+        <div class="mistake-fix-label">The Fix</div>
+        <div class="mistake-fix-text">Bring in help from unit one. Even a VA handling guest messages for a few hours a day makes a massive difference.</div>
+      </div>
+    </div>
+
+    <div class="mistake-card">
+      <div class="mistake-number">02</div>
+      <div class="mistake-title">Choosing the Wrong Property Type</div>
+      <div class="mistake-body">One early unit looked great on paper but was a nightmare operationally. Wrong layout, awkward access, wrong type of demand.</div>
+      <div class="mistake-cost">
+        <div class="mistake-cost-label">What It Cost Me</div>
+        <div class="mistake-cost-text">Lower occupancy, more complaints, higher maintenance, and an early exit &mdash; wasted time and setup capital.</div>
+      </div>
+      <div class="mistake-fix">
+        <div class="mistake-fix-label">The Fix</div>
+        <div class="mistake-fix-text">Be ruthless about property selection. Right layout, right location (demand drivers nearby), right landlord.</div>
+      </div>
+    </div>
+
+    <div class="mistake-card">
+      <div class="mistake-number">03</div>
+      <div class="mistake-title">Not Having Systems From Day One</div>
+      <div class="mistake-body">No proper CRM, no automated messaging, no standardised checklists, no SOPs. Just me, reacting to things as they came up.</div>
+      <div class="mistake-cost">
+        <div class="mistake-cost-label">What It Cost Me</div>
+        <div class="mistake-cost-text">Inconsistent guest experiences, missed details during turnovers, tanked reviews from small slip-ups compounding.</div>
+      </div>
+      <div class="mistake-fix">
+        <div class="mistake-fix-label">The Fix</div>
+        <div class="mistake-fix-text">Set up systems before the first unit goes live. Automated messaging, cleaning checklists, pricing strategy, maintenance protocols.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== STUDENT RESULTS ========== -->
+<div class="section">
+  <span class="section-label">Proof It Works</span>
+  <h2 class="section-title">Student Results</h2>
+  <p class="section-subtitle">This isn't just a "Terry thing." It's a system &mdash; and these are the people proving it.</p>
+
+  <div class="student-grid">
+
+    <div class="student-card">
+      <div class="student-avatar">E</div>
+      <div class="student-name">Ehab</div>
+      <div class="student-context">Started with zero experience, zero capital</div>
+      <div class="student-stats">
+        <div class="student-stat">
+          <span class="student-stat-label">Capital Raised</span>
+          <span class="student-stat-value">&pound;25k</span>
+        </div>
+        <div class="student-stat">
+          <span class="student-stat-label">Time to Fund</span>
+          <span class="student-stat-value">5 Weeks</span>
+        </div>
+        <div class="student-stat">
+          <span class="student-stat-label">Airbnb Units</span>
+          <span class="student-stat-value">2</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="student-card">
+      <div class="student-avatar">D</div>
+      <div class="student-name">Dylan</div>
+      <div class="student-context">Followed the system, scaled aggressively</div>
+      <div class="student-stats">
+        <div class="student-stat">
+          <span class="student-stat-label">Airbnb Units</span>
+          <span class="student-stat-value">5</span>
+        </div>
+        <div class="student-stat">
+          <span class="student-stat-label">Best Month</span>
+          <span class="student-stat-value">&pound;12k</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="student-card">
+      <div class="student-avatar">A</div>
+      <div class="student-name">Andrew</div>
+      <div class="student-context">Masters student, building part-time</div>
+      <div class="student-stats">
+        <div class="student-stat">
+          <span class="student-stat-label">Capital Raised</span>
+          <span class="student-stat-value">&pound;13k</span>
+        </div>
+        <div class="student-stat">
+          <span class="student-stat-label">Airbnb Units</span>
+          <span class="student-stat-value">3</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="student-card">
+      <div class="student-avatar">EK</div>
+      <div class="student-name">Elite Kleans</div>
+      <div class="student-context">One solid unit, reliable monthly income</div>
+      <div class="student-stats">
+        <div class="student-stat">
+          <span class="student-stat-label">Monthly Income</span>
+          <span class="student-stat-value">&pound;2.2k</span>
+        </div>
+        <div class="student-stat">
+          <span class="student-stat-label">Airbnb Units</span>
+          <span class="student-stat-value">1</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== WHAT I'D DO DIFFERENTLY ========== -->
+<div class="section">
+  <span class="section-label">If I Started Today</span>
+  <h2 class="section-title">What I'd Do Differently</h2>
+  <p class="section-subtitle">If I was starting from absolute zero in 2026, here's exactly what I'd do &mdash; in this order.</p>
+
+  <ol class="numbered-list">
+    <li>
+      <div class="step-title">Learn the model inside out</div>
+      <div class="step-body">Give yourself 2&ndash;4 weeks of intensive education. Understand serviced accommodation, rent-to-SA, legal requirements, the financial model. Don't wing it.</div>
+    </li>
+    <li>
+      <div class="step-title">Pick ONE city and become the expert</div>
+      <div class="step-body">Choose a city with strong demand drivers &mdash; universities, hospitals, business parks, transport links &mdash; and learn everything about it.</div>
+    </li>
+    <li>
+      <div class="step-title">Build your credibility online</div>
+      <div class="step-body">Start posting. Share what you're learning. Do deal analyses publicly. This is how you attract investors and landlords without cold-calling.</div>
+    </li>
+    <li>
+      <div class="step-title">Network with purpose</div>
+      <div class="step-body">Property events, online communities, local meetups. Build genuine relationships. Don't pitch anyone in the first conversation.</div>
+    </li>
+    <li>
+      <div class="step-title">Create your investor proposal</div>
+      <div class="step-body">Professional, clear, compelling. The numbers, returns, risk mitigation, exit strategy. Make it impossible for a reasonable person to say no.</div>
+    </li>
+    <li>
+      <div class="step-title">Secure your first investor</div>
+      <div class="step-body">Start with people in your network who have savings earning nothing. Present the opportunity. Be honest, transparent, professional.</div>
+    </li>
+    <li>
+      <div class="step-title">Find and secure your first property</div>
+      <div class="step-body">Use your market knowledge to identify the right property. Approach the landlord with a professional proposal. Negotiate terms that work for both sides.</div>
+    </li>
+    <li>
+      <div class="step-title">Get it live and profitable within 3 weeks</div>
+      <div class="step-body">Furnish it, photograph it, list it, start taking bookings. Don't overthink. Get it live, get reviews, optimise from there.</div>
+    </li>
+    <li>
+      <div class="step-title">Build your systems immediately</div>
+      <div class="step-body">Don't wait until you're drowning. Automated messaging, cleaning processes, pricing tools, SOPs &mdash; all from day one.</div>
+    </li>
+    <li>
+      <div class="step-title">Repeat</div>
+      <div class="step-body">Use the results from unit one to raise more capital and secure more properties. Each one gets easier than the last.</div>
+    </li>
+  </ol>
+</div>
+
+<hr class="divider">
+
+<!-- ========== 3C SYSTEM ========== -->
+<div class="section">
+  <span class="section-label">The Framework</span>
+  <h2 class="section-title">The 3C System &mdash; A Preview</h2>
+  <p class="section-subtitle">Everything in this case study follows one framework. It's the backbone of everything taught at Property Labs.</p>
+
+  <div class="three-c-grid">
+
+    <div class="three-c-card">
+      <div class="three-c-icon">C1</div>
+      <div class="three-c-title">Credibility</div>
+      <div class="three-c-body">Build genuine knowledge, a presence, and trust. When you have credibility, doors open. Investors approach you. Landlords want to work with you. Opportunities find you.</div>
+    </div>
+
+    <div class="three-c-card">
+      <div class="three-c-icon">C2</div>
+      <div class="three-c-title">Capital</div>
+      <div class="three-c-body">With credibility, raising capital becomes natural. You're presenting a genuine opportunity to people with savings doing nothing &mdash; offering better returns than their bank, backed by real assets.</div>
+    </div>
+
+    <div class="three-c-card">
+      <div class="three-c-icon">C3</div>
+      <div class="three-c-title">Cash Flow</div>
+      <div class="three-c-body">Deploy credibility and capital into serviced accommodation. Create consistent, scalable, location-independent income. The engine that funds your lifestyle, growth, and freedom.</div>
+    </div>
+
+  </div>
+
+  <div class="three-c-flow">
+    Credibility <span>&rarr;</span> Capital <span>&rarr;</span> Cash Flow <span>&rarr;</span> <span>Freedom</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== CTA ========== -->
+<div class="section cta-page">
+  <span class="section-label">Your Next Step</span>
+  <h2 class="section-title">Ready to Start?</h2>
+
+  <p class="cta-question">What would an extra &pound;2,000&ndash;&pound;5,000 per month do for your life? Clear your debts? Replace your job? Give you the freedom to stop trading hours for money?</p>
+
+  <div class="cta-options">
+
+    <div class="cta-box">
+      <div class="cta-box-label">Option 1</div>
+      <div class="cta-box-title">Book a Free Strategy Call</div>
+      <div class="cta-box-desc">I'll personally map out YOUR 90-day plan to go from where you are right now to your first profitable Airbnb unit. No pressure. No hard sell. Just a genuine conversation about what's possible.</div>
+      <a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" class="cta-button" target="_blank" rel="noopener">Book Your Free Call</a>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-box-label">Option 2</div>
+      <div class="cta-box-title">Attend the Free Live Webinar</div>
+      <div class="cta-box-desc">I'll walk you through the entire 3C System in detail. See exactly how I built my portfolio, how students are replicating it, and how you can start &mdash; even with zero money, zero experience.</div>
+      <div class="cta-date">April 13, 2026 &mdash; Live</div>
+      <p style="font-size:0.85rem;color:var(--gray-500);margin-top:12px;">Register through your Strategy Call or DM on social media.</p>
+    </div>
+
+  </div>
+
+  <div class="cta-closing">
+    <p>I started with nothing. My students started with nothing. The only difference between us and everyone else is that we decided to start.</p>
+    <strong>&mdash; Terry Dwobeng, Founder of Property Labs</strong>
+  </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site-footer">
+  <div class="footer-brand">Property Labs</div>
+  <div class="footer-url">propertylabs.to</div>
+</footer>
+
+</body>
+</html>

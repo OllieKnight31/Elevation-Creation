@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 1080px;
+    height: 1350px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0a0f0d;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .container {
+    width: 1080px;
+    height: 1350px;
+    position: relative;
+    display: flex;
+  }
+  .photo-side {
+    width: 45%;
+    height: 1350px;
+    position: relative;
+    overflow: hidden;
+  }
+  .photo-side img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+  .photo-side::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 50%, #0a0f0d 100%),
+                linear-gradient(180deg, transparent 70%, rgba(10,15,13,0.8) 100%);
+  }
+  .content-side {
+    width: 55%;
+    height: 1350px;
+    padding: 0 60px 120px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .section-label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    color: #3ECFA0;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 50px;
+  }
+  .result-card {
+    background: #111916;
+    border-left: 4px solid #3ECFA0;
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(62,207,160,0.05) 0%, transparent 60%);
+  }
+  .result-card .name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: #3ECFA0;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .result-card .result {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 24px;
+    color: #FFFFFF;
+    line-height: 1.4;
+    position: relative;
+  }
+  .result-card .detail {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 6px;
+    position: relative;
+  }
+  .cta-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 1080px;
+    margin-left: -45%;
+    height: 100px;
+    background: linear-gradient(135deg, #3ECFA0 0%, #2BB88A 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  .cta-bar span {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 30px;
+    color: #0a0f0d;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="photo-side">
+    <img src="/images/terry-hero.jpg" alt="Terry">
+  </div>
+  <div class="content-side">
+    <div class="section-label">Real Students. Real Results.</div>
+
+    <div class="result-card">
+      <div class="name">EHAB</div>
+      <div class="result">&pound;25,000 raised in 5 weeks</div>
+      <div class="detail">2 Airbnbs</div>
+    </div>
+
+    <div class="result-card">
+      <div class="name">DYLAN</div>
+      <div class="result">5 Airbnbs in 3 months</div>
+      <div class="detail">&pound;12k best month</div>
+    </div>
+
+    <div class="result-card">
+      <div class="name">ANDREW</div>
+      <div class="result">&pound;13,000 raised in month 1</div>
+      <div class="detail">3 units</div>
+    </div>
+  </div>
+
+  <div class="cta-bar">
+    <span>Free Training — April 13th</span>
+  </div>
+</div>
+</body>
+</html>

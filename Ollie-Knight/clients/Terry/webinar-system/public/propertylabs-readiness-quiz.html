@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Am I Ready to Launch My First Airbnb? | Property Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-card: #141414;
+  --bg-card-hover: #1a1a1a;
+  --coral: #3ECFA0;
+  --coral-dark: #2BB88A;
+  --coral-glow: rgba(62, 207, 160, 0.15);
+  --white: #ffffff;
+  --grey-100: #f5f5f5;
+  --grey-300: #b0b0b0;
+  --grey-500: #6b6b6b;
+  --grey-700: #2a2a2a;
+  --green: #2ecc71;
+  --amber: #3ECFA0;
+  --blue: #3498db;
+  --tier-grey: #95a5a6;
+  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Layout ── */
+.quiz-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ── Screens ── */
+.screen {
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.screen.active {
+  display: block;
+}
+
+.screen.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Intro Screen ── */
+.intro-badge {
+  display: inline-block;
+  background: var(--coral-glow);
+  color: var(--coral);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 100px;
+  margin-bottom: 28px;
+}
+
+.intro-headline {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 18px;
+  color: var(--white);
+}
+
+.intro-headline span {
+  color: var(--coral);
+}
+
+.intro-subhead {
+  font-size: 1.1rem;
+  color: var(--grey-300);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.intro-author {
+  font-size: 0.95rem;
+  color: var(--grey-500);
+  margin-bottom: 36px;
+}
+
+.intro-author strong {
+  color: var(--grey-300);
+}
+
+.btn-start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--coral);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding: 18px 48px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 24px rgba(62, 207, 160, 0.25);
+  width: 100%;
+  max-width: 380px;
+}
+
+.btn-start:hover {
+  background: var(--coral-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(62, 207, 160, 0.35);
+}
+
+.btn-start:active { transform: translateY(0); }
+
+.btn-start .arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.btn-start:hover .arrow { transform: translateX(4px); }
+
+.social-proof {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  color: var(--grey-500);
+  font-size: 0.88rem;
+}
+
+.social-proof-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+  50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
+}
+
+/* ── Progress Bar ── */
+.progress-wrapper {
+  margin-bottom: 36px;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  color: var(--grey-500);
+}
+
+.progress-label span:first-child { font-weight: 600; color: var(--grey-300); }
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background: var(--grey-700);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--coral), #ff8a8d);
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ── Question Screen ── */
+.question-number {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--coral);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+
+.question-text {
+  font-family: var(--font-heading);
+  font-size: clamp(1.3rem, 3.5vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.35;
+  margin-bottom: 28px;
+  color: var(--white);
+}
+
+.answers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.answer-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--grey-700);
+  border-radius: var(--radius);
+  color: var(--grey-100);
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+}
+
+.answer-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--coral);
+  transform: translateX(4px);
+}
+
+.answer-btn.selected {
+  background: var(--coral-glow);
+  border-color: var(--coral);
+  color: var(--white);
+}
+
+.answer-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--grey-700);
+  color: var(--grey-300);
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.answer-btn:hover .answer-letter,
+.answer-btn.selected .answer-letter {
+  background: var(--coral);
+  color: var(--white);
+}
+
+/* ── Question Transition ── */
+.question-content {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.question-content.exit {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.question-content.enter {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* ── Lead Capture Screen ── */
+.capture-card {
+  background: var(--bg-card);
+  border: 1px solid var(--grey-700);
+  border-radius: var(--radius-lg);
+  padding: 40px 32px;
+}
+
+.capture-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.capture-sub {
+  color: var(--grey-300);
+  font-size: 0.95rem;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--grey-300);
+  margin-bottom: 6px;
+}
+
+.form-group label .optional {
+  font-weight: 400;
+  color: var(--grey-500);
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1.5px solid var(--grey-700);
+  border-radius: var(--radius);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-input::placeholder { color: var(--grey-500); }
+.form-input:focus { border-color: var(--coral); }
+
+.btn-submit {
+  width: 100%;
+  padding: 16px;
+  background: var(--coral);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 20px rgba(62, 207, 160, 0.2);
+}
+
+.btn-submit:hover {
+  background: var(--coral-dark);
+  transform: translateY(-1px);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.form-disclaimer {
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: var(--grey-500);
+  line-height: 1.5;
+}
+
+/* ── Results Screen ── */
+.results-badge {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.results-badge.tier-launch { background: rgba(46, 204, 113, 0.15); color: var(--green); }
+.results-badge.tier-almost { background: var(--coral-glow); color: var(--coral); }
+.results-badge.tier-building { background: rgba(52, 152, 219, 0.15); color: var(--blue); }
+.results-badge.tier-explorer { background: rgba(149, 165, 166, 0.15); color: var(--tier-grey); }
+
+.results-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.results-message {
+  font-size: 1.05rem;
+  color: var(--grey-300);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+/* ── Score Gauge ── */
+.gauge-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.gauge-container {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.gauge-bg {
+  fill: none;
+  stroke: var(--grey-700);
+  stroke-width: 10;
+}
+
+.gauge-fill {
+  fill: none;
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 440;
+  stroke-dashoffset: 440;
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.gauge-fill.tier-launch { stroke: var(--green); }
+.gauge-fill.tier-almost { stroke: var(--coral); }
+.gauge-fill.tier-building { stroke: var(--blue); }
+.gauge-fill.tier-explorer { stroke: var(--tier-grey); }
+
+.gauge-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.gauge-score {
+  font-family: var(--font-heading);
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.gauge-score.tier-launch { color: var(--green); }
+.gauge-score.tier-almost { color: var(--coral); }
+.gauge-score.tier-building { color: var(--blue); }
+.gauge-score.tier-explorer { color: var(--tier-grey); }
+
+.gauge-max {
+  font-size: 0.82rem;
+  color: var(--grey-500);
+  margin-top: 2px;
+}
+
+/* ── Results CTA ── */
+.results-next {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px 32px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.btn-cta-primary {
+  background: var(--coral);
+  box-shadow: 0 4px 24px rgba(62, 207, 160, 0.25);
+}
+
+.btn-cta-primary:hover {
+  background: var(--coral-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(62, 207, 160, 0.35);
+}
+
+.btn-cta-secondary {
+  background: transparent;
+  border: 1.5px solid var(--grey-700);
+  color: var(--grey-300);
+  font-size: 0.95rem;
+}
+
+.btn-cta-secondary:hover {
+  border-color: var(--coral);
+  color: var(--white);
+}
+
+.results-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+  color: var(--grey-500);
+  font-size: 0.85rem;
+}
+
+.results-divider::before,
+.results-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--grey-700);
+}
+
+/* ── Footer ── */
+.quiz-footer {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--grey-700);
+}
+
+.quiz-footer p {
+  font-size: 0.82rem;
+  color: var(--grey-500);
+}
+
+.quiz-footer a {
+  color: var(--coral);
+  text-decoration: none;
+}
+
+/* ── Back Button ── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--grey-500);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  transition: color 0.2s ease;
+}
+
+.back-btn:hover { color: var(--white); }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .quiz-container { padding: 28px 16px; }
+  .capture-card { padding: 28px 20px; }
+  .btn-start { max-width: 100%; }
+  .gauge-container { width: 150px; height: 150px; }
+  .gauge-score { font-size: 2rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="quiz-container">
+
+  <!-- ═══════════════ INTRO SCREEN ═══════════════ -->
+  <div class="screen active visible" id="screen-intro">
+    <div class="intro-badge">2-Minute Assessment</div>
+    <h1 class="intro-headline">Are You Ready to Launch Your First <span>Airbnb</span>?</h1>
+    <p class="intro-subhead">Take this 2-minute assessment and find out exactly where you stand.</p>
+    <p class="intro-author">By <strong>Terry Dwobeng</strong>, Property Labs</p>
+    <button class="btn-start" id="btn-start" onclick="startQuiz()">
+      Start Quiz <span class="arrow">&rarr;</span>
+    </button>
+    <div class="social-proof">
+      <span class="social-proof-dot"></span>
+      <span>2,500+ people have taken this quiz</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════ QUESTION SCREEN ═══════════════ -->
+  <div class="screen" id="screen-question">
+    <div class="progress-wrapper">
+      <div class="progress-label">
+        <span id="progress-text">Question 1 of 8</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="question-content" id="question-content">
+      <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">
+        &larr; Back
+      </button>
+      <div class="question-number" id="question-number">Question 1</div>
+      <h2 class="question-text" id="question-text"></h2>
+      <div class="answers-list" id="answers-list"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ CAPTURE SCREEN ═══════════════ -->
+  <div class="screen" id="screen-capture">
+    <div class="capture-card">
+      <h2 class="capture-title">Your results are ready</h2>
+      <p class="capture-sub">Enter your details to see your personalised results and recommendations.</p>
+      <form id="capture-form" onsubmit="handleCapture(event)">
+        <div class="form-group">
+          <label for="cap-name">First Name</label>
+          <input type="text" id="cap-name" class="form-input" placeholder="e.g. Terry" required>
+        </div>
+        <div class="form-group">
+          <label for="cap-email">Email Address</label>
+          <input type="email" id="cap-email" class="form-input" placeholder="you@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="cap-phone">Phone Number <span class="optional">(optional)</span></label>
+          <input type="tel" id="cap-phone" class="form-input" placeholder="+44 7700 000000">
+        </div>
+        <button type="submit" class="btn-submit" id="btn-capture">Get Your Results</button>
+        <p class="form-disclaimer">We'll also send you a free guide based on your score. By submitting, you agree to receive communications from Property Labs. Unsubscribe anytime.</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════ RESULTS SCREEN ═══════════════ -->
+  <div class="screen" id="screen-results">
+    <div id="results-badge" class="results-badge"></div>
+    <h2 class="results-title" id="results-title"></h2>
+    <p class="results-message" id="results-message"></p>
+
+    <div class="gauge-wrapper">
+      <div class="gauge-container">
+        <svg class="gauge-svg" viewBox="0 0 160 160">
+          <circle class="gauge-bg" cx="80" cy="80" r="70"></circle>
+          <circle class="gauge-fill" id="gauge-fill" cx="80" cy="80" r="70"></circle>
+        </svg>
+        <div class="gauge-text">
+          <div class="gauge-score" id="gauge-score">0</div>
+          <div class="gauge-max">out of 40</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="results-next" id="results-next"></p>
+    <div id="results-ctas"></div>
+
+    <div class="quiz-footer">
+      <p>Property Labs by Terry Dwobeng</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ═══════════════════════════════════════════
+     QUIZ DATA
+     ═══════════════════════════════════════════ */
+
+  var questions = [
+    {
+      text: "How much capital do you currently have available to invest?",
+      answers: [
+        { text: "Less than \u00a31,000", score: 2 },
+        { text: "\u00a31,000 - \u00a35,000", score: 3 },
+        { text: "\u00a35,000 - \u00a315,000", score: 4 },
+        { text: "\u00a315,000+", score: 5 },
+        { text: "I don\u2019t have any but I\u2019m willing to learn how to raise it", score: 1 }
+      ]
+    },
+    {
+      text: "Do you have any property or Airbnb experience?",
+      answers: [
+        { text: "None at all", score: 1 },
+        { text: "I\u2019ve stayed in Airbnbs as a guest", score: 2 },
+        { text: "I\u2019ve researched it but haven\u2019t started", score: 3 },
+        { text: "I own/manage property already", score: 4 },
+        { text: "I\u2019ve run an Airbnb before", score: 5 }
+      ]
+    },
+    {
+      text: "How many hours per week can you dedicate to this?",
+      answers: [
+        { text: "Less than 5 hours", score: 2 },
+        { text: "5-10 hours", score: 3 },
+        { text: "10-20 hours", score: 4 },
+        { text: "20+ hours (I\u2019m going all in)", score: 5 }
+      ]
+    },
+    {
+      text: "What\u2019s your primary goal with Airbnb?",
+      answers: [
+        { text: "Replace my 9-5 income", score: 5 },
+        { text: "Build a side income (\u00a31-3k/month)", score: 4 },
+        { text: "Create long-term wealth through property", score: 4 },
+        { text: "Financial freedom and time freedom", score: 5 }
+      ]
+    },
+    {
+      text: "How soon do you want to launch your first Airbnb?",
+      answers: [
+        { text: "This month", score: 5 },
+        { text: "Within 3 months", score: 4 },
+        { text: "Within 6 months", score: 3 },
+        { text: "Within a year", score: 2 },
+        { text: "I\u2019m just exploring for now", score: 1 }
+      ]
+    },
+    {
+      text: "Have you identified a target location/area?",
+      answers: [
+        { text: "Yes, I\u2019ve done research and have 2-3 areas shortlisted", score: 5 },
+        { text: "I have some ideas but haven\u2019t researched properly", score: 3 },
+        { text: "No idea where to start", score: 1 }
+      ]
+    },
+    {
+      text: "What\u2019s your biggest concern about starting?",
+      answers: [
+        { text: "I don\u2019t have enough money", score: 2 },
+        { text: "I don\u2019t have enough knowledge/experience", score: 3 },
+        { text: "I\u2019m worried it won\u2019t work for me", score: 2 },
+        { text: "I don\u2019t have enough time", score: 2 },
+        { text: "I\u2019m not sure where to start", score: 3 }
+      ]
+    },
+    {
+      text: "Are you willing to invest in coaching/mentorship to accelerate your results?",
+      answers: [
+        { text: "Yes, absolutely \u2014 I want to avoid mistakes and move fast", score: 5 },
+        { text: "Maybe, depends on the cost and value", score: 3 },
+        { text: "No, I prefer to figure it out myself", score: 1 }
+      ]
+    }
+  ];
+
+  var tiers = {
+    launch:   { min: 32, label: "Ready to Launch",     cssClass: "tier-launch",   color: "#2ecc71" },
+    almost:   { min: 24, label: "Almost There",         cssClass: "tier-almost",   color: "#3ECFA0" },
+    building: { min: 16, label: "Building Foundations",  cssClass: "tier-building", color: "#3498db" },
+    explorer: { min: 8,  label: "Early Explorer",       cssClass: "tier-explorer", color: "#95a5a6" }
+  };
+
+  var results = {
+    launch: {
+      title: "You\u2019re Ready to Launch",
+      message: "You\u2019re ready. Most people at your stage launch within 60 days with the right guidance.",
+      next: "Your next step: Book a free Strategy Call with Property Labs to map out your 90-day plan.",
+      ctas: [
+        { text: "Book Your Free Strategy Call", url: "https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm", primary: true },
+        { divider: "Or" },
+        { text: "Join the Free Live Training \u2014 April 13th", url: "#webinar", primary: false }
+      ]
+    },
+    almost: {
+      title: "You\u2019re Almost There",
+      message: "You\u2019re closer than you think. A few key pieces and you\u2019ll be ready to launch.",
+      next: "What\u2019s holding you back is exactly what\u2019s covered in the free training.",
+      ctas: [
+        { text: "Register for the Free Training", url: "#webinar", primary: true },
+        { divider: "Or" },
+        { text: "Book a Free Strategy Call", url: "https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm", primary: false }
+      ]
+    },
+    building: {
+      title: "You\u2019re Building Foundations",
+      message: "Great news \u2014 you\u2019re asking the right questions. That\u2019s where every successful Airbnb operator started.",
+      next: "The free training covers exactly how to go from where you are to your first profitable Airbnb in 90 days.",
+      ctas: [
+        { text: "Register for the Free Training", url: "#webinar", primary: true }
+      ]
+    },
+    explorer: {
+      title: "Welcome, Early Explorer",
+      message: "Everyone starts somewhere. The fact that you\u2019re taking this quiz shows you\u2019re serious.",
+      next: "Start with the free training \u2014 you\u2019ll discover the exact system 25 everyday people used to launch profitable Airbnbs.",
+      ctas: [
+        { text: "Register for the Free Training", url: "#webinar", primary: true }
+      ]
+    }
+  };
+
+  /* ═══════════════════════════════════════════
+     STATE
+     ═══════════════════════════════════════════ */
+  var currentQuestion = 0;
+  var answers = [];
+  var totalScore = 0;
+  var letters = ['A','B','C','D','E'];
+
+  /* ═══════════════════════════════════════════
+     SCREEN MANAGEMENT
+     ═══════════════════════════════════════════ */
+
+  function showScreen(id) {
+    var screens = document.querySelectorAll('.screen');
+    screens.forEach(function(s) {
+      s.classList.remove('active', 'visible');
+    });
+    var target = document.getElementById(id);
+    target.classList.add('active');
+    // Force reflow for transition
+    void target.offsetWidth;
+    requestAnimationFrame(function() {
+      target.classList.add('visible');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ═══════════════════════════════════════════
+     QUIZ FLOW
+     ═══════════════════════════════════════════ */
+
+  window.startQuiz = function() {
+    showScreen('screen-question');
+    renderQuestion(0);
+  };
+
+  function renderQuestion(index) {
+    var q = questions[index];
+    var content = document.getElementById('question-content');
+    var qNum = document.getElementById('question-number');
+    var qText = document.getElementById('question-text');
+    var aList = document.getElementById('answers-list');
+    var backBtn = document.getElementById('back-btn');
+
+    // Update progress
+    var pct = Math.round((index / questions.length) * 100);
+    document.getElementById('progress-text').textContent = 'Question ' + (index + 1) + ' of ' + questions.length;
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+
+    // Transition out
+    content.classList.add('exit');
+
+    setTimeout(function() {
+      // Update content
+      qNum.textContent = 'Question ' + (index + 1);
+      qText.textContent = q.text;
+      backBtn.style.display = index > 0 ? 'inline-flex' : 'none';
+
+      aList.innerHTML = '';
+      q.answers.forEach(function(a, i) {
+        var btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.innerHTML = '<span class="answer-letter">' + letters[i] + '</span><span>' + a.text + '</span>';
+        btn.addEventListener('click', function() { selectAnswer(i, a.score); });
+
+        // Re-highlight if previously answered
+        if (answers[index] !== undefined && answers[index].answerIndex === i) {
+          btn.classList.add('selected');
+        }
+
+        aList.appendChild(btn);
+      });
+
+      // Transition in
+      content.classList.remove('exit');
+      content.classList.add('enter');
+      void content.offsetWidth;
+      content.classList.remove('enter');
+    }, 300);
+  }
+
+  function selectAnswer(answerIndex, score) {
+    // Highlight selected
+    var btns = document.querySelectorAll('.answer-btn');
+    btns.forEach(function(b) { b.classList.remove('selected'); });
+    btns[answerIndex].classList.add('selected');
+
+    // Store answer
+    answers[currentQuestion] = { answerIndex: answerIndex, score: score };
+
+    // Advance after brief pause
+    setTimeout(function() {
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion(currentQuestion);
+      } else {
+        // Calculate score
+        totalScore = 0;
+        answers.forEach(function(a) { totalScore += a.score; });
+        showScreen('screen-capture');
+      }
+    }, 350);
+  }
+
+  window.goBack = function() {
+    if (currentQuestion > 0) {
+      currentQuestion--;
+      renderQuestion(currentQuestion);
+    }
+  };
+
+  /* ═══════════════════════════════════════════
+     LEAD CAPTURE
+     ═══════════════════════════════════════════ */
+
+  window.handleCapture = function(e) {
+    e.preventDefault();
+    var name = document.getElementById('cap-name').value.trim();
+    var email = document.getElementById('cap-email').value.trim();
+    var phone = document.getElementById('cap-phone').value.trim();
+    var btn = document.getElementById('btn-capture');
+
+    if (!name || !email) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Loading...';
+
+    var tier = getTierKey(totalScore);
+
+    // Store in localStorage
+    var quizData = {
+      name: name,
+      email: email,
+      phone: phone,
+      score: totalScore,
+      tier: tier,
+      answers: answers,
+      completedAt: new Date().toISOString()
+    };
+    try { localStorage.setItem('plabs_quiz_result', JSON.stringify(quizData)); } catch(e) {}
+
+    // POST to Vercel API
+    var payload = {
+      source: 'quiz',
+      name: name,
+      email: email,
+      phone: phone,
+      score: totalScore,
+      tier: tier,
+      utm_source: getParam('utm_source'),
+      utm_medium: getParam('utm_medium'),
+      utm_campaign: getParam('utm_campaign'),
+      utm_content: getParam('utm_content'),
+      utm_term: getParam('utm_term')
+    };
+
+    fetch('/api?source=quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(function() {}).finally(function() {
+      showResults(tier, name);
+    });
+  };
+
+  /* ═══════════════════════════════════════════
+     RESULTS
+     ═══════════════════════════════════════════ */
+
+  function getTierKey(score) {
+    if (score >= tiers.launch.min) return 'launch';
+    if (score >= tiers.almost.min) return 'almost';
+    if (score >= tiers.building.min) return 'building';
+    return 'explorer';
+  }
+
+  function showResults(tierKey, name) {
+    var tier = tiers[tierKey];
+    var data = results[tierKey];
+
+    // Badge
+    var badge = document.getElementById('results-badge');
+    badge.className = 'results-badge ' + tier.cssClass;
+    badge.textContent = tier.label;
+
+    // Title / Message
+    document.getElementById('results-title').textContent = data.title + ', ' + name;
+    document.getElementById('results-message').textContent = data.message;
+
+    // Gauge
+    var gaugeFill = document.getElementById('gauge-fill');
+    gaugeFill.className = 'gauge-fill ' + tier.cssClass;
+    var gaugeScore = document.getElementById('gauge-score');
+    gaugeScore.className = 'gauge-score ' + tier.cssClass;
+
+    showScreen('screen-results');
+
+    // Animate gauge after screen is visible
+    setTimeout(function() {
+      var circumference = 2 * Math.PI * 70; // ~440
+      var pct = totalScore / 40;
+      var offset = circumference - (pct * circumference);
+      gaugeFill.style.strokeDashoffset = offset;
+
+      // Animate number
+      animateNumber(gaugeScore, 0, totalScore, 1200);
+    }, 400);
+
+    // Next step text
+    document.getElementById('results-next').textContent = data.next;
+
+    // CTAs
+    var ctaContainer = document.getElementById('results-ctas');
+    ctaContainer.innerHTML = '';
+    data.ctas.forEach(function(cta) {
+      if (cta.divider) {
+        var div = document.createElement('div');
+        div.className = 'results-divider';
+        div.textContent = cta.divider;
+        ctaContainer.appendChild(div);
+      } else {
+        var a = document.createElement('a');
+        a.href = cta.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.className = 'btn-cta ' + (cta.primary ? 'btn-cta-primary' : 'btn-cta-secondary');
+        a.textContent = cta.text;
+        ctaContainer.appendChild(a);
+      }
+    });
+  }
+
+  function animateNumber(el, from, to, duration) {
+    var start = performance.now();
+    function tick(now) {
+      var elapsed = now - start;
+      var progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      var ease = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(from + (to - from) * ease);
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* ═══════════════════════════════════════════
+     UTM HELPERS
+     ═══════════════════════════════════════════ */
+
+  function getParam(name) {
+    var params = new URLSearchParams(window.location.search);
+    return params.get(name) || '';
+  }
+
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+Section,Field,Your Property,Example: 2-Bed Manchester,Notes
+PROPERTY DETAILS,Property Address,,45 Dale Street Northern Quarter Manchester M1 2HF,Full address of the property
+PROPERTY DETAILS,Number of Bedrooms,,2,How many bedrooms
+PROPERTY DETAILS,Property Type (Flat/House/Room),,Flat,Select: Flat / House / Room
+PROPERTY DETAILS,Monthly Rent (£),,1100,What you pay the landlord per month
+PROPERTY DETAILS,Location / City,,Manchester,City or area
+,,,,
+REVENUE PROJECTION,Average Nightly Rate (£),,120,Check AirDNA or comparable Airbnb listings in the area
+REVENUE PROJECTION,Expected Occupancy Rate (%),,72,Use 65% as conservative estimate. Check AirDNA for area average
+REVENUE PROJECTION,Nights Per Month (calculated),,21.6,= Occupancy Rate x 30 days
+REVENUE PROJECTION,Monthly Revenue (calculated),,2592,= Nightly Rate x Nights Per Month
+REVENUE PROJECTION,Annual Revenue (calculated),,31104,= Monthly Revenue x 12
+,,,,
+COSTS (MONTHLY),Monthly Rent (£),,1100,Same as rent above
+COSTS (MONTHLY),Council Tax (£),,110,Check local council website for band. Budget 90-150/month
+COSTS (MONTHLY),Utilities - Gas Electric Water Wifi (£),,150,Budget 120-180 for a 2-bed. Get supplier quotes
+COSTS (MONTHLY),Insurance (£),,60,Short-let insurance from Guardhog Pikl or Proper. Budget 50-80/month
+COSTS (MONTHLY),Cleaning Cost Per Turnover (£),,60,Ask local cleaners. Typically 40-70 per clean for 2-bed
+COSTS (MONTHLY),Estimated Turnovers Per Month,,8,Average stay 2-3 nights = roughly 8-10 turnovers/month
+COSTS (MONTHLY),Total Cleaning (£) (calculated),,480,= Cost Per Turnover x Turnovers Per Month
+COSTS (MONTHLY),Consumables - Toiletries Coffee Etc (£),,40,Budget 30-50/month for guest supplies
+COSTS (MONTHLY),Platform Fees - Airbnb 3% (calculated),,77.76,= Monthly Revenue x 0.03
+COSTS (MONTHLY),Maintenance Reserve - 5% (calculated),,129.60,= Monthly Revenue x 0.05. Things break - budget for it
+COSTS (MONTHLY),Management Fee (£),,0,15-20% of revenue if using a co-host. 0 if self-managing
+COSTS (MONTHLY),Total Monthly Costs (calculated),,2147.36,= Sum of all costs above
+,,,,
+PROFITABILITY,Monthly Profit (£) (calculated),,444.64,= Monthly Revenue - Total Monthly Costs
+PROFITABILITY,Annual Profit (£) (calculated),,5335.68,= Monthly Profit x 12
+PROFITABILITY,Profit Margin % (calculated),,17.2,= (Monthly Profit / Monthly Revenue) x 100
+PROFITABILITY,ROI on Setup Costs % (calculated),,152.4,= (Annual Profit / Total Setup Investment) x 100
+PROFITABILITY,Break-Even Month (calculated),,8,= Total Setup Investment / Monthly Profit (rounded up)
+PROFITABILITY,VERDICT,,MARGINAL,PROFITABLE (25%+ margin) / MARGINAL (15-25%) / AVOID (below 15%)
+,,,,
+SETUP COSTS,Furniture and Furnishing (£),,3000,Budget 2000-4000 for 2-bed. IKEA FB Marketplace Dunelm
+SETUP COSTS,Photography (£),,150,Professional photos. 100-200. NOT optional
+SETUP COSTS,Initial Supplies (£),,300,First batch of linens towels consumables. Buy in bulk
+SETUP COSTS,Listing Setup (£),,50,Free if DIY. 100-200 if you need help
+SETUP COSTS,Total Setup Investment (£) (calculated),,3500,= Sum of all setup costs
+,,,,
+TERRY'S QUICK CHECKS,Rent-to-Revenue Ratio %,,42.4,= Rent / Monthly Revenue x 100. Must be below 45%. Sweet spot 35-40%
+TERRY'S QUICK CHECKS,Effective Nightly Rate (£),,86.40,= Monthly Revenue / 30. Your ACTUAL per-night earnings
+TERRY'S QUICK CHECKS,Cost Per Turnover (£),,70,Cleaning + laundry + consumables per guest changeover
+TERRY'S QUICK CHECKS,Minimum Nightly Rate to Break Even (£),,99.42,= Total Monthly Costs / Nights Per Month. Below this you lose money
+,,,,
+NOTES,How to use this analyser:,,,
+NOTES,1. Fill in the 'Your Property' column with real numbers,,,
+NOTES,2. All fields marked (calculated) will need formulas - see guide,,,
+NOTES,3. Run EVERY deal through this before signing anything,,,
+NOTES,4. If the verdict says AVOID then walk away,,,
+NOTES,5. Analyse at least 5-10 properties before committing,,,
+NOTES,Book a Strategy Call: https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm,,,

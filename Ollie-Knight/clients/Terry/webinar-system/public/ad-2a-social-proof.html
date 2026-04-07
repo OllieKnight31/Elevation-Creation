@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; background: #0a0f0d; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  .canvas { width: 1080px; height: 1350px; position: absolute; top: 0; left: 0; }
+
+  /* Terry photo — full left side */
+  .photo { position: absolute; top: 0; left: 0; width: 490px; height: 1350px; overflow: hidden; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+  .photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 30%, #0a0f0d 100%), linear-gradient(180deg, transparent 60%, #0a0f0d 100%); }
+
+  /* Content — right side, vertically centred */
+  .content { position: absolute; top: 0; left: 490px; width: 590px; height: 1250px; display: flex; flex-direction: column; justify-content: center; padding: 0 60px 0 50px; }
+
+  .label { font-weight: 800; font-size: 38px; color: #3ECFA0; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 60px; line-height: 1.2; }
+
+  .card { background: rgba(17,25,22,0.95); border-left: 5px solid #3ECFA0; border-radius: 14px; padding: 40px 44px; margin-bottom: 36px; }
+  .card .name { font-weight: 800; font-size: 32px; color: #3ECFA0; margin-bottom: 12px; }
+  .card .result { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 28px; color: #fff; line-height: 1.3; }
+  .card .detail { font-family: 'Inter', sans-serif; font-weight: 400; font-size: 22px; color: rgba(255,255,255,0.55); margin-top: 8px; }
+
+  /* Green CTA bar — full width at bottom */
+  .cta { position: absolute; bottom: 0; left: 0; width: 1080px; height: 100px; background: linear-gradient(135deg, #3ECFA0, #2BB88A); display: flex; align-items: center; justify-content: center; }
+  .cta span { font-weight: 800; font-size: 34px; color: #0a0f0d; letter-spacing: 3px; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="photo">
+    <img src="/images/terry-hero.jpg" alt="Terry Dwobeng">
+  </div>
+
+  <div class="content">
+    <div class="label">Real Students.<br>Real Results.</div>
+
+    <div class="card">
+      <div class="name">EHAB</div>
+      <div class="result">£25,000 raised in 5 weeks</div>
+      <div class="detail">2 Airbnbs cash-flow positive in 45 days</div>
+    </div>
+
+    <div class="card">
+      <div class="name">DYLAN</div>
+      <div class="result">5 Airbnbs in 3 months</div>
+      <div class="detail">£12k highest profit month</div>
+    </div>
+
+    <div class="card">
+      <div class="name">ANDREW</div>
+      <div class="result">£13,000 raised in month 1</div>
+      <div class="detail">Masters student + 3 Airbnb units</div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <span>Free Training — April 13th</span>
+  </div>
+</div>
+</body>
+</html>

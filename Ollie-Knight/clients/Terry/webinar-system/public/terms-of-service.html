@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service | Property Labs</title>
+<meta name="description" content="Terms of Service for Property Labs — the terms and conditions governing your use of our webinars and coaching programmes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-surface: #111111;
+  --bg-card: #161616;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #3ECFA0;
+  --accent-dim: rgba(62, 207, 160, 0.15);
+  --text: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Navigation */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.nav-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(62, 207, 160, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--accent);
+  font-family: var(--font-display);
+}
+
+.nav-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-back:hover {
+  color: var(--accent);
+}
+
+/* Container */
+.container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.page-header .subtitle {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.page-header .subtitle strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Section Headings */
+h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 48px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent-dim);
+}
+
+h3 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 28px;
+  margin-bottom: 10px;
+}
+
+/* Body text */
+p {
+  margin-bottom: 16px;
+}
+
+ul, ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+li strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* Info box */
+.info-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 24px 0;
+}
+
+.info-box p {
+  margin-bottom: 0;
+  font-size: 15px;
+}
+
+/* Pricing table */
+.pricing-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+.pricing-table th,
+.pricing-table td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pricing-table th {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--bg-card);
+}
+
+.pricing-table td {
+  color: var(--text-secondary);
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.footer-inner {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.footer-copy {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .page-header h1 {
+    font-size: 28px;
+  }
+  h2 {
+    font-size: 19px;
+  }
+  .container {
+    padding: 40px 20px 60px;
+  }
+  .pricing-table {
+    font-size: 13px;
+  }
+  .pricing-table th,
+  .pricing-table td {
+    padding: 10px 12px;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/register.html" class="nav-brand">
+    <div class="nav-logo">PL</div>
+    <span class="nav-text">Property Labs</span>
+  </a>
+  <a href="/register.html" class="nav-back">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Registration
+  </a>
+</nav>
+
+<main class="container">
+
+  <div class="page-header">
+    <h1>Terms of Service</h1>
+    <p class="subtitle">Last updated: <strong>26 March 2026</strong></p>
+  </div>
+
+  <p>These Terms of Service ("Terms") govern your use of the website at <a href="https://propertylabs.to">propertylabs.to</a> and all related services provided by Property Labs, operated by Terry Dwobeng ("we", "us", or "our").</p>
+
+  <p>By accessing our website, registering for a webinar, or purchasing any of our programmes, you agree to be bound by these Terms. If you do not agree, please do not use our services.</p>
+
+  <h2>1. Service Description</h2>
+  <p>Property Labs provides online education and coaching services focused on Airbnb property management and short-term rental business strategies. Our services include:</p>
+  <ul>
+    <li><strong>Free webinars:</strong> Live and recorded online training sessions covering Airbnb business fundamentals and strategies</li>
+    <li><strong>Coaching programmes:</strong> Structured training programmes with varying levels of mentorship, resources, and support</li>
+    <li><strong>Strategy calls:</strong> One-to-one consultation sessions to discuss your property goals</li>
+    <li><strong>Digital resources:</strong> Templates, guides, and educational materials provided as part of our programmes</li>
+  </ul>
+
+  <p>Our webinars and training are educational in nature. While we share proven strategies and real results, we do not guarantee any specific financial outcomes. Individual results depend on many factors including effort, market conditions, and personal circumstances.</p>
+
+  <h2>2. Eligibility</h2>
+  <p>You must be at least 18 years old and legally capable of entering into binding contracts to use our services. By using our website or purchasing a programme, you represent and warrant that you meet these requirements.</p>
+
+  <h2>3. Account and Registration</h2>
+  <p>When you register for a webinar or purchase a programme, you agree to:</p>
+  <ul>
+    <li>Provide accurate, current, and complete information</li>
+    <li>Keep your contact information up to date</li>
+    <li>Be responsible for all activity under your account</li>
+    <li>Not share your programme access credentials with others</li>
+  </ul>
+
+  <p>We reserve the right to refuse service, terminate accounts, or cancel registrations at our discretion if we believe these Terms have been violated.</p>
+
+  <h2>4. Pricing and Payment</h2>
+  <p>Our coaching programmes are offered at the following price tiers:</p>
+
+  <table class="pricing-table">
+    <thead>
+      <tr>
+        <th>Programme Tier</th>
+        <th>Price Range</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Foundation</td>
+        <td>From £500</td>
+        <td>Core training modules and community access</td>
+      </tr>
+      <tr>
+        <td>Accelerator</td>
+        <td>From £1,500</td>
+        <td>Enhanced training with group coaching and support</td>
+      </tr>
+      <tr>
+        <td>Elite / VIP</td>
+        <td>Up to £5,000</td>
+        <td>Comprehensive mentorship with one-to-one coaching</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>All prices are quoted in British Pounds (GBP) and are inclusive of VAT where applicable. We reserve the right to change our pricing at any time, though changes will not affect existing orders.</p>
+
+  <h3>Payment processing</h3>
+  <p>Payments are processed securely through Stripe. By making a purchase, you agree to Stripe's terms of service. We accept major credit and debit cards. Payment plans may be available for certain programmes — the specific terms will be presented at the time of purchase.</p>
+
+  <h3>Failed payments</h3>
+  <p>If you are on a payment plan and a scheduled payment fails, we will attempt to contact you to resolve the issue. Continued failure to pay may result in suspension of your programme access until the outstanding balance is settled.</p>
+
+  <h2>5. Refund Policy</h2>
+
+  <div class="info-box">
+    <p><strong>90-Day Money-Back Guarantee:</strong> We offer a 90-day refund guarantee on all coaching programmes. If you are not satisfied with the programme, you may request a full refund within 90 days of your purchase date.</p>
+  </div>
+
+  <h3>Conditions for refund</h3>
+  <ul>
+    <li>Refund requests must be submitted in writing to <a href="mailto:founder@propertylabs.to">founder@propertylabs.to</a> within 90 days of the original purchase date</li>
+    <li>We may ask you to provide feedback about your experience so that we can improve our services</li>
+    <li>Refunds will be processed to the original payment method within 14 business days of approval</li>
+  </ul>
+
+  <h3>Non-refundable items</h3>
+  <ul>
+    <li>Free webinar registrations (no payment involved)</li>
+    <li>Strategy call bookings that have already been attended</li>
+    <li>Requests submitted after the 90-day guarantee period</li>
+  </ul>
+
+  <h2>6. User Obligations</h2>
+  <p>When using our services, you agree to:</p>
+  <ul>
+    <li>Use our services only for lawful purposes and in compliance with all applicable laws</li>
+    <li>Not reproduce, distribute, or share programme materials with any third party</li>
+    <li>Not record, screenshot, or otherwise capture webinar or coaching content for redistribution</li>
+    <li>Treat other participants, staff, and coaches with respect during all interactions</li>
+    <li>Not use our platform to promote competing services or solicit other participants</li>
+    <li>Not attempt to gain unauthorised access to our systems or other users' accounts</li>
+  </ul>
+
+  <p>Violation of these obligations may result in immediate termination of your access without refund.</p>
+
+  <h2>7. Intellectual Property</h2>
+  <p>All content provided through our website, webinars, and coaching programmes is the intellectual property of Property Labs and Terry Dwobeng. This includes but is not limited to:</p>
+  <ul>
+    <li>Webinar presentations, recordings, and transcripts</li>
+    <li>Coaching programme materials, frameworks, and methodologies</li>
+    <li>Templates, worksheets, guides, and checklists</li>
+    <li>Website design, copy, logos, and branding</li>
+    <li>The "3C System" and any other proprietary frameworks</li>
+  </ul>
+
+  <p>You are granted a limited, non-exclusive, non-transferable licence to use programme materials for your personal, non-commercial educational purposes only. You may not:</p>
+  <ul>
+    <li>Copy, modify, or create derivative works from our materials</li>
+    <li>Distribute, sell, lease, or sublicence our content</li>
+    <li>Use our materials to create competing products or services</li>
+    <li>Remove any copyright, trademark, or proprietary notices</li>
+  </ul>
+
+  <h2>8. Earnings Disclaimer</h2>
+  <p>Any income figures, results, or examples shared during our webinars or marketing materials are illustrative only and are not guarantees of income or results. Your results will vary depending on your individual effort, experience, market conditions, capital availability, and many other factors.</p>
+  <p>We do not guarantee that you will earn any specific amount of money. Property investment and Airbnb hosting involve financial risk, and you should conduct your own due diligence before making any investment decisions.</p>
+
+  <h2>9. Limitation of Liability</h2>
+  <p>To the fullest extent permitted by law:</p>
+  <ul>
+    <li>Property Labs provides its services on an "as is" and "as available" basis without warranties of any kind, whether express or implied</li>
+    <li>We do not warrant that our services will be uninterrupted, error-free, or free of harmful components</li>
+    <li>Our total liability to you for any claims arising from or related to our services shall not exceed the total amount you have paid to us in the 12 months preceding the claim</li>
+    <li>We shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, revenue, data, or business opportunities</li>
+    <li>We are not liable for any decisions you make based on information provided during webinars or coaching sessions</li>
+  </ul>
+
+  <p>Nothing in these Terms excludes or limits our liability for death or personal injury caused by negligence, fraud or fraudulent misrepresentation, or any other liability that cannot be excluded or limited by law.</p>
+
+  <h2>10. Indemnification</h2>
+  <p>You agree to indemnify and hold harmless Property Labs, Terry Dwobeng, and any associated employees, contractors, or agents from any claims, losses, damages, liabilities, and expenses (including legal fees) arising from your breach of these Terms, misuse of our services, or violation of any applicable law.</p>
+
+  <h2>11. Termination</h2>
+  <p>We may suspend or terminate your access to our services at any time if:</p>
+  <ul>
+    <li>You breach any provision of these Terms</li>
+    <li>You fail to make required payments under a payment plan</li>
+    <li>We reasonably believe your conduct is harmful to other users, our business, or third parties</li>
+    <li>We are required to do so by law</li>
+  </ul>
+
+  <p>Upon termination, your right to access programme materials ceases immediately. Sections relating to intellectual property, limitation of liability, indemnification, and governing law survive termination.</p>
+
+  <h2>12. Third-Party Links and Services</h2>
+  <p>Our website and services may contain links to third-party websites or integrate with third-party platforms (such as WebinarJam, GoHighLevel, Calendly, and Stripe). We are not responsible for the content, privacy practices, or availability of these third-party services. Your use of such services is governed by their respective terms and policies.</p>
+
+  <h2>13. Force Majeure</h2>
+  <p>We shall not be liable for any failure or delay in performing our obligations where such failure or delay results from circumstances beyond our reasonable control, including but not limited to natural disasters, pandemic, internet outages, government actions, or technical failures of third-party platforms.</p>
+
+  <h2>14. Modifications to Terms</h2>
+  <p>We reserve the right to modify these Terms at any time. Changes will be posted on this page with an updated "Last updated" date. Your continued use of our services after changes are posted constitutes acceptance of the revised Terms. If we make material changes, we will make reasonable efforts to notify you via email.</p>
+
+  <h2>15. Governing Law and Disputes</h2>
+  <p>These Terms are governed by and construed in accordance with the laws of England and Wales. Any disputes arising from or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>
+  <p>Before initiating any formal proceedings, we encourage you to contact us directly to resolve any issues. We are committed to resolving disputes fairly and promptly.</p>
+
+  <h2>16. Severability</h2>
+  <p>If any provision of these Terms is found to be unenforceable or invalid by a court of competent jurisdiction, that provision shall be limited or eliminated to the minimum extent necessary, and the remaining provisions shall continue in full force and effect.</p>
+
+  <h2>17. Entire Agreement</h2>
+  <p>These Terms, together with our <a href="/privacy-policy.html">Privacy Policy</a>, constitute the entire agreement between you and Property Labs regarding your use of our services. They supersede all prior agreements, communications, and understandings, whether oral or written.</p>
+
+  <h2>18. Contact Us</h2>
+  <p>If you have any questions about these Terms of Service, please contact us:</p>
+  <ul>
+    <li><strong>Email:</strong> <a href="mailto:founder@propertylabs.to">founder@propertylabs.to</a></li>
+    <li><strong>Website:</strong> <a href="https://propertylabs.to">propertylabs.to</a></li>
+  </ul>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="/register.html">Register for Webinar</a>
+      <a href="/privacy-policy.html">Privacy Policy</a>
+      <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 Property Labs. All rights reserved. Operated by Terry Dwobeng, United Kingdom.</p>
+  </div>
+</footer>
+
+</body>
+</html>

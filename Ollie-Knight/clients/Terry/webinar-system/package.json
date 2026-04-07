@@ -1,0 +1,11 @@
+{
+  "name": "terry-dwobeng-webinar-tracker",
+  "version": "1.0.0",
+  "main": "api/index.js",
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0"
+  }
+}

@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14 Units, Zero Own Money — The Interactive Story | Property Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0a;
+  --coral: #FF5A5F;
+  --coral-dark: #e04e52;
+  --coral-glow: rgba(255, 90, 95, 0.15);
+  --white: #ffffff;
+  --gray-100: #f5f5f5;
+  --gray-200: #e5e5e5;
+  --gray-300: #d4d4d4;
+  --gray-400: #a3a3a3;
+  --gray-500: #737373;
+  --gray-600: #525252;
+  --gray-700: #404040;
+  --gray-800: #262626;
+  --gray-900: #171717;
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 50%, var(--coral-glow) 0%, transparent 50%);
+  animation: heroPulse 6s ease-in-out infinite;
+}
+
+@keyframes heroPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 900px; }
+
+.hero-label {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 2rem;
+  min-height: 2.2em;
+}
+
+.typewriter-text {
+  display: inline;
+  border-right: 3px solid var(--coral);
+  animation: blink 0.7s step-end infinite;
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+.hero-counters {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  margin: 2.5rem 0;
+  flex-wrap: wrap;
+}
+
+.hero-counter {
+  text-align: center;
+}
+
+.hero-counter .number {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  color: var(--coral);
+  display: block;
+}
+
+.hero-counter .label {
+  font-size: 0.9rem;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--gray-400);
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gray-500);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+.scroll-arrow {
+  width: 24px;
+  height: 24px;
+  border-right: 2px solid var(--coral);
+  border-bottom: 2px solid var(--coral);
+  transform: rotate(45deg);
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(10px); }
+}
+
+/* ─── SECTIONS ─── */
+.section {
+  padding: 6rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  color: var(--gray-400);
+  max-width: 700px;
+  line-height: 1.7;
+  margin-bottom: 3rem;
+}
+
+/* ─── TIMELINE ─── */
+.timeline { position: relative; padding-left: 3rem; }
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--coral), var(--gray-800));
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 4rem;
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.timeline-item.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -3rem;
+  top: 0.5rem;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--coral);
+  border: 3px solid var(--bg);
+  transform: translateX(-6px);
+  z-index: 1;
+}
+
+.timeline-item.visible::before {
+  box-shadow: 0 0 20px var(--coral-glow);
+}
+
+.timeline-period {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--coral);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.timeline-body {
+  color: var(--gray-300);
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+.timeline-body p { margin-bottom: 1rem; }
+
+.timeline-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.timeline-stat {
+  background: var(--gray-900);
+  border: 1px solid var(--gray-800);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  flex: 1;
+  min-width: 120px;
+}
+
+.timeline-stat .val {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--coral);
+  display: block;
+}
+
+.timeline-stat .desc {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 0.25rem;
+}
+
+.unit-counter-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.unit-counter-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--gray-800);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.unit-counter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--coral), #ff8a8e);
+  border-radius: 4px;
+  width: 0%;
+  transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.unit-counter-num {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 2rem;
+  color: var(--coral);
+  min-width: 60px;
+  text-align: right;
+}
+
+/* ─── DASHBOARD ─── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: var(--gray-900);
+  border: 1px solid var(--gray-800);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover, .stat-card.active {
+  border-color: var(--coral);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(255, 90, 95, 0.1);
+}
+
+.stat-card .stat-value {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 2.2rem;
+  color: var(--coral);
+  margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-label {
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.stat-card .stat-detail {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gray-800);
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  line-height: 1.6;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.stat-card.active .stat-detail {
+  max-height: 200px;
+}
+
+.stat-card .click-hint {
+  font-size: 0.7rem;
+  color: var(--gray-600);
+  margin-top: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Portfolio Table */
+.portfolio-table-wrap {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid var(--gray-800);
+}
+
+.portfolio-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.portfolio-table th {
+  background: var(--gray-900);
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.portfolio-table td {
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--gray-800);
+  white-space: nowrap;
+}
+
+.portfolio-table tr {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.portfolio-table tbody tr:hover {
+  background: rgba(255, 90, 95, 0.04);
+}
+
+.portfolio-table .profit { color: var(--coral); font-weight: 600; }
+
+.portfolio-table .total-row {
+  background: var(--gray-900);
+  font-weight: 700;
+}
+
+.portfolio-table .total-row td { border-top: 2px solid var(--coral); }
+
+.row-detail {
+  display: none;
+  background: var(--gray-900);
+}
+
+.row-detail.open { display: table-row; }
+
+.row-detail td {
+  padding: 1rem 1rem 1rem 2rem;
+  color: var(--gray-400);
+  font-size: 0.8rem;
+  line-height: 1.8;
+}
+
+/* ─── FLIP CARDS ─── */
+.mistakes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.flip-card {
+  perspective: 1000px;
+  height: 340px;
+  cursor: pointer;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+}
+
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.flip-card-front {
+  background: var(--gray-900);
+  border: 1px solid var(--gray-800);
+}
+
+.flip-card-back {
+  background: linear-gradient(135deg, var(--coral-dark), var(--coral));
+  transform: rotateY(180deg);
+  color: var(--white);
+}
+
+.flip-card-number {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--coral);
+  margin-bottom: 0.75rem;
+}
+
+.flip-card-front h3 {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.flip-card-front p {
+  color: var(--gray-400);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.flip-hint {
+  font-size: 0.7rem;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.flip-card-back h3 {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.flip-card-back p {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  opacity: 0.95;
+}
+
+.flip-card-back .fix-label {
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+/* ─── TABS (Student Results) ─── */
+.tabs-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: var(--gray-900);
+  border: 1px solid var(--gray-800);
+  color: var(--gray-400);
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover { border-color: var(--gray-600); color: var(--white); }
+
+.tab-btn.active {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: var(--white);
+}
+
+.tab-panel {
+  display: none;
+  background: var(--gray-900);
+  border: 1px solid var(--gray-800);
+  border-radius: 16px;
+  padding: 2.5rem;
+  animation: fadeInUp 0.4s ease;
+}
+
+.tab-panel.active { display: block; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.student-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.student-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.student-name {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.student-tagline {
+  color: var(--gray-400);
+  font-size: 0.9rem;
+}
+
+.student-stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.student-stat {
+  text-align: center;
+}
+
+.student-stat .val {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.8rem;
+  color: var(--coral);
+  display: block;
+}
+
+.student-stat .lbl {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.student-body {
+  color: var(--gray-300);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+/* ─── EMAIL GATE ─── */
+.email-gate {
+  background: linear-gradient(135deg, var(--gray-900), #1a1a1a);
+  border: 1px solid var(--gray-800);
+  border-radius: 20px;
+  padding: 3rem;
+  text-align: center;
+  max-width: 550px;
+  margin: 0 auto 4rem;
+}
+
+.email-gate h3 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.email-gate p {
+  color: var(--gray-400);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+.email-gate .form-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.email-gate input {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.9rem 1.2rem;
+  border-radius: 10px;
+  border: 1px solid var(--gray-700);
+  background: var(--gray-800);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.email-gate input:focus { border-color: var(--coral); }
+
+.email-gate input::placeholder { color: var(--gray-600); }
+
+.btn-unlock {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--coral);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  letter-spacing: 0.5px;
+}
+
+.btn-unlock:hover { background: var(--coral-dark); transform: translateY(-2px); }
+
+.email-gate .privacy {
+  font-size: 0.7rem;
+  color: var(--gray-600);
+  margin-top: 1rem;
+}
+
+/* ─── SIMULATOR ─── */
+.simulator-wrap {
+  display: none;
+}
+
+.simulator-wrap.unlocked { display: block; }
+
+.simulator {
+  background: var(--gray-900);
+  border: 1px solid var(--gray-800);
+  border-radius: 20px;
+  padding: 3rem;
+}
+
+.slider-group { margin-bottom: 2rem; }
+
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.slider-label span {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.slider-label .slider-val {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--coral);
+  font-size: 1.1rem;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--gray-800);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--coral);
+  cursor: pointer;
+  border: 3px solid var(--white);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--coral);
+  cursor: pointer;
+  border: 3px solid var(--white);
+}
+
+.sim-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--gray-800);
+}
+
+.sim-result {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255, 90, 95, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 90, 95, 0.1);
+}
+
+.sim-result .val {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 2rem;
+  color: var(--coral);
+  display: block;
+  transition: all 0.3s;
+}
+
+.sim-result .lbl {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 0.25rem;
+}
+
+/* ─── 3C SYSTEM ─── */
+.three-c-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.c-card {
+  background: var(--gray-900);
+  border: 1px solid var(--gray-800);
+  border-radius: 16px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.c-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--coral);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.c-card:hover::before, .c-card.expanded::before {
+  transform: scaleX(1);
+}
+
+.c-card:hover {
+  border-color: var(--coral);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(255, 90, 95, 0.08);
+}
+
+.c-card-icon {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--coral);
+  margin-bottom: 1rem;
+}
+
+.c-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.c-card .c-short {
+  color: var(--gray-400);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.c-card .c-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, margin 0.3s ease;
+  color: var(--gray-300);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.c-card.expanded .c-detail {
+  max-height: 300px;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gray-800);
+}
+
+.c-connector {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .c-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--coral);
+    font-size: 1.5rem;
+    z-index: 2;
+  }
+  .c-connector:nth-of-type(1) { left: calc(33.33% - 12px); }
+  .c-connector:nth-of-type(2) { left: calc(66.66% - 12px); }
+}
+
+/* ─── CTA ─── */
+.cta-section {
+  text-align: center;
+  padding: 6rem 2rem;
+  position: relative;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--coral-glow) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.cta-section > * { position: relative; z-index: 1; }
+
+.cta-section h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  color: var(--gray-400);
+  font-size: 1.05rem;
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-block;
+  letter-spacing: 0.3px;
+}
+
+.btn-primary {
+  background: var(--coral);
+  color: var(--white);
+  border: 2px solid var(--coral);
+}
+
+.btn-primary:hover {
+  background: var(--coral-dark);
+  border-color: var(--coral-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 90, 95, 0.3);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--white);
+  border: 2px solid var(--gray-700);
+}
+
+.btn-secondary:hover {
+  border-color: var(--white);
+  transform: translateY(-2px);
+}
+
+/* ─── FOOTER ─── */
+.footer {
+  text-align: center;
+  padding: 3rem 2rem;
+  border-top: 1px solid var(--gray-800);
+  color: var(--gray-600);
+  font-size: 0.8rem;
+}
+
+.footer-quote {
+  font-style: italic;
+  color: var(--gray-500);
+  max-width: 600px;
+  margin: 0 auto 1rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.footer-author {
+  color: var(--coral);
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* ─── ANIMATIONS ─── */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-on-scroll.from-left {
+  transform: translateX(-40px) translateY(0);
+}
+
+.animate-on-scroll.from-left.visible {
+  transform: translateX(0) translateY(0);
+}
+
+.animate-on-scroll.from-right {
+  transform: translateX(40px) translateY(0);
+}
+
+.animate-on-scroll.from-right.visible {
+  transform: translateX(0) translateY(0);
+}
+
+.stagger-1 { transition-delay: 0.1s; }
+.stagger-2 { transition-delay: 0.2s; }
+.stagger-3 { transition-delay: 0.3s; }
+.stagger-4 { transition-delay: 0.4s; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .section { padding: 4rem 1.25rem; }
+  .hero-counters { gap: 2rem; }
+  .flip-card { height: 380px; }
+  .email-gate { padding: 2rem 1.5rem; }
+  .simulator { padding: 2rem 1.5rem; }
+  .cta-section { padding: 4rem 1.25rem; }
+  .timeline { padding-left: 2rem; }
+  .timeline-item::before { left: -2rem; }
+  .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+  .portfolio-table { font-size: 0.75rem; }
+  .portfolio-table th, .portfolio-table td { padding: 0.6rem 0.5rem; }
+}
+
+@media (max-width: 480px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .hero-counters { flex-direction: column; gap: 1.5rem; }
+  .student-stats { gap: 1.5rem; }
+  .sim-results { grid-template-columns: 1fr; }
+  .email-gate .form-row { flex-direction: column; }
+}
+
+/* Divider */
+.divider {
+  width: 60px;
+  height: 3px;
+  background: var(--coral);
+  border-radius: 2px;
+  margin: 0 auto 3rem;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-label">Property Labs Case Study</p>
+    <h1><span class="typewriter-text" id="typewriter"></span></h1>
+    <div class="hero-counters">
+      <div class="hero-counter">
+        <span class="number" id="counter-units">0</span>
+        <span class="label">Airbnb Units</span>
+      </div>
+      <div class="hero-counter">
+        <span class="number" id="counter-revenue">0</span>
+        <span class="label">Peak Monthly Revenue</span>
+      </div>
+      <div class="hero-counter">
+        <span class="number" id="counter-money">0</span>
+        <span class="label">Own Money Used</span>
+      </div>
+    </div>
+    <p class="hero-subtitle">How a uni student with no savings, no experience, and no family money built a property portfolio generating thousands per month. This is the full breakdown.</p>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll to explore</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════════════ TIMELINE ═══════════════ -->
+<section class="section">
+  <p class="section-label animate-on-scroll">The Journey</p>
+  <h2 class="section-title animate-on-scroll">Month-by-Month Timeline</h2>
+  <p class="section-subtitle animate-on-scroll">Every milestone from zero to 14 units -- no steps skipped, no shortcuts taken.</p>
+
+  <div class="timeline">
+    <!-- Month 1-2 -->
+    <div class="timeline-item" data-units="0">
+      <p class="timeline-period">Months 1 - 2</p>
+      <h3 class="timeline-title">Building Credibility</h3>
+      <div class="timeline-body">
+        <p>No properties. No money. No experience. Just relentless education and networking. Terry treated learning like a second degree -- courses, podcasts, books, property meetups, LinkedIn, Facebook groups. Every spare hour.</p>
+        <p>He learned the numbers cold: average nightly rates, occupancy by season, cleaning turnaround costs, margins by city. Then he started posting publicly -- not flexing, just sharing honest deal analyses and learnings. Consistency built trust.</p>
+        <p>By month two: zero properties, zero money spent -- but genuine credibility. People knew he was serious.</p>
+      </div>
+      <div class="unit-counter-display">
+        <div class="unit-counter-bar"><div class="unit-counter-fill" data-width="0"></div></div>
+        <div class="unit-counter-num">0 / 14</div>
+      </div>
+    </div>
+
+    <!-- Month 3-4 -->
+    <div class="timeline-item" data-units="0">
+      <p class="timeline-period">Months 3 - 4</p>
+      <h3 class="timeline-title">First Capital Raised</h3>
+      <div class="timeline-body">
+        <p>The credibility paid off. When Terry presented an opportunity to potential investors, they could see he had done the work. He was not asking for a handout -- he was walking them through numbers, market research, deployment plans, and exit strategies.</p>
+        <p>His first investor was not a millionaire. They were a regular person with savings earning nothing in the bank. Terry showed them what those savings could do in serviced accommodation.</p>
+      </div>
+      <div class="timeline-stat-row">
+        <div class="timeline-stat">
+          <span class="val" data-count-to="0">--</span>
+          <span class="desc">Own Money</span>
+        </div>
+        <div class="timeline-stat">
+          <span class="val">OPM</span>
+          <span class="desc">Capital Source</span>
+        </div>
+        <div class="timeline-stat">
+          <span class="val">Proven</span>
+          <span class="desc">Knowledge</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Month 5-6 -->
+    <div class="timeline-item" data-units="1">
+      <p class="timeline-period">Months 5 - 6</p>
+      <h3 class="timeline-title">First Airbnb Live</h3>
+      <div class="timeline-body">
+        <p>A 2-bedroom apartment secured through a rent-to-SA arrangement. Fixed monthly rent to the landlord, then subletting on Airbnb and Booking.com. The landlord got guaranteed rent; Terry got the spread.</p>
+      </div>
+      <div class="timeline-stat-row">
+        <div class="timeline-stat">
+          <span class="val">$850</span>
+          <span class="desc">Rent / Month</span>
+        </div>
+        <div class="timeline-stat">
+          <span class="val">$95</span>
+          <span class="desc">Nightly Rate</span>
+        </div>
+        <div class="timeline-stat">
+          <span class="val">78%</span>
+          <span class="desc">Occupancy</span>
+        </div>
+        <div class="timeline-stat">
+          <span class="val">$800</span>
+          <span class="desc">Monthly Profit</span>
+        </div>
+      </div>
+      <div class="unit-counter-display">
+        <div class="unit-counter-bar"><div class="unit-counter-fill" data-width="7"></div></div>
+        <div class="unit-counter-num">1 / 14</div>
+      </div>
+    </div>
+
+    <!-- Month 7-12 -->
+    <div class="timeline-item" data-units="6">
+      <p class="timeline-period">Months 7 - 12</p>
+      <h3 class="timeline-title">Scaling to Multiple Units</h3>
+      <div class="timeline-body">
+        <p>With proof of concept -- a live, profitable unit with real reviews and real income -- everything accelerated. Raising capital became easier with actual results to show. Landlords were easier to approach with a track record.</p>
+        <p>Each new unit followed the same formula: find the right property, secure the landlord, raise setup capital, furnish and list within 2-3 weeks, then systemise with cleaning teams, automated messaging, and dynamic pricing.</p>
+        <p>The key shift: moving from doing everything solo to building systems. SOPs, checklists, a cleaning team, automated guest messaging. The business started running like a business.</p>
+      </div>
+      <div class="unit-counter-display">
+        <div class="unit-counter-bar"><div class="unit-counter-fill" data-width="43"></div></div>
+        <div class="unit-counter-num">6 / 14</div>
+      </div>
+    </div>
+
+    <!-- Year 2+ -->
+    <div class="timeline-item" data-units="14">
+      <p class="timeline-period">Year 2+</p>
+      <h3 class="timeline-title">14 Units -- Full Portfolio</h3>
+      <div class="timeline-body">
+        <p>The portfolio hit 14 units generating up to $16,000 per month at peak. A team handling day-to-day operations. Systems and processes enabling focus on growth and strategy rather than being stuck in the weeds.</p>
+        <p>Every single unit built without using a single penny of his own money.</p>
+      </div>
+      <div class="unit-counter-display">
+        <div class="unit-counter-bar"><div class="unit-counter-fill" data-width="100"></div></div>
+        <div class="unit-counter-num">14 / 14</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DASHBOARD ═══════════════ -->
+<section class="section" id="dashboard">
+  <p class="section-label animate-on-scroll">The Numbers</p>
+  <h2 class="section-title animate-on-scroll">Portfolio Dashboard</h2>
+  <p class="section-subtitle animate-on-scroll">Transparent breakdown of a typical strong month across all 14 units. Click any stat to see more detail.</p>
+
+  <div class="dashboard-grid">
+    <div class="stat-card animate-on-scroll stagger-1" onclick="toggleStatCard(this)">
+      <div class="stat-value" data-animate-count="14" data-suffix="">0</div>
+      <div class="stat-label">Total Units</div>
+      <div class="stat-detail">Spread across Manchester (4), Birmingham (3), Leeds (3), Nottingham (3), and Sheffield (1). Mix of 1-bed, 2-bed flats and houses.</div>
+      <div class="click-hint">Click for details</div>
+    </div>
+    <div class="stat-card animate-on-scroll stagger-2" onclick="toggleStatCard(this)">
+      <div class="stat-value">$31,000</div>
+      <div class="stat-label">Monthly Revenue</div>
+      <div class="stat-detail">Combined revenue across all 14 units in a typical strong month. Average nightly rates range from $75 to $120 depending on property size and location.</div>
+      <div class="click-hint">Click for details</div>
+    </div>
+    <div class="stat-card animate-on-scroll stagger-3" onclick="toggleStatCard(this)">
+      <div class="stat-value">$11,900</div>
+      <div class="stat-label">Monthly Profit</div>
+      <div class="stat-detail">After all costs: rent, utilities, cleaning, consumables, platform fees, insurance, and maintenance reserves. Average profit per unit: ~$850/month.</div>
+      <div class="click-hint">Click for details</div>
+    </div>
+    <div class="stat-card animate-on-scroll stagger-4" onclick="toggleStatCard(this)">
+      <div class="stat-value">$16,000+</div>
+      <div class="stat-label">Peak Month Profit</div>
+      <div class="stat-detail">Best month net profit. Seasonality matters -- August peaks vs January dips. Portfolio diversification across cities and property types smooths out fluctuations.</div>
+      <div class="click-hint">Click for details</div>
+    </div>
+  </div>
+
+  <!-- Portfolio Table -->
+  <div class="portfolio-table-wrap animate-on-scroll">
+    <table class="portfolio-table" id="portfolioTable">
+      <thead>
+        <tr>
+          <th>Unit</th>
+          <th>City</th>
+          <th>Type</th>
+          <th>Nightly</th>
+          <th>Occ.</th>
+          <th>Revenue</th>
+          <th>Costs</th>
+          <th>Profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="toggleRow(this)">
+          <td>1</td><td>Manchester</td><td>2-bed flat</td><td>$105</td><td>82%</td><td>$2,583</td><td>$1,550</td><td class="profit">$1,033</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $105 | Occupancy: 82% | Rent: ~$900/mo | Utilities: ~$250/mo | Cleaning + consumables: ~$200/mo | Platform fees + insurance + maintenance: ~$200/mo</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>2</td><td>Manchester</td><td>1-bed flat</td><td>$85</td><td>80%</td><td>$2,040</td><td>$1,200</td><td class="profit">$840</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $85 | Occupancy: 80% | Compact unit with strong business traveller demand. Lower setup cost, consistent bookings.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>3</td><td>Birmingham</td><td>2-bed flat</td><td>$95</td><td>78%</td><td>$2,223</td><td>$1,400</td><td class="profit">$823</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $95 | Occupancy: 78% | City centre location near hospitals and universities. Good mix of tourist and contractor demand.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>4</td><td>Birmingham</td><td>2-bed house</td><td>$100</td><td>75%</td><td>$2,250</td><td>$1,450</td><td class="profit">$800</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $100 | Occupancy: 75% | House format attracts families and longer stays. Slightly lower occupancy but higher nightly rates compensate.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>5</td><td>Leeds</td><td>2-bed flat</td><td>$90</td><td>80%</td><td>$2,160</td><td>$1,300</td><td class="profit">$860</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $90 | Occupancy: 80% | Strong demand from university visitors and weekend city break travellers.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>6</td><td>Leeds</td><td>1-bed flat</td><td>$75</td><td>82%</td><td>$1,845</td><td>$1,100</td><td class="profit">$745</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $75 | Occupancy: 82% | Highest occupancy in portfolio. Budget-friendly pricing drives consistent bookings.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>7</td><td>Nottingham</td><td>2-bed flat</td><td>$88</td><td>77%</td><td>$2,033</td><td>$1,280</td><td class="profit">$753</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $88 | Occupancy: 77% | Close to Nottingham Trent University. Steady demand year-round.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>8</td><td>Nottingham</td><td>3-bed house</td><td>$120</td><td>74%</td><td>$2,664</td><td>$1,700</td><td class="profit">$964</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $120 | Occupancy: 74% | Largest unit in portfolio. Higher revenue per booking, popular with groups and families.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>9</td><td>Manchester</td><td>2-bed flat</td><td>$110</td><td>81%</td><td>$2,673</td><td>$1,600</td><td class="profit">$1,073</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $110 | Occupancy: 81% | Premium Manchester location. Highest revenue unit in portfolio.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>10</td><td>Sheffield</td><td>2-bed flat</td><td>$82</td><td>76%</td><td>$1,870</td><td>$1,200</td><td class="profit">$670</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $82 | Occupancy: 76% | Lower entry cost market. Good margins despite lower nightly rates.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>11</td><td>Birmingham</td><td>1-bed flat</td><td>$78</td><td>79%</td><td>$1,849</td><td>$1,150</td><td class="profit">$699</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $78 | Occupancy: 79% | Compact city centre unit. Low overheads, consistent returns.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>12</td><td>Manchester</td><td>2-bed flat</td><td>$108</td><td>83%</td><td>$2,689</td><td>$1,580</td><td class="profit">$1,109</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $108 | Occupancy: 83% | Highest occupancy 2-bed. Optimised listing and dynamic pricing driving strong performance.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>13</td><td>Leeds</td><td>2-bed flat</td><td>$92</td><td>78%</td><td>$2,153</td><td>$1,320</td><td class="profit">$833</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $92 | Occupancy: 78% | Reliable performer in growing Leeds SA market.</td></tr>
+        <tr onclick="toggleRow(this)">
+          <td>14</td><td>Nottingham</td><td>2-bed flat</td><td>$90</td><td>76%</td><td>$2,052</td><td>$1,300</td><td class="profit">$752</td>
+        </tr>
+        <tr class="row-detail"><td colspan="8">Nightly rate: $90 | Occupancy: 76% | Most recent addition. Already performing at portfolio average within first 2 months.</td></tr>
+        <tr class="total-row">
+          <td colspan="5"><strong>Portfolio Total</strong></td>
+          <td><strong>$31,084</strong></td>
+          <td><strong>$19,130</strong></td>
+          <td class="profit"><strong>$11,954</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ 3 MISTAKES ═══════════════ -->
+<section class="section">
+  <p class="section-label animate-on-scroll">Lessons Learned</p>
+  <h2 class="section-title animate-on-scroll">The 3 Biggest Mistakes</h2>
+  <p class="section-subtitle animate-on-scroll">Click each card to reveal what it cost and the fix.</p>
+
+  <div class="mistakes-grid">
+    <div class="flip-card animate-on-scroll stagger-1" onclick="this.classList.toggle('flipped')">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <div class="flip-card-number">#1</div>
+          <h3>Trying to Do Everything Alone</h3>
+          <p>Guest comms, cleaning coordination, listing optimisation, investor relations, landlord management -- all of it, solo.</p>
+          <div class="flip-hint">Click to reveal the cost + fix</div>
+        </div>
+        <div class="flip-card-back">
+          <h3>What It Cost</h3>
+          <p>Burnout. Missed messages. Slower response times tanking reviews. Nearly quit the entire business. Dealing with guest issues at 11pm before 9am lectures.</p>
+          <p class="fix-label">The Fix:</p>
+          <p>Bring in help from unit one. Even a virtual assistant handling guest messages a few hours a day. You cannot scale while doing every task yourself.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-card animate-on-scroll stagger-2" onclick="this.classList.toggle('flipped')">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <div class="flip-card-number">#2</div>
+          <h3>Choosing the Wrong Property Type</h3>
+          <p>A property that looked great on paper but was a nightmare operationally. Wrong layout, awkward access, wrong kind of demand.</p>
+          <div class="flip-hint">Click to reveal the cost + fix</div>
+        </div>
+        <div class="flip-card-back">
+          <h3>What It Cost</h3>
+          <p>Lower occupancy than projected. More guest complaints. Higher maintenance costs. Lower margins. Exited the property after several months -- wasted time and setup capital.</p>
+          <p class="fix-label">The Fix:</p>
+          <p>Be ruthless about property selection. Right layout (open plan, comfortable sleeping, good bathroom), right location (demand drivers nearby), right landlord (supports the model).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-card animate-on-scroll stagger-3" onclick="this.classList.toggle('flipped')">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <div class="flip-card-number">#3</div>
+          <h3>Not Having Systems From Day One</h3>
+          <p>Running everything from a phone. No CRM. No automated messaging. No standardised cleaning checklists. No SOPs. Just reacting.</p>
+          <div class="flip-hint">Click to reveal the cost + fix</div>
+        </div>
+        <div class="flip-card-back">
+          <h3>What It Cost</h3>
+          <p>Inconsistent guest experiences. Missed details during turnovers. Forgotten restocks. Late check-in instructions. Small things that tanked reviews and made the business feel chaotic.</p>
+          <p class="fix-label">The Fix:</p>
+          <p>Set up systems before the first unit goes live. Automated messaging templates. Cleaning checklists. Pricing strategy. Maintenance protocols. Build infrastructure first, then plug properties in.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STUDENT RESULTS ═══════════════ -->
+<section class="section">
+  <p class="section-label animate-on-scroll">Proof It Works</p>
+  <h2 class="section-title animate-on-scroll">Student Results</h2>
+  <p class="section-subtitle animate-on-scroll">This is not just a "Terry thing." It is a system -- and these students prove it.</p>
+
+  <div class="tabs-nav animate-on-scroll">
+    <button class="tab-btn active" onclick="switchTab(event, 'tab-ehab')">Ehab</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-dylan')">Dylan</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-andrew')">Andrew</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-elite')">Elite Kleans</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-ehab">
+    <div class="student-header">
+      <div class="student-avatar">E</div>
+      <div>
+        <div class="student-name">Ehab</div>
+        <div class="student-tagline">Zero experience, zero capital -- funded in 5 weeks</div>
+      </div>
+    </div>
+    <div class="student-stats">
+      <div class="student-stat">
+        <span class="val" data-animate-count="25000" data-prefix="$">0</span>
+        <span class="lbl">Capital Raised</span>
+      </div>
+      <div class="student-stat">
+        <span class="val">5 wks</span>
+        <span class="lbl">Time to Fund</span>
+      </div>
+      <div class="student-stat">
+        <span class="val" data-animate-count="2" data-prefix="">0</span>
+        <span class="lbl">Airbnb Units</span>
+      </div>
+    </div>
+    <p class="student-body">Ehab came in with zero experience in property and zero capital. Within five weeks of joining Property Labs, he raised $25,000 from investors using the exact frameworks Terry teaches. He secured his first two Airbnb units shortly after and had them live and generating income. Five weeks. From nothing to funded and operational.</p>
+  </div>
+
+  <div class="tab-panel" id="tab-dylan">
+    <div class="student-header">
+      <div class="student-avatar">D</div>
+      <div>
+        <div class="student-name">Dylan</div>
+        <div class="student-tagline">Followed the system, then scaled aggressively</div>
+      </div>
+    </div>
+    <div class="student-stats">
+      <div class="student-stat">
+        <span class="val">5</span>
+        <span class="lbl">Airbnb Units</span>
+      </div>
+      <div class="student-stat">
+        <span class="val">$12,000</span>
+        <span class="lbl">Best Month</span>
+      </div>
+    </div>
+    <p class="student-body">Dylan is a perfect example of what happens when you follow the system and then scale aggressively. He built up to 5 Airbnb units and hit a $12,000 best month. That is not a one-off spike -- that is the result of strong property selection, sharp pricing, and dialled-in operations across multiple units.</p>
+  </div>
+
+  <div class="tab-panel" id="tab-andrew">
+    <div class="student-header">
+      <div class="student-avatar">A</div>
+      <div>
+        <div class="student-name">Andrew</div>
+        <div class="student-tagline">Masters student building a portfolio part-time</div>
+      </div>
+    </div>
+    <div class="student-stats">
+      <div class="student-stat">
+        <span class="val">$13,000</span>
+        <span class="lbl">Capital Raised</span>
+      </div>
+      <div class="student-stat">
+        <span class="val">3</span>
+        <span class="lbl">Units Secured</span>
+      </div>
+      <div class="student-stat">
+        <span class="val">Full-time</span>
+        <span class="lbl">Student</span>
+      </div>
+    </div>
+    <p class="student-body">Andrew was doing his Masters degree while building his Airbnb portfolio. Full-time studying, part-time building a property business. He raised $13,000 and secured 3 units. If you are a student thinking "I do not have time" -- Andrew is your answer.</p>
+  </div>
+
+  <div class="tab-panel" id="tab-elite">
+    <div class="student-header">
+      <div class="student-avatar">EK</div>
+      <div>
+        <div class="student-name">Elite Kleans</div>
+        <div class="student-tagline">One unit, meaningful income</div>
+      </div>
+    </div>
+    <div class="student-stats">
+      <div class="student-stat">
+        <span class="val">1</span>
+        <span class="lbl">Unit</span>
+      </div>
+      <div class="student-stat">
+        <span class="val">$2,200</span>
+        <span class="lbl">Monthly Revenue</span>
+      </div>
+    </div>
+    <p class="student-body">Not everyone wants 14 units. Some people want one solid unit that brings in reliable monthly income. Elite Kleans did exactly that -- one unit generating $2,200 per month. That is a meaningful amount of money from a single property, managed alongside other commitments.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ EMAIL GATE + SIMULATOR ═══════════════ -->
+<section class="section" id="simulator-section">
+  <p class="section-label animate-on-scroll">Your Turn</p>
+  <h2 class="section-title animate-on-scroll">"What If" Portfolio Simulator</h2>
+  <p class="section-subtitle animate-on-scroll">Model what your own serviced accommodation portfolio could look like.</p>
+
+  <div class="email-gate animate-on-scroll" id="emailGate">
+    <h3>Unlock the Portfolio Simulator</h3>
+    <p>Enter your details below to access the interactive calculator and see what your portfolio could generate.</p>
+    <div class="form-row">
+      <input type="text" id="gateName" placeholder="First name" required>
+      <input type="email" id="gateEmail" placeholder="Email address" required>
+    </div>
+    <button class="btn-unlock" onclick="unlockSimulator()">Unlock Simulator</button>
+    <p class="privacy">Your information is secure. No spam, ever.</p>
+  </div>
+
+  <div class="simulator-wrap" id="simulatorWrap">
+    <div class="simulator">
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>Number of Units</span>
+          <span class="slider-val" id="unitSliderVal">3</span>
+        </div>
+        <input type="range" min="1" max="10" value="3" id="unitSlider" oninput="updateSimulator()">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>Avg. Monthly Profit per Unit</span>
+          <span class="slider-val" id="profitSliderVal">$800</span>
+        </div>
+        <input type="range" min="300" max="1500" step="50" value="800" id="profitSlider" oninput="updateSimulator()">
+      </div>
+      <div class="sim-results">
+        <div class="sim-result">
+          <span class="val" id="simMonthly">$2,400</span>
+          <span class="lbl">Monthly Income</span>
+        </div>
+        <div class="sim-result">
+          <span class="val" id="simAnnual">$28,800</span>
+          <span class="lbl">Annual Income</span>
+        </div>
+        <div class="sim-result">
+          <span class="val" id="simReplace">13 months</span>
+          <span class="lbl">Replace Avg. UK Salary</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 3C SYSTEM ═══════════════ -->
+<section class="section">
+  <p class="section-label animate-on-scroll">The Framework</p>
+  <h2 class="section-title animate-on-scroll">The 3C System</h2>
+  <p class="section-subtitle animate-on-scroll">The backbone of everything taught at Property Labs. Click each pillar to learn more.</p>
+
+  <div class="three-c-grid">
+    <div class="c-card animate-on-scroll stagger-1" onclick="this.classList.toggle('expanded')">
+      <div class="c-card-icon">C1</div>
+      <h3>Credibility</h3>
+      <p class="c-short">Before you raise a single pound or speak to a single landlord, you need to be someone worth listening to.</p>
+      <div class="c-detail">This is not about faking it. It is about genuinely building knowledge, building a presence, and building trust. When you have credibility, doors open. Investors approach you. Landlords want to work with you. Opportunities find you. This phase is the foundation that makes everything else possible.</div>
+    </div>
+    <div class="c-card animate-on-scroll stagger-2" onclick="this.classList.toggle('expanded')">
+      <div class="c-card-icon">C2</div>
+      <h3>Capital</h3>
+      <p class="c-short">Once you have credibility, raising capital becomes a natural next step. You are not begging for money.</p>
+      <div class="c-detail">You are presenting a genuine opportunity to people who have savings doing nothing. You are offering them better returns than their bank, backed by real assets and a proven model. This is how you start with zero of your own money -- and it is completely repeatable.</div>
+    </div>
+    <div class="c-card animate-on-scroll stagger-3" onclick="this.classList.toggle('expanded')">
+      <div class="c-card-icon">C3</div>
+      <h3>Cash Flow</h3>
+      <p class="c-short">With credibility and capital in place, you deploy into serviced accommodation and create monthly cash flow.</p>
+      <div class="c-detail">Consistent, scalable, location-independent income. This is the engine that funds your lifestyle, your growth, and your freedom. Credibility leads to Capital. Capital leads to Cash Flow. Cash Flow leads to freedom.</div>
+    </div>
+  </div>
+
+  <div style="text-align: center;" class="animate-on-scroll">
+    <p style="color: var(--gray-400); margin-bottom: 1.5rem; font-size: 1.05rem;">Learn the full system, step by step, in the free live webinar.</p>
+    <a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" target="_blank" class="btn-primary" style="font-size: 1.1rem; padding: 1.1rem 3rem;">Register for April 13th Webinar</a>
+  </div>
+</section>
+
+<!-- ═══════════════ CTA ═══════════════ -->
+<section class="cta-section">
+  <h2>What Would an Extra $2,000 - $5,000 Per Month Do for Your Life?</h2>
+  <p>That is what a single well-run Airbnb unit can generate. You do not need savings, experience, or a property portfolio to start.</p>
+  <div class="cta-buttons">
+    <a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" target="_blank" class="btn-primary">Book a Free Strategy Call</a>
+    <a href="#simulator-section" class="btn-secondary">Try the Simulator</a>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="footer">
+  <p class="footer-quote">"It all started with nothing. Property Labs students start with nothing. The only difference between those who build and everyone else is the decision to start."</p>
+  <p class="footer-author">-- Terry Dwobeng, Founder of Property Labs</p>
+  <p style="margin-top: 1.5rem;">Property Labs | Free Live Webinar: April 13, 2026</p>
+</footer>
+
+<script>
+/* ═══════════════ TYPEWRITER ═══════════════ */
+(function() {
+  const text = '14 Units. Zero Own Money.';
+  const el = document.getElementById('typewriter');
+  let i = 0;
+  function type() {
+    if (i <= text.length) {
+      el.textContent = text.slice(0, i);
+      i++;
+      setTimeout(type, i === 1 ? 600 : 70);
+    } else {
+      el.style.borderRight = 'none';
+    }
+  }
+  setTimeout(type, 800);
+})();
+
+/* ═══════════════ HERO COUNTERS ═══════════════ */
+function animateCounter(id, target, prefix, suffix, duration) {
+  const el = document.getElementById(id);
+  const start = 0;
+  const startTime = performance.now();
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(start + (target - start) * eased);
+    el.textContent = prefix + current.toLocaleString() + suffix;
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+setTimeout(() => {
+  animateCounter('counter-units', 14, '', '', 2000);
+  animateCounter('counter-revenue', 16000, '\u00A3', '/mo', 2500);
+  document.getElementById('counter-money').textContent = '\u00A30';
+}, 2200);
+
+/* ═══════════════ INTERSECTION OBSERVER ═══════════════ */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Animate unit counter fills
+      const fill = entry.target.querySelector('.unit-counter-fill');
+      if (fill) {
+        setTimeout(() => {
+          fill.style.width = fill.dataset.width + '%';
+        }, 300);
+      }
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.animate-on-scroll, .timeline-item').forEach(el => {
+  observer.observe(el);
+});
+
+/* ═══════════════ STAT CARD TOGGLE ═══════════════ */
+function toggleStatCard(card) {
+  const wasActive = card.classList.contains('active');
+  document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+  if (!wasActive) card.classList.add('active');
+}
+
+/* ═══════════════ PORTFOLIO TABLE ROW TOGGLE ═══════════════ */
+function toggleRow(row) {
+  const detail = row.nextElementSibling;
+  if (detail && detail.classList.contains('row-detail')) {
+    detail.classList.toggle('open');
+  }
+}
+
+/* ═══════════════ TAB SWITCHING ═══════════════ */
+function switchTab(e, tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  e.currentTarget.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+/* ═══════════════ EMAIL GATE ═══════════════ */
+function unlockSimulator() {
+  const name = document.getElementById('gateName').value.trim();
+  const email = document.getElementById('gateEmail').value.trim();
+  if (!name || !email) {
+    document.getElementById('gateName').style.borderColor = name ? 'var(--gray-700)' : 'var(--coral)';
+    document.getElementById('gateEmail').style.borderColor = email ? 'var(--gray-700)' : 'var(--coral)';
+    return;
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    document.getElementById('gateEmail').style.borderColor = 'var(--coral)';
+    return;
+  }
+  document.getElementById('emailGate').style.display = 'none';
+  document.getElementById('simulatorWrap').classList.add('unlocked');
+  updateSimulator();
+}
+
+/* ═══════════════ SIMULATOR ═══════════════ */
+function updateSimulator() {
+  const units = parseInt(document.getElementById('unitSlider').value);
+  const profit = parseInt(document.getElementById('profitSlider').value);
+  const monthly = units * profit;
+  const annual = monthly * 12;
+  const avgUKSalary = 35000;
+  const monthsToReplace = Math.ceil(avgUKSalary / 12 / profit);
+  const unitsNeeded = Math.ceil((avgUKSalary / 12) / profit);
+
+  document.getElementById('unitSliderVal').textContent = units;
+  document.getElementById('profitSliderVal').textContent = '\u00A3' + profit.toLocaleString();
+  document.getElementById('simMonthly').textContent = '\u00A3' + monthly.toLocaleString();
+  document.getElementById('simAnnual').textContent = '\u00A3' + annual.toLocaleString();
+
+  if (units >= unitsNeeded) {
+    document.getElementById('simReplace').textContent = 'Already there';
+  } else {
+    document.getElementById('simReplace').textContent = unitsNeeded + ' units needed';
+  }
+}
+
+/* ═══════════════ CONVERT £ DISPLAY ═══════════════ */
+// Note: The case study uses £ (GBP). We replace $ signs in the rendered output
+// with £ for consistency. This is handled inline in HTML using £ directly where needed.
+// The HTML above uses $ as a display placeholder — let's fix them all to £.
+(function() {
+  function walk(node) {
+    if (node.nodeType === 3) {
+      if (node.textContent.includes('$')) {
+        node.textContent = node.textContent.replace(/\$/g, '\u00A3');
+      }
+    } else if (node.nodeType === 1 && node.tagName !== 'SCRIPT' && node.tagName !== 'STYLE') {
+      for (let child of node.childNodes) walk(child);
+    }
+  }
+  walk(document.body);
+})();
+
+/* Init simulator display */
+updateSimulator();
+</script>
+</body>
+</html>

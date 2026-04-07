@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airbnb Deal Calculator | Property Labs by Terry Dwobeng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-card: #141414;
+  --bg-card-alt: #1a1a1a;
+  --bg-input: #1e1e1e;
+  --coral: #3ECFA0;
+  --coral-dark: #2BB88A;
+  --green: #00C853;
+  --green-dim: #00a344;
+  --amber: #FFB300;
+  --red: #FF3D00;
+  --white: #ffffff;
+  --gray-100: #f0f0f0;
+  --gray-200: #cccccc;
+  --gray-400: #888888;
+  --gray-600: #555555;
+  --gray-800: #2a2a2a;
+  --border: #2a2a2a;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  padding: 48px 24px 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header h1 {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.header h1 span { color: var(--coral); }
+
+.header .subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--coral);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.header .tagline {
+  color: var(--gray-400);
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+/* MAIN LAYOUT */
+.calculator-wrap {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* INPUT PANEL */
+.input-panel { display: flex; flex-direction: column; gap: 24px; }
+
+.section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.section-card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--coral);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-200);
+  margin-bottom: 6px;
+}
+
+.field input[type="text"],
+.field input[type="number"],
+.field select {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.field input:focus, .field select:focus {
+  border-color: var(--coral);
+}
+
+.field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.currency-input {
+  position: relative;
+}
+
+.currency-input .prefix {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  font-size: 15px;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.currency-input input {
+  padding-left: 28px !important;
+}
+
+/* SLIDERS */
+.slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.slider-wrap input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--gray-800);
+  border-radius: 3px;
+  outline: none;
+}
+
+.slider-wrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--coral);
+  cursor: pointer;
+  border: 2px solid var(--white);
+  box-shadow: 0 2px 8px rgba(62,207,160,0.4);
+}
+
+.slider-wrap input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--coral);
+  cursor: pointer;
+  border: 2px solid var(--white);
+  box-shadow: 0 2px 8px rgba(62,207,160,0.4);
+}
+
+.slider-value {
+  min-width: 60px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--white);
+  font-variant-numeric: tabular-nums;
+}
+
+.slider-number-input {
+  width: 80px !important;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* AUTO CALCULATED */
+.auto-calc {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--coral);
+  font-weight: 600;
+  font-size: 15px;
+  border: 1px dashed var(--border);
+}
+
+/* COLLAPSIBLE */
+.collapsible-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapsible-toggle .chevron {
+  transition: transform 0.3s;
+  color: var(--gray-400);
+  font-size: 12px;
+}
+
+.collapsible-toggle.open .chevron { transform: rotate(180deg); }
+
+.collapsible-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+}
+
+.collapsible-body.open {
+  max-height: 400px;
+  padding-top: 20px;
+}
+
+/* RESULTS PANEL */
+.results-panel {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* BIG NUMBERS */
+.big-numbers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.big-number-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+}
+
+.big-number-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.big-number-card .label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gray-400);
+  margin-bottom: 8px;
+}
+
+.big-number-card .value {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  transition: color 0.3s;
+  font-variant-numeric: tabular-nums;
+}
+
+.big-number-card.full-width .value {
+  font-size: 44px;
+}
+
+.big-number-card .value.green { color: var(--green); }
+.big-number-card .value.amber { color: var(--amber); }
+.big-number-card .value.red { color: var(--red); }
+
+/* GAUGE */
+.gauge-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gauge-container h4 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gray-400);
+  margin-bottom: 20px;
+}
+
+.gauge-svg {
+  width: 180px;
+  height: 110px;
+}
+
+.gauge-bg {
+  fill: none;
+  stroke: var(--gray-800);
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+.gauge-fill {
+  fill: none;
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease, stroke 0.4s;
+}
+
+.gauge-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  fill: var(--white);
+  text-anchor: middle;
+}
+
+.gauge-label-text {
+  font-size: 11px;
+  fill: var(--gray-400);
+  text-anchor: middle;
+  font-weight: 500;
+}
+
+/* METRICS GRID */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.metric-card .metric-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gray-400);
+  margin-bottom: 6px;
+}
+
+.metric-card .metric-value {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-card.span-full {
+  grid-column: 1 / -1;
+}
+
+/* VERDICT */
+.verdict-box {
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  transition: background 0.4s, border-color 0.4s;
+  border: 2px solid;
+}
+
+.verdict-box.strong {
+  background: rgba(0, 200, 83, 0.08);
+  border-color: var(--green);
+}
+
+.verdict-box.marginal {
+  background: rgba(255, 179, 0, 0.08);
+  border-color: var(--amber);
+}
+
+.verdict-box.walk {
+  background: rgba(255, 61, 0, 0.08);
+  border-color: var(--red);
+}
+
+.verdict-box .verdict-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.verdict-box.strong .verdict-label { color: var(--green); }
+.verdict-box.marginal .verdict-label { color: var(--amber); }
+.verdict-box.walk .verdict-label { color: var(--red); }
+
+.verdict-box .verdict-desc {
+  color: var(--gray-200);
+  font-size: 14px;
+}
+
+/* PROPERTY LABS RULES */
+.rules-panel {
+  max-width: 1360px;
+  margin: 0 auto 0;
+  padding: 0 24px 32px;
+}
+
+.rules-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+.rules-card h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--coral);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.rules-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.rules-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--gray-200);
+  line-height: 1.5;
+}
+
+.rules-list li::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  background: var(--coral);
+  border-radius: 50%;
+  margin-top: 6px;
+}
+
+.rule-highlight {
+  color: var(--white);
+  font-weight: 600;
+}
+
+/* CTA */
+.cta-section {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.cta-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #141414 100%);
+  border: 1px solid var(--coral);
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+}
+
+.cta-card h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-primary:hover {
+  background: var(--coral-dark);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  display: inline-block;
+  background: transparent;
+  color: var(--white);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  border: 1px solid var(--gray-600);
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.btn-secondary:hover {
+  border-color: var(--white);
+  transform: translateY(-1px);
+}
+
+/* EMAIL GATE MODAL */
+.email-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.email-overlay.active { display: flex; }
+
+.email-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+
+.email-modal .close-modal {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--gray-400);
+  font-size: 20px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color 0.2s;
+}
+
+.email-modal .close-modal:hover { color: var(--white); }
+
+.email-modal h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.email-modal p {
+  color: var(--gray-400);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.email-modal .form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.email-modal input[type="text"],
+.email-modal input[type="email"] {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+
+.email-modal input:focus { border-color: var(--coral); }
+
+.email-modal .btn-primary {
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px;
+}
+
+.email-modal .skip {
+  display: block;
+  margin-top: 12px;
+  color: var(--gray-600);
+  font-size: 13px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-decoration: underline;
+  font-family: 'Inter', sans-serif;
+}
+
+.email-modal .skip:hover { color: var(--gray-400); }
+
+/* COST BREAKDOWN */
+.breakdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--gray-400);
+  margin-top: 8px;
+  user-select: none;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.breakdown-toggle:hover { color: var(--gray-200); }
+
+.cost-breakdown {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.cost-breakdown.open { max-height: 400px; }
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--gray-200);
+  border-bottom: 1px solid var(--border);
+}
+
+.breakdown-row:last-child { border-bottom: none; }
+
+.breakdown-row .breakdown-val {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .calculator-wrap {
+    grid-template-columns: 1fr;
+  }
+  .results-panel {
+    position: static;
+  }
+  .big-number-card .value { font-size: 26px; }
+  .big-number-card.full-width .value { font-size: 34px; }
+  .rules-list { grid-template-columns: 1fr; }
+  .email-modal .form-row { flex-direction: column; }
+}
+
+@media (max-width: 500px) {
+  .header { padding: 32px 16px 24px; }
+  .calculator-wrap { padding: 20px 16px; gap: 20px; }
+  .section-card { padding: 18px; }
+  .metrics-grid { grid-template-columns: 1fr; }
+  .big-numbers { grid-template-columns: 1fr; }
+  .cta-card { padding: 28px 20px; }
+  .rules-panel, .cta-section { padding-left: 16px; padding-right: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="subtitle">by Property Labs</div>
+  <h1>Airbnb Deal <span>Calculator</span></h1>
+  <p class="tagline">Is this property worth it? Find out in 60 seconds.</p>
+</header>
+
+<!-- CALCULATOR -->
+<main class="calculator-wrap">
+
+  <!-- LEFT: INPUTS -->
+  <div class="input-panel">
+
+    <!-- Section 1: Property Details -->
+    <div class="section-card">
+      <h3>Property Details</h3>
+      <div class="field">
+        <label>City / Area</label>
+        <input type="text" id="city" placeholder="e.g. Manchester, Leeds, Birmingham">
+      </div>
+      <div class="field">
+        <label>Number of Bedrooms</label>
+        <select id="bedrooms">
+          <option value="1">1 Bedroom</option>
+          <option value="2" selected>2 Bedrooms</option>
+          <option value="3">3 Bedrooms</option>
+          <option value="4">4+ Bedrooms</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Monthly Rent</label>
+        <div class="currency-input">
+          <span class="prefix">&pound;</span>
+          <input type="number" id="rent" value="850" min="0" step="10">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Revenue Estimate -->
+    <div class="section-card">
+      <h3>Revenue Estimate</h3>
+      <div class="field">
+        <label>Average Nightly Rate</label>
+        <div class="slider-wrap">
+          <input type="range" id="nightlyRateSlider" min="50" max="300" value="120" step="5">
+          <div class="currency-input" style="width:auto">
+            <span class="prefix">&pound;</span>
+            <input type="number" id="nightlyRate" class="slider-number-input" value="120" min="50" max="300" step="5">
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Expected Occupancy</label>
+        <div class="slider-wrap">
+          <input type="range" id="occupancySlider" min="40" max="95" value="70" step="1">
+          <span class="slider-value" id="occupancyValue">70%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Costs -->
+    <div class="section-card">
+      <h3>Costs</h3>
+      <div class="field">
+        <label>Council Tax / month</label>
+        <div class="currency-input">
+          <span class="prefix">&pound;</span>
+          <input type="number" id="councilTax" value="120" min="0" step="5">
+        </div>
+      </div>
+      <div class="field">
+        <label>Utilities / month</label>
+        <div class="currency-input">
+          <span class="prefix">&pound;</span>
+          <input type="number" id="utilities" value="150" min="0" step="5">
+        </div>
+      </div>
+      <div class="field">
+        <label>Cleaning per turnover</label>
+        <div class="currency-input">
+          <span class="prefix">&pound;</span>
+          <input type="number" id="cleaning" value="45" min="0" step="5">
+        </div>
+      </div>
+      <div class="field">
+        <label>Average stay length (nights)</label>
+        <select id="stayLength">
+          <option value="1">1 night</option>
+          <option value="2">2 nights</option>
+          <option value="3" selected>3 nights</option>
+          <option value="4">4 nights</option>
+          <option value="5">5 nights</option>
+          <option value="7">7 nights</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Average turnovers / month</label>
+        <div class="auto-calc" id="turnoversDisplay">-- auto-calculated --</div>
+      </div>
+      <div class="field">
+        <label>Insurance / month</label>
+        <div class="currency-input">
+          <span class="prefix">&pound;</span>
+          <input type="number" id="insurance" value="30" min="0" step="5">
+        </div>
+      </div>
+      <div class="field">
+        <label>Consumables / month</label>
+        <div class="currency-input">
+          <span class="prefix">&pound;</span>
+          <input type="number" id="consumables" value="40" min="0" step="5">
+        </div>
+      </div>
+      <div class="field">
+        <label>Platform Fee</label>
+        <div class="slider-wrap">
+          <input type="range" id="platformFeeSlider" min="0" max="15" value="3" step="0.5">
+          <span class="slider-value" id="platformFeeValue">3%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Maintenance Reserve</label>
+        <div class="slider-wrap">
+          <input type="range" id="maintenanceSlider" min="0" max="15" value="5" step="0.5">
+          <span class="slider-value" id="maintenanceValue">5%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Setup Costs (Collapsible) -->
+    <div class="section-card">
+      <div class="collapsible-toggle" id="setupToggle" onclick="toggleSetup()">
+        <h3 style="margin-bottom:0;border-bottom:none;padding-bottom:0;">Setup Costs</h3>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="collapsible-body" id="setupBody">
+        <div class="field">
+          <label>Furniture &amp; Furnishing</label>
+          <div class="currency-input">
+            <span class="prefix">&pound;</span>
+            <input type="number" id="furniture" value="3000" min="0" step="100">
+          </div>
+        </div>
+        <div class="field">
+          <label>Photography</label>
+          <div class="currency-input">
+            <span class="prefix">&pound;</span>
+            <input type="number" id="photography" value="150" min="0" step="10">
+          </div>
+        </div>
+        <div class="field">
+          <label>Initial Supplies</label>
+          <div class="currency-input">
+            <span class="prefix">&pound;</span>
+            <input type="number" id="initialSupplies" value="200" min="0" step="10">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: RESULTS -->
+  <div class="results-panel">
+
+    <!-- Big Numbers -->
+    <div class="big-numbers">
+      <div class="big-number-card">
+        <div class="label">Monthly Revenue</div>
+        <div class="value green" id="revenueDisplay">&pound;0</div>
+      </div>
+      <div class="big-number-card">
+        <div class="label">Monthly Costs</div>
+        <div class="value" id="costsDisplay" style="color:var(--gray-200)">&pound;0</div>
+      </div>
+      <div class="big-number-card full-width">
+        <div class="label">Monthly Profit</div>
+        <div class="value" id="profitDisplay">&pound;0</div>
+        <button class="breakdown-toggle" id="breakdownToggle" onclick="toggleBreakdown()">
+          <span id="breakdownChevron" style="transition:transform 0.3s;display:inline-block;">&#9660;</span>
+          View cost breakdown
+        </button>
+        <div class="cost-breakdown" id="costBreakdown">
+          <div class="breakdown-row"><span>Rent</span><span class="breakdown-val" id="bRent">--</span></div>
+          <div class="breakdown-row"><span>Council Tax</span><span class="breakdown-val" id="bCouncil">--</span></div>
+          <div class="breakdown-row"><span>Utilities</span><span class="breakdown-val" id="bUtilities">--</span></div>
+          <div class="breakdown-row"><span>Cleaning</span><span class="breakdown-val" id="bCleaning">--</span></div>
+          <div class="breakdown-row"><span>Insurance</span><span class="breakdown-val" id="bInsurance">--</span></div>
+          <div class="breakdown-row"><span>Consumables</span><span class="breakdown-val" id="bConsumables">--</span></div>
+          <div class="breakdown-row"><span>Platform Fee</span><span class="breakdown-val" id="bPlatform">--</span></div>
+          <div class="breakdown-row"><span>Maintenance Reserve</span><span class="breakdown-val" id="bMaintenance">--</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gauge -->
+    <div class="gauge-container">
+      <h4>Profit Margin</h4>
+      <svg class="gauge-svg" viewBox="0 0 180 110">
+        <path class="gauge-bg" d="M 20 95 A 70 70 0 0 1 160 95"></path>
+        <path class="gauge-fill" id="gaugeFill" d="M 20 95 A 70 70 0 0 1 160 95" stroke="var(--gray-600)"
+              style="stroke-dasharray: 220; stroke-dashoffset: 220;"></path>
+        <text class="gauge-text" x="90" y="85" id="gaugeText">0%</text>
+        <text class="gauge-label-text" x="90" y="102">MARGIN</text>
+      </svg>
+    </div>
+
+    <!-- Metrics -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Profit Margin</div>
+        <div class="metric-value" id="metricMargin">0%</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Annual Profit</div>
+        <div class="metric-value" id="metricAnnual">&pound;0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">ROI on Setup</div>
+        <div class="metric-value" id="metricROI">0%</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Break-Even Month</div>
+        <div class="metric-value" id="metricBreakeven">--</div>
+      </div>
+      <div class="metric-card span-full">
+        <div class="metric-label">Rent-to-Revenue Ratio</div>
+        <div class="metric-value" id="metricRentRatio">0%</div>
+      </div>
+    </div>
+
+    <!-- Verdict -->
+    <div class="verdict-box strong" id="verdictBox">
+      <div class="verdict-label" id="verdictLabel">ENTER YOUR NUMBERS</div>
+      <div class="verdict-desc" id="verdictDesc">Fill in the details on the left to see your deal verdict.</div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- PROPERTY LABS RULES -->
+<div class="rules-panel">
+  <div class="rules-card">
+    <h3>The Property Labs Rules</h3>
+    <ul class="rules-list">
+      <li><span>Never spend more than <span class="rule-highlight">&pound;4k furnishing a 2-bed</span></span></li>
+      <li><span>Target minimum <span class="rule-highlight">65% occupancy</span></span></li>
+      <li><span>If the deal doesn't make <span class="rule-highlight">&pound;500/month profit, walk away</span></span></li>
+      <li><span>Rent-to-revenue ratio should be <span class="rule-highlight">below 45%</span></span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-card">
+    <h3>Want help analysing your next deal?</h3>
+    <div class="cta-buttons">
+      <a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" target="_blank" rel="noopener" class="btn-primary">Book a Free Strategy Call</a>
+      <a href="#" class="btn-secondary" onclick="return false;">Join the Free Live Training &mdash; April 13th</a>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL GATE MODAL -->
+<div class="email-overlay" id="emailOverlay">
+  <div class="email-modal">
+    <button class="close-modal" onclick="closeEmailGate()">&times;</button>
+    <h3>Save Your Analysis</h3>
+    <p>Get the full Property Labs Deal Analyser spreadsheet and have this analysis emailed to you.</p>
+    <div class="form-row">
+      <input type="text" id="gateName" placeholder="First name">
+      <input type="email" id="gateEmail" placeholder="Email address">
+    </div>
+    <button class="btn-primary" onclick="submitEmailGate()">Download Full Spreadsheet</button>
+    <button class="skip" onclick="closeEmailGate()">Skip for now</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // State
+  let calcCount = 0;
+  let emailGateShown = false;
+  let emailGateDismissed = false;
+  let animFrameId = null;
+
+  // Element refs
+  const $ = id => document.getElementById(id);
+
+  const els = {
+    rent: $('rent'),
+    nightlyRate: $('nightlyRate'),
+    nightlyRateSlider: $('nightlyRateSlider'),
+    occupancySlider: $('occupancySlider'),
+    occupancyValue: $('occupancyValue'),
+    councilTax: $('councilTax'),
+    utilities: $('utilities'),
+    cleaning: $('cleaning'),
+    stayLength: $('stayLength'),
+    turnoversDisplay: $('turnoversDisplay'),
+    insurance: $('insurance'),
+    consumables: $('consumables'),
+    platformFeeSlider: $('platformFeeSlider'),
+    platformFeeValue: $('platformFeeValue'),
+    maintenanceSlider: $('maintenanceSlider'),
+    maintenanceValue: $('maintenanceValue'),
+    furniture: $('furniture'),
+    photography: $('photography'),
+    initialSupplies: $('initialSupplies'),
+    revenueDisplay: $('revenueDisplay'),
+    costsDisplay: $('costsDisplay'),
+    profitDisplay: $('profitDisplay'),
+    gaugeFill: $('gaugeFill'),
+    gaugeText: $('gaugeText'),
+    metricMargin: $('metricMargin'),
+    metricAnnual: $('metricAnnual'),
+    metricROI: $('metricROI'),
+    metricBreakeven: $('metricBreakeven'),
+    metricRentRatio: $('metricRentRatio'),
+    verdictBox: $('verdictBox'),
+    verdictLabel: $('verdictLabel'),
+    verdictDesc: $('verdictDesc'),
+  };
+
+  // Helpers
+  function num(el) {
+    const v = parseFloat(el.value);
+    return isNaN(v) ? 0 : v;
+  }
+
+  function formatCurrency(val) {
+    const abs = Math.abs(val);
+    const formatted = abs >= 1000
+      ? abs.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+      : abs.toFixed(0);
+    return (val < 0 ? '-' : '') + '\u00A3' + formatted;
+  }
+
+  // Animated number targets
+  const animTargets = {};
+  const animCurrents = {};
+
+  function animateValue(elId, target) {
+    animTargets[elId] = target;
+    if (!(elId in animCurrents)) animCurrents[elId] = 0;
+  }
+
+  function runAnimations() {
+    let needsFrame = false;
+    for (const id in animTargets) {
+      const target = animTargets[id];
+      const current = animCurrents[id] || 0;
+      const diff = target - current;
+      if (Math.abs(diff) < 1) {
+        animCurrents[id] = target;
+      } else {
+        animCurrents[id] = current + diff * 0.15;
+        needsFrame = true;
+      }
+      const el = $(id);
+      if (el) {
+        if (id === 'metricMargin' || id === 'metricRentRatio' || id === 'metricROI') {
+          el.textContent = Math.round(animCurrents[id]) + '%';
+        } else if (id === 'metricBreakeven') {
+          const m = Math.round(animCurrents[id]);
+          el.textContent = m <= 0 ? 'N/A' : (m > 36 ? '36+' : 'Month ' + m);
+        } else {
+          el.textContent = formatCurrency(Math.round(animCurrents[id]));
+        }
+      }
+    }
+    if (needsFrame) {
+      animFrameId = requestAnimationFrame(runAnimations);
+    } else {
+      animFrameId = null;
+    }
+  }
+
+  function startAnim() {
+    if (!animFrameId) animFrameId = requestAnimationFrame(runAnimations);
+  }
+
+  // Main calculation
+  function calculate() {
+    const rent = num(els.rent);
+    const nightlyRate = num(els.nightlyRate);
+    const occupancy = num(els.occupancySlider) / 100;
+    const councilTax = num(els.councilTax);
+    const utilities = num(els.utilities);
+    const cleaningCost = num(els.cleaning);
+    const stayLength = num(els.stayLength);
+    const insurance = num(els.insurance);
+    const consumablesCost = num(els.consumables);
+    const platformFee = num(els.platformFeeSlider) / 100;
+    const maintenanceReserve = num(els.maintenanceSlider) / 100;
+    const furnitureCost = num(els.furniture);
+    const photoCost = num(els.photography);
+    const suppliesCost = num(els.initialSupplies);
+
+    // Calculate
+    const bookedNights = Math.round(30 * occupancy);
+    const turnovers = stayLength > 0 ? Math.round(bookedNights / stayLength) : 0;
+    const grossRevenue = bookedNights * nightlyRate;
+    const platformFeeAmount = grossRevenue * platformFee;
+    const netRevenue = grossRevenue - platformFeeAmount;
+
+    const cleaningTotal = turnovers * cleaningCost;
+    const maintenanceAmount = grossRevenue * maintenanceReserve;
+
+    const totalCosts = rent + councilTax + utilities + cleaningTotal + insurance + consumablesCost + platformFeeAmount + maintenanceAmount;
+    const profit = netRevenue - (rent + councilTax + utilities + cleaningTotal + insurance + consumablesCost + maintenanceAmount);
+    const margin = grossRevenue > 0 ? (profit / grossRevenue) * 100 : 0;
+
+    const setupTotal = furnitureCost + photoCost + suppliesCost;
+    const annualProfit = profit * 12;
+    const roi = setupTotal > 0 ? (annualProfit / setupTotal) * 100 : 0;
+    const breakeven = profit > 0 ? Math.ceil(setupTotal / profit) : 0;
+    const rentRatio = grossRevenue > 0 ? (rent / grossRevenue) * 100 : 0;
+
+    // Update turnovers display
+    els.turnoversDisplay.textContent = turnovers + ' turnovers/month (' + bookedNights + ' booked nights)';
+
+    // Update big numbers with animation
+    animateValue('revenueDisplay', grossRevenue);
+    animateValue('costsDisplay', totalCosts);
+    animateValue('profitDisplay', profit);
+    startAnim();
+
+    // Revenue color
+    els.revenueDisplay.className = 'value green';
+
+    // Profit color
+    if (profit >= 500) {
+      els.profitDisplay.className = 'value green';
+    } else if (profit >= 200) {
+      els.profitDisplay.className = 'value amber';
+    } else {
+      els.profitDisplay.className = 'value red';
+    }
+
+    // Gauge
+    const maxArc = 220;
+    const clampedMargin = Math.max(0, Math.min(100, margin));
+    const offset = maxArc - (clampedMargin / 100) * maxArc;
+    els.gaugeFill.style.strokeDashoffset = offset;
+
+    let gaugeColor;
+    if (margin >= 25) gaugeColor = 'var(--green)';
+    else if (margin >= 15) gaugeColor = 'var(--amber)';
+    else gaugeColor = 'var(--red)';
+
+    els.gaugeFill.style.stroke = gaugeColor;
+    els.gaugeText.textContent = Math.round(margin) + '%';
+
+    // Metric cards
+    animateValue('metricMargin', margin);
+    animateValue('metricAnnual', annualProfit);
+    animateValue('metricROI', roi);
+    animateValue('metricBreakeven', breakeven);
+    animateValue('metricRentRatio', rentRatio);
+    startAnim();
+
+    // Rent ratio color
+    els.metricRentRatio.style.color = rentRatio <= 45 ? 'var(--green)' : 'var(--red)';
+
+    // Verdict
+    if (profit >= 500 && margin >= 25) {
+      els.verdictBox.className = 'verdict-box strong';
+      els.verdictLabel.textContent = 'STRONG DEAL';
+      els.verdictDesc.textContent = 'This looks profitable. The numbers work.';
+    } else if (profit >= 200 && margin >= 15) {
+      els.verdictBox.className = 'verdict-box marginal';
+      els.verdictLabel.textContent = 'MARGINAL DEAL';
+      els.verdictDesc.textContent = 'Could work but margins are tight. Consider negotiating rent down.';
+    } else {
+      els.verdictBox.className = 'verdict-box walk';
+      els.verdictLabel.textContent = 'WALK AWAY';
+      els.verdictDesc.textContent = "The numbers don't stack up. Look for a better deal.";
+    }
+
+    // Cost breakdown
+    $('bRent').textContent = formatCurrency(rent);
+    $('bCouncil').textContent = formatCurrency(councilTax);
+    $('bUtilities').textContent = formatCurrency(utilities);
+    $('bCleaning').textContent = formatCurrency(cleaningTotal);
+    $('bInsurance').textContent = formatCurrency(insurance);
+    $('bConsumables').textContent = formatCurrency(consumablesCost);
+    $('bPlatform').textContent = formatCurrency(platformFeeAmount);
+    $('bMaintenance').textContent = formatCurrency(maintenanceAmount);
+
+    // Calc count for email gate
+    calcCount++;
+    if (calcCount >= 3 && !emailGateShown && !emailGateDismissed) {
+      emailGateShown = true;
+      $('emailOverlay').classList.add('active');
+    }
+  }
+
+  // Sync sliders and inputs
+  function syncSlider(slider, display, suffix, numberInput) {
+    slider.addEventListener('input', function() {
+      if (numberInput) {
+        numberInput.value = this.value;
+      } else if (display) {
+        display.textContent = this.value + suffix;
+      }
+      calculate();
+    });
+
+    if (numberInput) {
+      numberInput.addEventListener('input', function() {
+        let v = parseFloat(this.value);
+        if (!isNaN(v)) {
+          v = Math.max(parseFloat(slider.min), Math.min(parseFloat(slider.max), v));
+          slider.value = v;
+        }
+        calculate();
+      });
+    }
+  }
+
+  syncSlider(els.nightlyRateSlider, null, '', els.nightlyRate);
+  syncSlider(els.occupancySlider, els.occupancyValue, '%');
+  syncSlider(els.platformFeeSlider, els.platformFeeValue, '%');
+  syncSlider(els.maintenanceSlider, els.maintenanceValue, '%');
+
+  // Attach to all inputs
+  const allInputs = document.querySelectorAll('input[type="number"], select');
+  allInputs.forEach(inp => {
+    inp.addEventListener('input', calculate);
+    inp.addEventListener('change', calculate);
+  });
+
+  // Setup costs collapsible
+  window.toggleSetup = function() {
+    const toggle = $('setupToggle');
+    const body = $('setupBody');
+    toggle.classList.toggle('open');
+    body.classList.toggle('open');
+  };
+
+  // Cost breakdown toggle
+  window.toggleBreakdown = function() {
+    const bd = $('costBreakdown');
+    const chev = $('breakdownChevron');
+    bd.classList.toggle('open');
+    chev.style.transform = bd.classList.contains('open') ? 'rotate(180deg)' : '';
+  };
+
+  // Email gate
+  window.closeEmailGate = function() {
+    $('emailOverlay').classList.remove('active');
+    emailGateDismissed = true;
+  };
+
+  window.submitEmailGate = function() {
+    const name = $('gateName').value.trim();
+    const email = $('gateEmail').value.trim();
+    if (!name || !email) {
+      alert('Please enter your name and email.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    // In production, this would POST to an API
+    console.log('Lead captured:', { name, email });
+    $('emailOverlay').classList.remove('active');
+    emailGateDismissed = true;
+    alert('Thanks, ' + name + '! Check your inbox for the Deal Analyser spreadsheet.');
+  };
+
+  // Validate number inputs (prevent negative)
+  document.querySelectorAll('input[type="number"]').forEach(inp => {
+    inp.addEventListener('change', function() {
+      if (this.min !== '' && parseFloat(this.value) < parseFloat(this.min)) {
+        this.value = this.min;
+      }
+    });
+  });
+
+  // Initial calculation
+  calculate();
+
+})();
+</script>
+
+</body>
+</html>

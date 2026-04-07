@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Airbnb Deal Analyser | Property Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --bg-card: #141414;
+    --bg-card-alt: #1a1a1a;
+    --bg-elevated: #1e1e1e;
+    --coral: #FF5A5F;
+    --coral-dim: rgba(255, 90, 95, 0.12);
+    --coral-glow: rgba(255, 90, 95, 0.25);
+    --text: #f0f0f0;
+    --text-secondary: #a0a0a0;
+    --text-muted: #666;
+    --border: #222;
+    --green: #22c55e;
+    --green-dim: rgba(34, 197, 94, 0.12);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245, 158, 11, 0.12);
+    --red: #ef4444;
+    --red-dim: rgba(239, 68, 68, 0.12);
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, var(--coral-glow) 0%, transparent 65%);
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: var(--coral-dim);
+    color: var(--coral);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 100px;
+    border: 1px solid rgba(255, 90, 95, 0.2);
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .cover h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 24px;
+    position: relative;
+    max-width: 700px;
+  }
+
+  .cover h1 span {
+    color: var(--coral);
+  }
+
+  .cover .subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin-bottom: 48px;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  .cover-divider {
+    width: 60px;
+    height: 3px;
+    background: var(--coral);
+    border-radius: 2px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  .cover-author {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    position: relative;
+  }
+
+  .cover-author strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .cover-footer {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    padding: 80px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-label {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--coral);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .section-intro {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin-bottom: 48px;
+    line-height: 1.8;
+  }
+
+  /* ── INTRO ── */
+  .intro-text {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 740px;
+    line-height: 1.9;
+    padding: 80px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .intro-text p + p {
+    margin-top: 20px;
+  }
+
+  /* ── STEP CARDS ── */
+  .steps-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .step-card {
+    display: flex;
+    gap: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    transition: border-color 0.2s;
+  }
+
+  .step-card:hover {
+    border-color: rgba(255, 90, 95, 0.3);
+  }
+
+  .step-number {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    background: var(--coral-dim);
+    color: var(--coral);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 90, 95, 0.15);
+  }
+
+  .step-content h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .step-content p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* ── TABLES ── */
+  .table-group {
+    margin-bottom: 48px;
+  }
+
+  .table-group-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+    padding-left: 16px;
+    border-left: 3px solid var(--coral);
+  }
+
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .ref-table thead th {
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ref-table tbody tr {
+    background: var(--bg-card);
+  }
+
+  .ref-table tbody tr:nth-child(even) {
+    background: var(--bg-card-alt);
+  }
+
+  .ref-table tbody td {
+    padding: 14px 20px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  .ref-table tbody td:first-child {
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+    width: 200px;
+  }
+
+  .ref-table tbody td:nth-child(2) {
+    width: 250px;
+  }
+
+  .ref-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* ── RULES OF THUMB (ACCENT BOX) ── */
+  .rules-box {
+    background: linear-gradient(135deg, rgba(255, 90, 95, 0.08) 0%, rgba(255, 90, 95, 0.03) 100%);
+    border: 1px solid rgba(255, 90, 95, 0.2);
+    border-radius: 16px;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rules-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--coral);
+    border-radius: 4px 0 0 4px;
+  }
+
+  .rules-box h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 32px;
+  }
+
+  .rules-subsection {
+    margin-bottom: 32px;
+  }
+
+  .rules-subsection:last-child {
+    margin-bottom: 0;
+  }
+
+  .rules-subsection h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--coral);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.85rem;
+  }
+
+  .rules-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .rules-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .rules-list li .bullet {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    background: var(--coral);
+    border-radius: 50%;
+    margin-top: 9px;
+  }
+
+  .rules-list li strong {
+    color: #fff;
+  }
+
+  .red-flag-list li .bullet {
+    background: var(--red);
+  }
+
+  /* ── WORKED EXAMPLE / DASHBOARD ── */
+  .dashboard {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .dashboard-header {
+    background: var(--bg-elevated);
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .dashboard-header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .dashboard-header .badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+  }
+
+  .badge-amber {
+    background: var(--amber-dim);
+    color: var(--amber);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .dashboard-body {
+    padding: 32px;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .dash-section {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .dash-section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .dash-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .dash-row:last-child {
+    border-bottom: none;
+  }
+
+  .dash-row .label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .dash-row .value {
+    font-family: 'Plus Jakarta Sans', monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .dash-row.total {
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+    padding-top: 12px;
+  }
+
+  .dash-row.total .label {
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .dash-row.total .value {
+    color: var(--coral);
+    font-weight: 800;
+  }
+
+  .dash-section.full-width {
+    grid-column: 1 / -1;
+  }
+
+  /* Profitability metrics row */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+
+  .metric-card {
+    text-align: center;
+    padding: 20px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .metric-card .metric-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .metric-card .metric-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  .metric-amber { color: var(--amber); }
+  .metric-green { color: var(--green); }
+  .metric-red { color: var(--red); }
+
+  .verdict-bar {
+    margin-top: 24px;
+    padding: 20px 32px;
+    background: var(--amber-dim);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .verdict-bar .verdict-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .verdict-bar .verdict-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--amber);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .dashboard-commentary {
+    margin-top: 32px;
+    padding: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .dashboard-commentary p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .dashboard-commentary p + p {
+    margin-top: 16px;
+  }
+
+  /* ── FEATURE CARDS (3 Numbers) ── */
+  .feature-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .feature-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 28px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .feature-card:hover {
+    border-color: rgba(255, 90, 95, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .feature-card-number {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--coral);
+    opacity: 0.3;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .feature-card h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .feature-card .threshold {
+    display: inline-block;
+    background: var(--coral-dim);
+    color: var(--coral);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255, 90, 95, 0.15);
+  }
+
+  .feature-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .feature-card .sweet-spot {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .feature-card .sweet-spot strong {
+    color: var(--green);
+  }
+
+  /* ── MISTAKES ── */
+  .mistakes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mistake-item {
+    display: flex;
+    gap: 20px;
+    padding: 24px 28px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .mistake-item:hover {
+    border-color: rgba(255, 90, 95, 0.2);
+  }
+
+  .mistake-number {
+    flex-shrink: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--coral);
+    opacity: 0.5;
+    width: 32px;
+  }
+
+  .mistake-content h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .mistake-content p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* ── CTA PAGE ── */
+  .cta-page {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 40px;
+    border-top: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-page::before {
+    content: '';
+    position: absolute;
+    bottom: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--coral-glow) 0%, transparent 65%);
+    pointer-events: none;
+    opacity: 0.3;
+  }
+
+  .cta-page h2 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 24px;
+    max-width: 600px;
+    position: relative;
+  }
+
+  .cta-page .cta-desc {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin-bottom: 40px;
+    line-height: 1.8;
+    position: relative;
+  }
+
+  .cta-list {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .cta-list li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    padding: 10px 0;
+  }
+
+  .cta-list li .check {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--coral-dim);
+    border: 1px solid rgba(255, 90, 95, 0.2);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cta-list li .check svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--coral);
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .cta-button {
+    display: inline-block;
+    background: var(--coral);
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding: 18px 48px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    box-shadow: 0 4px 24px rgba(255, 90, 95, 0.3);
+  }
+
+  .cta-button:hover {
+    background: #e84e53;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(255, 90, 95, 0.4);
+  }
+
+  .cta-subtext {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    position: relative;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    letter-spacing: 0.03em;
+  }
+
+  .footer span {
+    margin: 0 12px;
+    opacity: 0.3;
+  }
+
+  /* ── PRINT STYLES ── */
+  @media print {
+    body { background: #fff; color: #1a1a1a; }
+    .cover { page-break-after: always; min-height: auto; padding: 120px 40px; }
+    .section { page-break-inside: avoid; }
+    .step-card, .feature-card, .mistake-item { page-break-inside: avoid; }
+    .dashboard { page-break-inside: avoid; }
+    .cta-page { page-break-before: always; }
+    .rules-box { page-break-inside: avoid; }
+
+    :root {
+      --bg: #fff;
+      --bg-card: #f9f9f9;
+      --bg-card-alt: #f4f4f4;
+      --bg-elevated: #eee;
+      --text: #1a1a1a;
+      --text-secondary: #444;
+      --text-muted: #888;
+      --border: #ddd;
+    }
+
+    .cover::before, .cta-page::before { display: none; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .page { padding: 0 20px; }
+    .cover h1 { font-size: 2.4rem; }
+    .section-title { font-size: 1.6rem; }
+    .feature-cards { grid-template-columns: 1fr; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .metrics-row { grid-template-columns: repeat(2, 1fr); }
+    .rules-box { padding: 28px; }
+    .ref-table tbody td:first-child { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ COVER PAGE ═══════════════════ -->
+<div class="cover">
+  <div class="cover-badge">Property Labs Guide</div>
+  <h1>The Airbnb<br><span>Deal Analyser</span></h1>
+  <p class="subtitle">Plug in any property's numbers and know if it's profitable in 60 seconds.</p>
+  <div class="cover-divider"></div>
+  <p class="cover-author">By <strong>Terry Dwobeng</strong> | Property Labs</p>
+  <div class="cover-footer">propertylabs.to</div>
+</div>
+
+<div class="page">
+
+  <!-- ═══════════════════ INTRO ═══════════════════ -->
+  <div class="intro-text">
+    <p>I've seen too many people jump into Airbnb, sign a lease, spend thousands on furniture, and then realise three months later that they're actually <strong style="color:#fff">losing money</strong>. That's not a business. That's an expensive hobby.</p>
+    <p>This analyser exists so you never make that mistake. Before you commit to any deal, you plug the numbers in here. If it works on paper, it works in real life. If it doesn't work on paper, walk away. Simple as that.</p>
+  </div>
+
+  <!-- ═══════════════════ HOW TO USE ═══════════════════ -->
+  <div class="section">
+    <span class="section-label">Getting Started</span>
+    <h2 class="section-title">How to Use the Analyser</h2>
+    <p class="section-intro">No spreadsheet wizardry required. Follow these six steps and you'll have your answer.</p>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h3>Open the Spreadsheet</h3>
+          <p>Import the CSV file into Google Sheets (File > Import > Upload). The formulas will be laid out for you. All you need to do is fill in the yellow-highlighted input cells.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h3>Fill in the Property Details</h3>
+          <p>Start at the top. Pop in the address, number of bedrooms, property type, monthly rent, and the city. This is basic stuff you'll get from the listing or the landlord.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h3>Add Your Revenue Numbers</h3>
+          <p>You need two numbers: your average nightly rate and your expected occupancy rate. I'll show you exactly where to find these below.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h3>Fill In Your Costs</h3>
+          <p>Go line by line. Rent, council tax, utilities, insurance, cleaning, consumables, platform fees. Don't skip anything. The deals that look profitable but aren't? It's always because someone forgot to account for a cost.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <h3>Add Your Setup Costs</h3>
+          <p>How much are you spending to get this place guest-ready? Furniture, photography, supplies, listing setup. Be honest with yourself here.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">6</div>
+        <div class="step-content">
+          <h3>Read the Verdict</h3>
+          <p>The bottom section tells you everything: monthly profit, annual profit, profit margin, ROI, and how many months until you break even. Green means go. Red means walk away.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ FIELD REFERENCE ═══════════════════ -->
+  <div class="section">
+    <span class="section-label">Reference</span>
+    <h2 class="section-title">What Each Field Means</h2>
+    <p class="section-intro">A complete reference for every input in the analyser, including where to find the data you need.</p>
+
+    <!-- Property Details -->
+    <div class="table-group">
+      <h3 class="table-group-title">Property Details</h3>
+      <table class="ref-table">
+        <thead><tr><th>Field</th><th>What It Is</th><th>Where to Find It</th></tr></thead>
+        <tbody>
+          <tr><td>Property Address</td><td>The full address of the property you're analysing</td><td>The listing or landlord</td></tr>
+          <tr><td>Number of Bedrooms</td><td>How many bedrooms the property has</td><td>The listing</td></tr>
+          <tr><td>Property Type</td><td>Flat, house, or room</td><td>The listing</td></tr>
+          <tr><td>Monthly Rent</td><td>What you'll pay the landlord each month</td><td>The tenancy agreement or listing on Rightmove/OpenRent</td></tr>
+          <tr><td>Location / City</td><td>The city or area</td><td>You know this one</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Revenue Projection -->
+    <div class="table-group">
+      <h3 class="table-group-title">Revenue Projection</h3>
+      <table class="ref-table">
+        <thead><tr><th>Field</th><th>What It Is</th><th>Where to Find It</th></tr></thead>
+        <tbody>
+          <tr><td>Average Nightly Rate</td><td>What you'll charge guests per night on average</td><td>Search AirDNA, Mashvisor, or comparable listings on Airbnb. Filter by same bedroom count and similar quality. Take the average of 5-10 comparable listings.</td></tr>
+          <tr><td>Expected Occupancy Rate</td><td>What percentage of nights you'll actually book</td><td>AirDNA gives area averages. For your first estimate, use 65-70% for a decent area. Never assume above 80% unless you have real data.</td></tr>
+          <tr><td>Nights Per Month</td><td>How many nights you'll be booked (calculated)</td><td>Occupancy Rate x 30. The spreadsheet does this for you.</td></tr>
+          <tr><td>Monthly Revenue</td><td>Your gross income before any costs (calculated)</td><td>Nightly Rate x Nights Per Month. Automatic.</td></tr>
+          <tr><td>Annual Revenue</td><td>Monthly Revenue x 12 (calculated)</td><td>Automatic.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Costs -->
+    <div class="table-group">
+      <h3 class="table-group-title">Monthly Costs</h3>
+      <table class="ref-table">
+        <thead><tr><th>Field</th><th>What It Is</th><th>Where to Find It</th></tr></thead>
+        <tbody>
+          <tr><td>Monthly Rent</td><td>Same as above, pulled into costs</td><td>Your tenancy agreement</td></tr>
+          <tr><td>Council Tax</td><td>Monthly council tax payment</td><td>Check the local council's website. Search "[city] council tax bands". The landlord can also tell you the band.</td></tr>
+          <tr><td>Utilities</td><td>Gas, electric, water, and wifi combined</td><td>Budget 120-180/month for a 2-bed. Call suppliers for exact quotes. Wifi is typically 25-35/month.</td></tr>
+          <tr><td>Insurance</td><td>Short-let or serviced accommodation insurance</td><td>Get quotes from Guardhog, Pikl, or Proper Insurance. Budget 50-80/month.</td></tr>
+          <tr><td>Cleaning</td><td>Cost per clean multiplied by turnovers per month</td><td>Typically 40-70 per clean for a 2-bed. Multiply by expected turnovers (roughly 8-10/month).</td></tr>
+          <tr><td>Consumables</td><td>Toiletries, coffee, tea, welcome packs</td><td>Budget 30-50/month. Covers toilet rolls, shower gel, coffee pods, bin bags, etc.</td></tr>
+          <tr><td>Platform Fees</td><td>Airbnb charges hosts approximately 3% per booking</td><td>3% of Monthly Revenue. The spreadsheet calculates this.</td></tr>
+          <tr><td>Maintenance Reserve</td><td>Money set aside for repairs and replacements</td><td>5% of Monthly Revenue. Things break. Budget for it.</td></tr>
+          <tr><td>Management Fee</td><td>If using a co-host or management company</td><td>Typically 15-20% of revenue. Leave at 0 if self-managing.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Setup Costs -->
+    <div class="table-group">
+      <h3 class="table-group-title">Setup Costs</h3>
+      <table class="ref-table">
+        <thead><tr><th>Field</th><th>What It Is</th><th>Where to Find It</th></tr></thead>
+        <tbody>
+          <tr><td>Furniture & Furnishing</td><td>Everything the guest sees and uses</td><td>Budget 2,000-4,000 for a 2-bed. IKEA, Facebook Marketplace, B&M, Dunelm.</td></tr>
+          <tr><td>Photography</td><td>Professional listing photos</td><td>100-200 for a decent property photographer. This is NOT optional.</td></tr>
+          <tr><td>Initial Supplies</td><td>First batch of consumables, linens, towels</td><td>200-400. Buy in bulk.</td></tr>
+          <tr><td>Listing Setup</td><td>Any costs for getting your listing live</td><td>Usually free if DIY. Budget 100-200 if you need help.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ TERRY'S RULES ═══════════════════ -->
+  <div class="section">
+    <div class="rules-box">
+      <h2>Terry's Rules of Thumb</h2>
+      <p style="color:var(--text-secondary); margin-bottom:32px; font-size:0.95rem;">These are the benchmarks I use on every single deal. If a property doesn't hit these, I don't touch it.</p>
+
+      <div class="rules-subsection">
+        <h3>Minimum Margins</h3>
+        <ul class="rules-list">
+          <li><span class="bullet"></span><span><strong>Monthly profit must be at least &pound;500 after ALL costs.</strong> If you're making &pound;200-300/month, one bad month wipes you out. You need a buffer.</span></li>
+          <li><span class="bullet"></span><span><strong>Profit margin must be at least 25%.</strong> Below that, you're working too hard for too little.</span></li>
+          <li><span class="bullet"></span><span><strong>Break-even must be within 3-4 months.</strong> If it takes 6+ months to recoup your setup costs, the deal is too thin.</span></li>
+        </ul>
+      </div>
+
+      <div class="rules-subsection">
+        <h3>Occupancy Benchmarks</h3>
+        <ul class="rules-list">
+          <li><span class="bullet"></span><span><strong>65%</strong> = conservative estimate (use this for your first analysis)</span></li>
+          <li><span class="bullet"></span><span><strong>75%</strong> = good, achievable with a solid listing and pricing strategy</span></li>
+          <li><span class="bullet"></span><span><strong>85%+</strong> = exceptional, only realistic in prime locations or peak seasons</span></li>
+          <li><span class="bullet"></span><span><strong>Below 55%</strong> = red flag, the area might not have enough demand</span></li>
+        </ul>
+      </div>
+
+      <div class="rules-subsection">
+        <h3>Red Flags -- Walk Away Immediately</h3>
+        <ul class="rules-list red-flag-list">
+          <li><span class="bullet"></span><span>Rent is more than 50% of projected revenue at 65% occupancy</span></li>
+          <li><span class="bullet"></span><span>The area has more than 100 Airbnb listings within 1 mile and low occupancy rates</span></li>
+          <li><span class="bullet"></span><span>Council tax is Band D or above (eats into margins)</span></li>
+          <li><span class="bullet"></span><span>The landlord hasn't explicitly agreed to subletting</span></li>
+          <li><span class="bullet"></span><span>No nearby transport links, attractions, or business hubs driving demand</span></li>
+          <li><span class="bullet"></span><span>The property needs more than &pound;5,000 in setup costs</span></li>
+          <li><span class="bullet"></span><span>Monthly profit is below &pound;300 even at 75% occupancy</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ WORKED EXAMPLE ═══════════════════ -->
+  <div class="section">
+    <span class="section-label">Worked Example</span>
+    <h2 class="section-title">2-Bed Flat in Manchester</h2>
+    <p class="section-intro">A real-looking deal so you can see exactly how the analyser works in practice. 2-bedroom flat on Dale Street, Northern Quarter -- modern build, walking distance from Piccadilly Station and the Arndale Centre.</p>
+
+    <div class="dashboard">
+      <div class="dashboard-header">
+        <h3>Deal Analysis: 45 Dale Street, Northern Quarter, Manchester M1 2HF</h3>
+        <span class="badge badge-amber">Marginal</span>
+      </div>
+      <div class="dashboard-body">
+        <div class="dashboard-grid">
+
+          <!-- Property Details -->
+          <div class="dash-section">
+            <div class="dash-section-label">Property Details</div>
+            <div class="dash-row"><span class="label">Bedrooms</span><span class="value">2</span></div>
+            <div class="dash-row"><span class="label">Type</span><span class="value">Flat</span></div>
+            <div class="dash-row"><span class="label">Monthly Rent</span><span class="value">&pound;1,100</span></div>
+            <div class="dash-row"><span class="label">City</span><span class="value">Manchester</span></div>
+          </div>
+
+          <!-- Revenue Projection -->
+          <div class="dash-section">
+            <div class="dash-section-label">Revenue Projection</div>
+            <div class="dash-row"><span class="label">Avg Nightly Rate</span><span class="value">&pound;120</span></div>
+            <div class="dash-row"><span class="label">Occupancy Rate</span><span class="value">72%</span></div>
+            <div class="dash-row"><span class="label">Nights / Month</span><span class="value">21.6</span></div>
+            <div class="dash-row total"><span class="label">Monthly Revenue</span><span class="value">&pound;2,592</span></div>
+          </div>
+
+          <!-- Monthly Costs -->
+          <div class="dash-section">
+            <div class="dash-section-label">Monthly Costs</div>
+            <div class="dash-row"><span class="label">Rent</span><span class="value">&pound;1,100</span></div>
+            <div class="dash-row"><span class="label">Council Tax (Band B)</span><span class="value">&pound;110</span></div>
+            <div class="dash-row"><span class="label">Utilities</span><span class="value">&pound;150</span></div>
+            <div class="dash-row"><span class="label">Insurance</span><span class="value">&pound;60</span></div>
+            <div class="dash-row"><span class="label">Cleaning (8 turnovers)</span><span class="value">&pound;480</span></div>
+            <div class="dash-row"><span class="label">Consumables</span><span class="value">&pound;40</span></div>
+            <div class="dash-row"><span class="label">Platform Fees (3%)</span><span class="value">&pound;78</span></div>
+            <div class="dash-row"><span class="label">Maintenance Reserve (5%)</span><span class="value">&pound;130</span></div>
+            <div class="dash-row"><span class="label">Management Fee</span><span class="value">&pound;0</span></div>
+            <div class="dash-row total"><span class="label">Total Monthly Costs</span><span class="value">&pound;2,148</span></div>
+          </div>
+
+          <!-- Setup Costs -->
+          <div class="dash-section">
+            <div class="dash-section-label">Setup Investment</div>
+            <div class="dash-row"><span class="label">Furniture & Furnishing</span><span class="value">&pound;3,000</span></div>
+            <div class="dash-row"><span class="label">Photography</span><span class="value">&pound;150</span></div>
+            <div class="dash-row"><span class="label">Initial Supplies</span><span class="value">&pound;300</span></div>
+            <div class="dash-row"><span class="label">Listing Setup</span><span class="value">&pound;50</span></div>
+            <div class="dash-row total"><span class="label">Total Setup Investment</span><span class="value">&pound;3,500</span></div>
+          </div>
+        </div>
+
+        <!-- Profitability Metrics -->
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-value metric-amber">&pound;444</div>
+            <div class="metric-label">Monthly Profit</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value metric-amber">&pound;5,328</div>
+            <div class="metric-label">Annual Profit</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value metric-red">17.1%</div>
+            <div class="metric-label">Profit Margin</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value metric-green">152%</div>
+            <div class="metric-label">ROI on Setup</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value metric-red">Month 8</div>
+            <div class="metric-label">Break-Even</div>
+          </div>
+        </div>
+
+        <div class="verdict-bar">
+          <span class="verdict-label">Analysis Verdict</span>
+          <span class="verdict-text">Marginal -- Needs Optimisation</span>
+        </div>
+
+        <div class="dashboard-commentary">
+          <p>At first glance, &pound;444/month looks alright. But the profit margin is only 17.1% and break-even is month 8. That's outside the comfort zone.</p>
+          <p>But what if we push the nightly rate to &pound;130? Now monthly revenue goes to &pound;2,808, monthly profit jumps to &pound;624, and the margin hits 22.2%. Getting closer.</p>
+          <p>Or what if we negotiate the rent down to &pound;1,000? Now we're at &pound;544/month profit with a 21% margin.</p>
+          <p><strong style="color:#fff;">This is exactly why you run the numbers BEFORE you sign anything.</strong> Small changes in rent or nightly rate completely change whether a deal works or not.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ 3 NUMBERS ═══════════════════ -->
+  <div class="section">
+    <span class="section-label">Critical Metrics</span>
+    <h2 class="section-title">3 Numbers That Make or Break a Deal</h2>
+    <p class="section-intro">I've analysed hundreds of deals. It always comes down to these three numbers. Get them right and you'll be profitable. Get any one of them wrong and you'll struggle.</p>
+
+    <div class="feature-cards">
+      <div class="feature-card">
+        <div class="feature-card-number">01</div>
+        <h3>The Rent-to-Revenue Ratio</h3>
+        <div class="threshold">Max 40-45% of Revenue</div>
+        <p>Your rent should be no more than 40-45% of your projected monthly revenue. If your rent is 50%+ of revenue, you've got almost no room for costs and profit. The deal is dead before it starts.</p>
+        <p style="margin-top:12px;"><em style="color:var(--text-muted);">Calculate: Monthly Rent / Monthly Revenue x 100</em></p>
+        <div class="sweet-spot"><strong>Sweet spot: 35-40%.</strong> That gives you breathing room.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-number">02</div>
+        <h3>The Effective Nightly Rate</h3>
+        <div class="threshold">Run at 85-90% of Listed Rate</div>
+        <p>This is your actual revenue per night, not your listed price. Account for weekday dips, seasonal lows, gaps between bookings, and longer-stay discounts. Your effective rate is: Monthly Revenue / 30.</p>
+        <p style="margin-top:12px;"><em style="color:var(--text-muted);">Listing at &pound;120/night but effective rate of &pound;86/night is a very different deal.</em></p>
+        <div class="sweet-spot"><strong>Always model reality,</strong> not best-case.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-number">03</div>
+        <h3>Cost Per Turnover</h3>
+        <div class="threshold">Aim for 2.5+ Night Avg Stay</div>
+        <p>How much it costs every time a guest checks out and a new one checks in: cleaning (&pound;40-70), laundry (&pound;10-20), consumables (&pound;5-10), plus your time. At 10 turnovers/month, that's &pound;700+ just on turnovers.</p>
+        <p style="margin-top:12px;"><em style="color:var(--text-muted);">Set 2-night minimums. Offer weekly discounts. Every extra night is near-pure profit.</em></p>
+        <div class="sweet-spot"><strong>Longer stays = lower turnover cost</strong> per pound earned.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ COMMON MISTAKES ═══════════════════ -->
+  <div class="section">
+    <span class="section-label">Avoid These</span>
+    <h2 class="section-title">7 Common Mistakes Beginners Make</h2>
+    <p class="section-intro">Every one of these has cost someone real money. Don't let it be you.</p>
+
+    <div class="mistakes-list">
+      <div class="mistake-item">
+        <div class="mistake-number">01</div>
+        <div class="mistake-content">
+          <h4>Using Best-Case Occupancy</h4>
+          <p>"I'll just assume 85% occupancy." No, you won't. Not in your first 3 months. Not in January. Not without reviews. Start your analysis at 65% and work up from there. If the deal doesn't work at 65%, it's not a deal.</p>
+        </div>
+      </div>
+      <div class="mistake-item">
+        <div class="mistake-number">02</div>
+        <div class="mistake-content">
+          <h4>Forgetting About Seasonality</h4>
+          <p>A property that makes &pound;2,500/month in summer might make &pound;1,200/month in winter. Your analysis needs to account for the annual average, not just the good months. Always model a "worst month" scenario alongside the average.</p>
+        </div>
+      </div>
+      <div class="mistake-item">
+        <div class="mistake-number">03</div>
+        <div class="mistake-content">
+          <h4>Ignoring Platform Fees</h4>
+          <p>Airbnb takes roughly 3% from hosts (and 14-16% from guests). That 3% doesn't sound like much, but on &pound;2,500/month revenue, it's &pound;75. Over a year, it's &pound;900. It adds up.</p>
+        </div>
+      </div>
+      <div class="mistake-item">
+        <div class="mistake-number">04</div>
+        <div class="mistake-content">
+          <h4>Underestimating Cleaning Costs</h4>
+          <p>Cleaning is almost always your second biggest cost after rent. And it scales with turnovers. If you're getting short stays (1-2 nights), your cleaning costs will eat you alive. Factor in realistic turnover rates.</p>
+        </div>
+      </div>
+      <div class="mistake-item">
+        <div class="mistake-number">05</div>
+        <div class="mistake-content">
+          <h4>Not Accounting for Void Periods</h4>
+          <p>Your property won't be booked 365 days a year. There will be gaps between bookings, maintenance days, and the occasional cancellation. Build in a 5-10% void buffer on top of your occupancy estimate.</p>
+        </div>
+      </div>
+      <div class="mistake-item">
+        <div class="mistake-number">06</div>
+        <div class="mistake-content">
+          <h4>Skipping the Setup Cost Recovery Calculation</h4>
+          <p>"I'll make it back eventually." When? Month 3? Month 12? Month 24? You need to know your break-even point. If it takes more than 4 months to recover setup costs, either negotiate harder on rent or find a cheaper way to furnish.</p>
+        </div>
+      </div>
+      <div class="mistake-item">
+        <div class="mistake-number">07</div>
+        <div class="mistake-content">
+          <h4>Analysing Only One Deal</h4>
+          <p>The biggest mistake is falling in love with the first property you find. Analyse at least 5-10 properties before committing to one. The more deals you run through this spreadsheet, the better your instinct gets for what a good deal looks like.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .page -->
+
+<!-- ═══════════════════ CTA PAGE ═══════════════════ -->
+<div class="cta-page">
+  <span class="section-label">Next Step</span>
+  <h2>Ready to Find Your First (or Next) Profitable Deal?</h2>
+  <p class="cta-desc">This analyser gives you the numbers. But numbers are only half the story. If you want the full system, that's what the Strategy Call is for.</p>
+
+  <ul class="cta-list">
+    <li>
+      <span class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      <span>Review your current situation and goals</span>
+    </li>
+    <li>
+      <span class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      <span>Identify the best areas and property types for your budget</span>
+    </li>
+    <li>
+      <span class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      <span>Map out your first 90 days to a profitable Airbnb business</span>
+    </li>
+    <li>
+      <span class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      <span>See the exact system Terry uses to manage multiple properties</span>
+    </li>
+  </ul>
+
+  <a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" class="cta-button">Book Your Free Strategy Call</a>
+  <p class="cta-subtext">No pressure. No hard sell. Just a straight conversation about whether Airbnb is right for you.</p>
+</div>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<div class="footer">
+  Property Labs <span>|</span> propertylabs.to <span>|</span> Copyright 2026 Property Labs. All rights reserved.
+</div>
+
+</body>
+</html>

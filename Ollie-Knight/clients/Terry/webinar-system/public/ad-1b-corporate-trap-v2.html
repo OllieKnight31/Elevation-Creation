@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 1080px;
+    height: 1350px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0a0f0d;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .container {
+    width: 1080px;
+    height: 1350px;
+    display: flex;
+    position: relative;
+  }
+  .left-half {
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(180deg, #0d1210 0%, #111916 40%, #0a0f0d 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .left-half::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 40px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 60px);
+  }
+  .left-half::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    background:
+      linear-gradient(0deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.04) 60%, transparent 60%) 10% 100% / 80px 500px no-repeat,
+      linear-gradient(0deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.03) 70%, transparent 70%) 30% 100% / 60px 600px no-repeat,
+      linear-gradient(0deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.05) 50%, transparent 50%) 55% 100% / 100px 450px no-repeat,
+      linear-gradient(0deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.03) 65%, transparent 65%) 75% 100% / 70px 550px no-repeat;
+  }
+  .right-half {
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a2e24 0%, #2a4a3a 30%, #1e3a2c 60%, #3ECFA0 200%);
+    position: relative;
+    overflow: hidden;
+  }
+  .right-half::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 40%, rgba(62,207,160,0.15) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(62,207,160,0.1) 0%, transparent 40%);
+  }
+  .right-half::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,200,100,0.08) 0%, transparent 60%);
+  }
+  .divider {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(62,207,160,0.4) 30%, rgba(62,207,160,0.4) 70%, transparent 100%);
+    z-index: 5;
+  }
+  .content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+    width: 85%;
+  }
+  .content h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 86px;
+    color: #FFFFFF;
+    line-height: 1.05;
+    text-shadow: 0 4px 40px rgba(0,0,0,0.8), 0 2px 10px rgba(0,0,0,0.5);
+    margin-bottom: 40px;
+  }
+  .content .sub {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    color: #3ECFA0;
+    line-height: 1.4;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+  }
+  .bottom-strip {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 90px;
+    background: linear-gradient(180deg, transparent 0%, #0a0f0d 30%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  .bottom-strip span {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: #3ECFA0;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="left-half"></div>
+  <div class="right-half"></div>
+  <div class="divider"></div>
+  <div class="content">
+    <h1>Still Trading Time for Money?</h1>
+    <div class="sub">There's a system that pays you<br>while you sleep.</div>
+  </div>
+  <div class="bottom-strip">
+    <span>FREE TRAINING — APRIL 13 — 7PM BST</span>
+  </div>
+</div>
+</body>
+</html>

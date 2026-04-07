@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airbnb Hotspot Explorer | Property Labs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0a0a0a;--surface:#111;--surface2:#1a1a1a;--surface3:#222;
+--coral:#FF5A5F;--coral-dim:rgba(255,90,95,.15);--coral-glow:rgba(255,90,95,.3);
+--green:#22c55e;--green-dim:rgba(34,197,94,.15);
+--red:#ef4444;--red-dim:rgba(239,68,68,.12);--red-border:rgba(239,68,68,.4);
+--yellow:#eab308;--yellow-dim:rgba(234,179,8,.15);
+--text:#f5f5f5;--text2:#a3a3a3;--text3:#666;
+--border:#2a2a2a;
+--radius:12px;--radius-sm:8px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Plus Jakarta Sans',sans-serif;line-height:1.2}
+
+/* HEADER */
+.hero{text-align:center;padding:60px 24px 40px;max-width:800px;margin:0 auto}
+.hero-badge{display:inline-block;background:var(--coral-dim);color:var(--coral);font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:6px 16px;border-radius:20px;margin-bottom:20px}
+.hero h1{font-size:clamp(28px,5vw,44px);font-weight:800;margin-bottom:16px}
+.hero h1 span{color:var(--coral)}
+.hero p{color:var(--text2);font-size:clamp(15px,2vw,18px);max-width:600px;margin:0 auto}
+.hero .byline{margin-top:12px;font-size:13px;color:var(--text3)}
+
+/* FILTER BAR */
+.filter-bar{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:16px 24px}
+.filter-inner{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text3)}
+.filter-group input[type=range]{-webkit-appearance:none;appearance:none;width:200px;height:6px;border-radius:3px;background:var(--surface3);outline:none;cursor:pointer}
+.filter-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--coral);cursor:pointer;border:2px solid var(--bg)}
+.range-value{font-size:13px;color:var(--coral);font-weight:600}
+.toggle-group{display:flex;gap:0;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border)}
+.toggle-btn{padding:8px 16px;font-size:13px;font-weight:500;background:var(--surface2);color:var(--text2);border:none;cursor:pointer;transition:all .2s}
+.toggle-btn.active{background:var(--coral);color:#fff}
+.sort-select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;outline:none}
+.sort-select:focus{border-color:var(--coral)}
+
+/* SECTIONS */
+.section{max-width:1100px;margin:0 auto;padding:40px 24px}
+.section-title{font-size:clamp(20px,3vw,28px);font-weight:700;margin-bottom:8px}
+.section-sub{color:var(--text2);font-size:15px;margin-bottom:32px}
+
+/* CARDS GRID */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+
+/* LOCATION CARD */
+.location-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .3s ease;cursor:pointer;position:relative;overflow:hidden}
+.location-card:hover{border-color:var(--coral);transform:translateY(-2px);box-shadow:0 8px 32px rgba(255,90,95,.08)}
+.location-card.avoid{border-color:var(--red-border)}
+.location-card.avoid:hover{border-color:var(--red);box-shadow:0 8px 32px rgba(239,68,68,.1)}
+.location-card.expanded{grid-column:1/-1}
+
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.card-location{font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:700}
+.card-region{font-size:13px;color:var(--text2);margin-top:2px}
+.card-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap}
+.badge-hot{background:var(--coral-dim);color:var(--coral)}
+.badge-avoid{background:var(--red-dim);color:var(--red)}
+
+/* STAT BARS */
+.stat-bars{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.stat-row{display:flex;flex-direction:column;gap:4px}
+.stat-meta{display:flex;justify-content:space-between;font-size:12px}
+.stat-name{color:var(--text2);font-weight:500}
+.stat-value{color:var(--text);font-weight:600}
+.stat-track{height:8px;background:var(--surface3);border-radius:4px;overflow:hidden}
+.stat-fill{height:100%;border-radius:4px;width:0;transition:width 1.2s cubic-bezier(.25,.8,.25,1)}
+.stat-fill.coral{background:linear-gradient(90deg,var(--coral),#ff8a8e)}
+.stat-fill.green{background:linear-gradient(90deg,var(--green),#4ade80)}
+.stat-fill.yellow{background:linear-gradient(90deg,var(--yellow),#facc15)}
+.stat-fill.red{background:linear-gradient(90deg,var(--red),#f87171)}
+
+/* BEST PROPERTY BADGE */
+.best-property{display:inline-block;background:var(--green-dim);color:var(--green);font-size:12px;font-weight:600;padding:5px 12px;border-radius:6px;margin-bottom:12px}
+
+/* EXPANDABLE SECTIONS */
+.expandable{margin-top:12px}
+.expand-trigger{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--coral);cursor:pointer;background:none;border:none;padding:6px 0;font-family:'Inter',sans-serif}
+.expand-trigger.warn{color:var(--yellow)}
+.expand-trigger svg{transition:transform .3s}
+.expand-trigger.open svg{transform:rotate(90deg)}
+.expand-content{max-height:0;overflow:hidden;transition:max-height .4s ease,opacity .3s;opacity:0}
+.expand-content.open{opacity:1}
+.expand-text{padding:10px 0;font-size:14px;color:var(--text2);line-height:1.7}
+
+/* DETAIL VIEW */
+.detail-panel{max-height:0;overflow:hidden;transition:max-height .5s ease;opacity:0}
+.detail-panel.open{opacity:1;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.detail-item{background:var(--surface2);border-radius:var(--radius-sm);padding:14px}
+.detail-item .label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:4px}
+.detail-item .value{font-size:16px;font-weight:700}
+
+/* AVOID REASONS */
+.avoid-reasons{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.avoid-reasons li{font-size:13px;color:var(--text2);padding-left:16px;position:relative;line-height:1.6}
+.avoid-reasons li::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--red)}
+.avoid-advice{margin-top:14px;font-size:13px;color:var(--text2);font-style:italic;padding:12px;background:var(--surface2);border-radius:var(--radius-sm);border-left:3px solid var(--yellow)}
+
+/* COMPARE CHECKBOX */
+.compare-check{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.compare-check input[type=checkbox]{width:18px;height:18px;accent-color:var(--coral);cursor:pointer}
+.compare-check label{font-size:13px;color:var(--text2);cursor:pointer}
+
+/* COMPARISON TABLE */
+.comparison-section{max-width:1100px;margin:0 auto;padding:0 24px 40px}
+.comparison-wrap{background:var(--surface);border:1px solid var(--coral);border-radius:var(--radius);padding:28px;display:none}
+.comparison-wrap.active{display:block;animation:fadeSlide .4s ease}
+.comparison-title{font-size:22px;font-weight:700;margin-bottom:20px;font-family:'Plus Jakarta Sans',sans-serif}
+.comp-table{width:100%;border-collapse:collapse}
+.comp-table th,.comp-table td{padding:12px 16px;text-align:left;font-size:14px;border-bottom:1px solid var(--border)}
+.comp-table th{color:var(--text3);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.comp-table td{color:var(--text)}
+.comp-table .winner{color:var(--green);font-weight:700}
+.comp-table .cat{color:var(--text2);font-weight:500}
+.comp-clear{margin-top:16px;background:none;border:1px solid var(--border);color:var(--text2);padding:8px 20px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.comp-clear:hover{border-color:var(--coral);color:var(--coral)}
+
+/* VALIDATOR */
+.validator{max-width:1100px;margin:0 auto;padding:0 24px 60px}
+.validator-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px}
+.validator-input-row{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+.validator-input{flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:var(--radius-sm);font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+.validator-input:focus{border-color:var(--coral)}
+.validator-btn{background:var(--coral);color:#fff;border:none;padding:12px 24px;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:transform .2s,box-shadow .2s}
+.validator-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px var(--coral-glow)}
+
+.checklist{display:flex;flex-direction:column;gap:16px;margin-top:8px}
+.check-step{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;display:flex;gap:14px;align-items:flex-start;cursor:pointer;transition:all .2s}
+.check-step:hover{border-color:var(--text3)}
+.check-step.checked{border-color:var(--green);background:var(--green-dim)}
+.check-step input{width:20px;height:20px;accent-color:var(--green);margin-top:2px;cursor:pointer;flex-shrink:0}
+.check-step .step-num{font-size:12px;font-weight:700;color:var(--coral);min-width:20px}
+.check-step .step-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.check-step .step-desc{font-size:13px;color:var(--text2);line-height:1.6}
+.check-step.checked .step-title{color:var(--green)}
+
+.score-bar{margin-top:28px;text-align:center}
+.score-label{font-size:13px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.score-track{height:12px;background:var(--surface3);border-radius:6px;overflow:hidden;margin-bottom:8px}
+.score-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));transition:width .6s ease;width:0}
+.score-num{font-size:32px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif}
+.score-num.low{color:var(--red)}.score-num.mid{color:var(--yellow)}.score-num.high{color:var(--green)}
+
+/* EMAIL GATE */
+.email-gate{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;justify-content:center;align-items:center;backdrop-filter:blur(8px)}
+.email-gate.active{display:flex}
+.gate-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px;max-width:480px;width:90%;text-align:center;position:relative}
+.gate-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer}
+.gate-box h3{font-size:24px;font-weight:800;margin-bottom:8px;font-family:'Plus Jakarta Sans',sans-serif}
+.gate-box p{color:var(--text2);font-size:14px;margin-bottom:24px}
+.gate-form{display:flex;flex-direction:column;gap:12px}
+.gate-form input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:var(--radius-sm);font-size:15px;font-family:'Inter',sans-serif;outline:none}
+.gate-form input:focus{border-color:var(--coral)}
+.gate-form button{background:var(--coral);color:#fff;border:none;padding:14px;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:transform .2s,box-shadow .2s}
+.gate-form button:hover{transform:translateY(-1px);box-shadow:0 4px 20px var(--coral-glow)}
+.gate-note{font-size:11px;color:var(--text3);margin-top:12px}
+
+/* CTA SECTION */
+.cta-section{max-width:800px;margin:0 auto;padding:0 24px 80px;text-align:center}
+.cta-box{background:linear-gradient(135deg,rgba(255,90,95,.08),rgba(255,90,95,.02));border:1px solid rgba(255,90,95,.25);border-radius:var(--radius);padding:48px 32px}
+.cta-box h2{font-size:clamp(22px,4vw,32px);font-weight:800;margin-bottom:12px}
+.cta-box h2 span{color:var(--coral)}
+.cta-box p{color:var(--text2);font-size:15px;max-width:540px;margin:0 auto 8px}
+.cta-list{list-style:none;text-align:left;max-width:460px;margin:20px auto 28px;display:flex;flex-direction:column;gap:8px}
+.cta-list li{font-size:14px;color:var(--text2);padding-left:20px;position:relative}
+.cta-list li::before{content:"";position:absolute;left:0;top:7px;width:8px;height:8px;border-radius:50%;background:var(--coral)}
+.cta-btn{display:inline-block;background:var(--coral);color:#fff;text-decoration:none;padding:16px 40px;border-radius:var(--radius-sm);font-size:17px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;transition:transform .2s,box-shadow .2s}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px var(--coral-glow)}
+.cta-divider{margin:24px 0;color:var(--text3);font-size:13px}
+.cta-secondary{display:inline-block;border:1px solid var(--border);color:var(--text2);text-decoration:none;padding:12px 28px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;transition:all .2s}
+.cta-secondary:hover{border-color:var(--coral);color:var(--coral)}
+
+/* FOOTER */
+.footer{text-align:center;padding:32px 24px;border-top:1px solid var(--border);font-size:12px;color:var(--text3);line-height:1.8}
+
+/* ANIMATIONS */
+@keyframes fadeSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card-enter{animation:fadeSlide .4s ease both}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+.filter-inner{flex-direction:column;gap:14px}
+.filter-group input[type=range]{width:100%}
+.cards-grid{grid-template-columns:1fr}
+.detail-grid{grid-template-columns:1fr}
+.comp-table{font-size:12px}
+.comp-table th,.comp-table td{padding:8px 10px}
+.hero{padding:40px 20px 28px}
+}
+@media(max-width:480px){
+.validator-input-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+<div class="hero-badge">Interactive Explorer</div>
+<h1>5 Airbnb Hotspots Most People <span>Don't Know About</span></h1>
+<p>Where smart operators are making &pound;1,500&ndash;&pound;3,000/month per unit right now &mdash; and 3 "obvious" locations to avoid.</p>
+<div class="byline">By Terry Dwobeng | Property Labs &middot; Based on real portfolio data 2025&ndash;2026</div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+<div class="filter-inner">
+<div class="filter-group">
+<span class="filter-label">Max Monthly Rent</span>
+<div style="display:flex;align-items:center;gap:10px">
+<input type="range" id="budgetSlider" min="500" max="2000" step="50" value="2000">
+<span class="range-value" id="budgetValue">&pound;2,000</span>
+</div>
+</div>
+<div class="filter-group">
+<span class="filter-label">Property Type</span>
+<div class="toggle-group">
+<button class="toggle-btn active" data-type="any">Any</button>
+<button class="toggle-btn" data-type="flat">Flat</button>
+<button class="toggle-btn" data-type="house">House</button>
+</div>
+</div>
+<div class="filter-group">
+<span class="filter-label">Sort By</span>
+<select class="sort-select" id="sortSelect">
+<option value="revenue">Revenue</option>
+<option value="occupancy">Occupancy</option>
+<option value="roi">ROI (Rate vs Cost)</option>
+<option value="margin">Profit Margin</option>
+</select>
+</div>
+</div>
+</div>
+
+<!-- HOTSPOT CARDS -->
+<div class="section">
+<h2 class="section-title">Top 5 Hotspot Locations</h2>
+<p class="section-sub">Click any card to expand full details. Tick locations to compare side by side.</p>
+<div class="cards-grid" id="hotspotsGrid"></div>
+</div>
+
+<!-- AVOID SECTION -->
+<div class="section">
+<h2 class="section-title" style="color:var(--red)">3 Locations to Avoid</h2>
+<p class="section-sub">Popular cities where new operators consistently lose money or burn out.</p>
+<div class="cards-grid" id="avoidGrid"></div>
+</div>
+
+<!-- COMPARISON TABLE -->
+<div class="comparison-section">
+<div class="comparison-wrap" id="comparisonWrap">
+<h3 class="comparison-title">Side-by-Side Comparison</h3>
+<div style="overflow-x:auto"><table class="comp-table" id="compTable"></table></div>
+<button class="comp-clear" onclick="clearComparison()">Clear Comparison</button>
+</div>
+</div>
+
+<!-- LOCATION VALIDATOR -->
+<div class="validator" id="validatorSection">
+<h2 class="section-title" style="margin-bottom:8px">Check Any Location</h2>
+<p class="section-sub">Use the Property Labs 5-step validation checklist to score any area before committing.</p>
+<div class="validator-box">
+<div class="validator-input-row">
+<input type="text" class="validator-input" id="validatorInput" placeholder="Enter a city or area name...">
+<button class="validator-btn" onclick="startValidation()">Validate</button>
+</div>
+<div id="validatorChecklist" style="display:none">
+<div class="checklist" id="checklistItems"></div>
+<div class="score-bar" id="scoreBar">
+<div class="score-label">Location Score</div>
+<div class="score-track"><div class="score-fill" id="scoreFill"></div></div>
+<div class="score-num" id="scoreNum">0/100</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+<div class="cta-box">
+<h2>Want the <span>Complete System</span>?</h2>
+<p>Location is just one piece of the puzzle. The free live training walks through everything:</p>
+<ul class="cta-list">
+<li>How to find properties where landlords want you to run SA</li>
+<li>Exact furnishing checklist &mdash; setup costs under &pound;3,000/unit</li>
+<li>Pricing strategy for 70%+ occupancy year-round</li>
+<li>How to manage 14 units without it taking over your life</li>
+</ul>
+<a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" target="_blank" class="cta-btn">Register for Free Live Training &mdash; April 13, 2026</a>
+<div class="cta-divider">or</div>
+<a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" target="_blank" class="cta-secondary">Book a Free 30-Min Strategy Call</a>
+</div>
+</div>
+
+<!-- EMAIL GATE -->
+<div class="email-gate" id="emailGate">
+<div class="gate-box">
+<button class="gate-close" onclick="closeGate()">&times;</button>
+<h3>Get the Full Hotspot Database</h3>
+<p>You've explored the top picks. Unlock the complete database with 15+ validated locations, revenue data, and risk ratings.</p>
+<form class="gate-form" onsubmit="submitGate(event)">
+<input type="text" placeholder="First Name" required id="gateName">
+<input type="email" placeholder="Email Address" required id="gateEmail">
+<button type="submit">Send the Full Database</button>
+</form>
+<div class="gate-note">No spam. Unsubscribe anytime.</div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+&copy; 2026 Property Labs. All rights reserved.<br>
+This guide is for informational purposes only and does not constitute financial or investment advice. Always do your own due diligence before making any property investment decisions.
+</div>
+
+<script>
+// ─── DATA ───
+const hotspots = [
+  {
+    id:'bath',name:'Bath',region:'Somerset',type:'flat',
+    nightlyRate:135,occupancy:74,revenueMin:2800,revenueMax:3000,
+    estimatedRent:1200,
+    whyItWorks:'Bath is a UNESCO World Heritage Site. It pulls in international tourists, domestic weekend visitors, and a surprising amount of corporate travel thanks to the professional services firms based there and in nearby Bristol. The Roman Baths, the Royal Crescent, the Christmas markets -- there is always something drawing people in. Plus, the University of Bath brings parent visits, graduation stays, and open day traffic.',
+    bestProperty:'1-bed or 2-bed period apartment in the city centre or within a 10-minute walk. Georgian-style interiors photograph beautifully and command premium rates.',
+    bestPropertyShort:'Period apartment, city centre',
+    riskFactor:'Bath & North East Somerset Council has specific planning requirements for short-term lets. Check whether the property requires a change of use -- particularly if it is in a conservation area.'
+  },
+  {
+    id:'liverpool',name:'Liverpool',region:'Waterfront & Baltic Triangle',type:'flat',
+    nightlyRate:105,occupancy:72,revenueMin:2100,revenueMax:2400,
+    estimatedRent:850,
+    whyItWorks:'Liverpool pulls in stag and hen parties, football tourism (Anfield and Goodison Park weekends are gold), conference delegates at the ACC Liverpool, and a strong music and culture scene. The cost base is significantly lower than London or Manchester, so your margins are better even at lower nightly rates. The city also has a growing digital and creative sector bringing in midweek business travellers.',
+    bestProperty:'Modern 2-bed apartment in the Baltic Triangle or waterfront area. Stylish interiors do well here -- this is a younger demographic who care about aesthetics.',
+    bestPropertyShort:'Modern 2-bed apartment',
+    riskFactor:'Some new-build apartment blocks have restrictive leases that explicitly prohibit short-term letting. Read the lease carefully. If doing rent-to-SA, get the landlord\'s written permission and check building management rules.'
+  },
+  {
+    id:'stratford',name:'Stratford-upon-Avon',region:'Warwickshire',type:'house',
+    nightlyRate:120,occupancy:70,revenueMin:2300,revenueMax:2600,
+    estimatedRent:950,
+    whyItWorks:'Shakespeare\'s birthplace. The Royal Shakespeare Company runs performances almost every day of the year -- every audience member needs somewhere to stay. Add international coach tours, school trips, and the Cotswolds day-trip crowd using Stratford as a base. Demand does not dry up in winter. Also well-positioned for NEC and Birmingham overspill.',
+    bestProperty:'Characterful 2-bed cottage or apartment within walking distance of the town centre and RSC theatre. Period features and a "quintessentially English" feel command a premium from international guests.',
+    bestPropertyShort:'2-bed cottage, town centre',
+    riskFactor:'Parking. The town centre has limited parking, and guests -- especially international visitors with hire cars -- will leave negative reviews if they cannot park easily. Prioritise properties with a dedicated parking space.'
+  },
+  {
+    id:'cardiff',name:'Cardiff Bay',region:'South Wales',type:'flat',
+    nightlyRate:95,occupancy:71,revenueMin:1800,revenueMax:2100,
+    estimatedRent:750,
+    whyItWorks:'The Principality Stadium generates massive demand -- Six Nations weekends, concerts, and major events push nightly rates to over 200. Cardiff Bay has steady demand from corporate travellers, BBC and media production crews (BBC Wales, Bad Wolf Studios), and leisure visitors. Welsh Government offices bring consistent midweek bookings. Cost of entry is significantly lower than English cities -- furnish a 2-bed to high standard for under 5,000.',
+    bestProperty:'2-bed apartment in Cardiff Bay or city centre, ideally within walking distance of the Principality Stadium and Bay waterfront. Modern, clean, well-equipped units outperform here.',
+    bestPropertyShort:'2-bed apartment, Bay area',
+    riskFactor:'The Welsh Government introduced a licensing scheme for short-term lets in 2025. Make sure you are registered and compliant -- non-compliance carries fines.'
+  },
+  {
+    id:'york',name:'York',region:'Outside the City Walls',type:'house',
+    nightlyRate:110,occupancy:73,revenueMin:2200,revenueMax:2500,
+    estimatedRent:900,
+    whyItWorks:'York attracts over 8 million visitors a year. The Minster, the Shambles, Christmas markets, the racecourse -- demand is enormous and spread across the year. Properties just outside the city walls (Bishopthorpe Road, Holgate, South Bank) cost 30-40% less to rent or buy. Same guest demand at a fraction of the cost base means significantly better margins. University of York also drives bookings.',
+    bestProperty:'2-bed terraced house or ground-floor flat with outdoor space. Families and couples visiting York love having more room than a hotel, and a small garden or courtyard is a genuine differentiator.',
+    bestPropertyShort:'2-bed terraced house',
+    riskFactor:'City of York Council has been consulting on short-term let regulations. The political mood is shifting towards tighter controls -- stay informed and operate within the rules.'
+  }
+];
+
+const avoidLocations = [
+  {
+    id:'london',name:'London Zone 1-2',region:'Central London',
+    nightlyRate:200,occupancy:55,revenueMin:1200,revenueMax:1800,estimatedRent:2400,
+    reasons:[
+      'Rent is astronomical -- a 1-bed in Zone 1-2 costs 2,000-2,800/month before furnishing, bills, or linen.',
+      'The 90-night rule. You can only let short-term for 90 nights/year without planning permission. This kills revenue potential.',
+      'Over 80,000 Airbnb listings. You are competing with professional management companies and hotels.',
+      'By the time you factor in the 90-night cap, high rent, cleaning costs, and furnishing, most units barely break even.'
+    ],
+    advice:'Unless you own the property outright with no mortgage, London Zone 1-2 is not where you start.'
+  },
+  {
+    id:'manchester',name:'Central Manchester',region:'Greater Manchester',
+    nightlyRate:95,occupancy:58,revenueMin:1100,revenueMax:1500,estimatedRent:1400,
+    reasons:[
+      'Oversaturated. Huge wave of new-build apartments, many used for short-term lets. Supply has outstripped demand.',
+      'Manchester City Council is cracking down. Several developments have enforced lease clauses banning Airbnb-style use.',
+      'Race to the bottom on price. Operators are undercutting each other. Rates dropped but rents have not.',
+      'Guest expectations are hotel-level. One bad review and your listing drops off a cliff.'
+    ],
+    advice:'If you want Greater Manchester, look at Salford Quays, Didsbury, or Stockport -- lower costs and less competition.'
+  },
+  {
+    id:'edinburgh',name:'Edinburgh Old Town',region:'Scotland',
+    nightlyRate:160,occupancy:52,revenueMin:1000,revenueMax:1600,estimatedRent:1800,
+    reasons:[
+      'Mandatory short-term let licensing scheme. The council actively refuses licences in certain residential areas.',
+      'Severe seasonal dependency. August festival is phenomenal, but January-March occupancy drops significantly.',
+      'High entry costs. Premium rents plus licensing fees, insurance, and safety compliance push breakeven very high.',
+      'Edinburgh has designated the entire city as a control area. Short-term lets can be restricted or banned.'
+    ],
+    advice:'Edinburgh can work for experienced operators -- but not beginners, and not in the Old Town. Look at Leith or Portobello.'
+  }
+];
+
+const validationSteps = [
+  {title:'Check Airbnb for Similar Listings',desc:'Search for similar properties in your target area. Look for 20-50 listings (sweet spot), average nightly rates, 3-star reviews for real guest concerns, and calendars booked 2-3 months ahead (strong demand).'},
+  {title:'Use AirDNA for Occupancy Data',desc:'Check annual occupancy (aim above 65%), revenue trends (is the market growing?), and seasonal patterns. You want markets where off-peak is still decent.'},
+  {title:'Check Local Council Regulations',desc:'Google "[council name] short-term let regulations." Check for licence/registration/planning requirements. Look at recent council meeting minutes. Call the planning department directly if unsure.'},
+  {title:'Call 3 Local Letting Agents',desc:'Ask about demand for short-term furnished lets, rent comparisons (AST vs short-term), and whether landlords are moving into SA. If they all say "everyone is doing Airbnb," look elsewhere.'},
+  {title:'Run the Numbers (Deal Analyser)',desc:'Calculate monthly revenue (rate x occupancy x 30), all monthly costs (rent, council tax, utilities, cleaning, insurance, fees, maintenance), monthly profit, setup costs, and months to breakeven. If profit is below 500/month or breakeven is longer than 4 months, move on.'}
+];
+
+// ─── STATE ───
+let selectedType = 'any';
+let maxBudget = 2000;
+let sortBy = 'revenue';
+let expandedCards = new Set();
+let comparedLocations = new Set();
+let exploredCount = 0;
+let gateShown = false;
+let gateDismissed = false;
+
+// ─── HELPERS ───
+function getRevenue(loc){ return (loc.revenueMin + loc.revenueMax) / 2; }
+function getMargin(loc){ return ((getRevenue(loc) - loc.estimatedRent) / getRevenue(loc) * 100); }
+function getROI(loc){ return (loc.nightlyRate / (loc.estimatedRent / 30)); }
+
+function sortLocations(locs){
+  const copy = [...locs];
+  switch(sortBy){
+    case 'revenue': return copy.sort((a,b) => getRevenue(b) - getRevenue(a));
+    case 'occupancy': return copy.sort((a,b) => b.occupancy - a.occupancy);
+    case 'roi': return copy.sort((a,b) => getROI(b) - getROI(a));
+    case 'margin': return copy.sort((a,b) => getMargin(b) - getMargin(a));
+  }
+  return copy;
+}
+
+function filterLocations(locs){
+  return locs.filter(l => {
+    if(l.estimatedRent > maxBudget) return false;
+    if(selectedType !== 'any' && l.type !== selectedType) return false;
+    return true;
+  });
+}
+
+// ─── RENDER HOTSPOTS ───
+function renderHotspots(){
+  const grid = document.getElementById('hotspotsGrid');
+  const filtered = sortLocations(filterLocations(hotspots));
+  grid.innerHTML = '';
+  if(filtered.length === 0){
+    grid.innerHTML = '<p style="color:var(--text3);grid-column:1/-1;text-align:center;padding:40px 0;">No locations match your current filters. Try adjusting the budget or property type.</p>';
+    return;
+  }
+  filtered.forEach((loc, i) => {
+    const isExpanded = expandedCards.has(loc.id);
+    const isCompared = comparedLocations.has(loc.id);
+    const revenue = getRevenue(loc);
+    const margin = getMargin(loc);
+    const card = document.createElement('div');
+    card.className = 'location-card card-enter' + (isExpanded ? ' expanded' : '');
+    card.style.animationDelay = (i * 0.08) + 's';
+    card.innerHTML = `
+      <div class="card-header" onclick="toggleCard('${loc.id}')">
+        <div>
+          <div class="card-location">${loc.name}</div>
+          <div class="card-region">${loc.region}</div>
+        </div>
+        <span class="card-badge badge-hot">Hotspot</span>
+      </div>
+      <div class="stat-bars">
+        <div class="stat-row">
+          <div class="stat-meta"><span class="stat-name">Nightly Rate</span><span class="stat-value">&pound;${loc.nightlyRate}</span></div>
+          <div class="stat-track"><div class="stat-fill coral" data-width="${(loc.nightlyRate / 200) * 100}"></div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-meta"><span class="stat-name">Occupancy</span><span class="stat-value">${loc.occupancy}%</span></div>
+          <div class="stat-track"><div class="stat-fill green" data-width="${loc.occupancy}"></div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-meta"><span class="stat-name">Monthly Revenue</span><span class="stat-value">&pound;${loc.revenueMin.toLocaleString()}&ndash;&pound;${loc.revenueMax.toLocaleString()}</span></div>
+          <div class="stat-track"><div class="stat-fill yellow" data-width="${(revenue / 3200) * 100}"></div></div>
+        </div>
+      </div>
+      <div class="best-property">${loc.bestPropertyShort}</div>
+      <div class="expandable">
+        <button class="expand-trigger ${isExpanded ? 'open' : ''}" onclick="event.stopPropagation();toggleSection(this,'why-${loc.id}')">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2L8 6L4 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Why it works
+        </button>
+        <div class="expand-content ${isExpanded ? 'open' : ''}" id="why-${loc.id}" ${isExpanded ? 'style="max-height:500px"' : ''}>
+          <div class="expand-text">${loc.whyItWorks}</div>
+        </div>
+      </div>
+      <div class="expandable">
+        <button class="expand-trigger warn" onclick="event.stopPropagation();toggleSection(this,'risk-${loc.id}')">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2L8 6L4 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Risk factor
+        </button>
+        <div class="expand-content" id="risk-${loc.id}">
+          <div class="expand-text" style="color:var(--yellow)">${loc.riskFactor}</div>
+        </div>
+      </div>
+      <div class="detail-panel ${isExpanded ? 'open' : ''}" id="detail-${loc.id}" ${isExpanded ? 'style="max-height:400px"' : ''}>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="label">Estimated Monthly Rent</div><div class="value">&pound;${loc.estimatedRent.toLocaleString()}</div></div>
+          <div class="detail-item"><div class="label">Profit Margin</div><div class="value" style="color:var(--green)">${margin.toFixed(0)}%</div></div>
+          <div class="detail-item"><div class="label">Est. Monthly Profit</div><div class="value" style="color:var(--green)">&pound;${(revenue - loc.estimatedRent).toLocaleString()}</div></div>
+          <div class="detail-item"><div class="label">Rate-to-Rent Ratio</div><div class="value">${getROI(loc).toFixed(1)}x</div></div>
+        </div>
+        <div style="margin-top:14px;font-size:13px;color:var(--text2);line-height:1.7"><strong style="color:var(--text)">Best property type:</strong> ${loc.bestProperty}</div>
+      </div>
+      <div class="compare-check" onclick="event.stopPropagation()">
+        <input type="checkbox" id="cmp-${loc.id}" ${isCompared ? 'checked' : ''} onchange="toggleCompare('${loc.id}')">
+        <label for="cmp-${loc.id}">Compare this location</label>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  animateBars();
+}
+
+// ─── RENDER AVOID ───
+function renderAvoid(){
+  const grid = document.getElementById('avoidGrid');
+  grid.innerHTML = '';
+  avoidLocations.forEach((loc, i) => {
+    const card = document.createElement('div');
+    card.className = 'location-card avoid card-enter';
+    card.style.animationDelay = (i * 0.08) + 's';
+    const revenue = getRevenue(loc);
+    card.innerHTML = `
+      <div class="card-header" onclick="toggleAvoidCard(this)">
+        <div>
+          <div class="card-location">${loc.name}</div>
+          <div class="card-region">${loc.region}</div>
+        </div>
+        <span class="card-badge badge-avoid">Avoid</span>
+      </div>
+      <div class="stat-bars">
+        <div class="stat-row">
+          <div class="stat-meta"><span class="stat-name">Nightly Rate</span><span class="stat-value">&pound;${loc.nightlyRate}</span></div>
+          <div class="stat-track"><div class="stat-fill coral" data-width="${(loc.nightlyRate / 200) * 100}"></div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-meta"><span class="stat-name">Occupancy</span><span class="stat-value">${loc.occupancy}%</span></div>
+          <div class="stat-track"><div class="stat-fill red" data-width="${loc.occupancy}"></div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-meta"><span class="stat-name">Monthly Revenue</span><span class="stat-value">&pound;${loc.revenueMin.toLocaleString()}&ndash;&pound;${loc.revenueMax.toLocaleString()}</span></div>
+          <div class="stat-track"><div class="stat-fill red" data-width="${(revenue / 3200) * 100}"></div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-meta"><span class="stat-name">Est. Monthly Rent</span><span class="stat-value" style="color:var(--red)">&pound;${loc.estimatedRent.toLocaleString()}</span></div>
+          <div class="stat-track"><div class="stat-fill red" data-width="${(loc.estimatedRent / 2800) * 100}"></div></div>
+        </div>
+      </div>
+      <div class="expandable">
+        <button class="expand-trigger" style="color:var(--red)" onclick="event.stopPropagation();toggleSection(this,'reasons-${loc.id}')">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2L8 6L4 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Why to avoid
+        </button>
+        <div class="expand-content" id="reasons-${loc.id}">
+          <ul class="avoid-reasons">
+            ${loc.reasons.map(r => `<li>${r}</li>`).join('')}
+          </ul>
+          <div class="avoid-advice">${loc.advice}</div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  animateBars();
+}
+
+// ─── ANIMATIONS ───
+function animateBars(){
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const fills = entry.target.querySelectorAll('.stat-fill');
+        fills.forEach(f => { f.style.width = Math.min(parseFloat(f.dataset.width), 100) + '%'; });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.2});
+  document.querySelectorAll('.location-card').forEach(c => observer.observe(c));
+}
+
+// ─── EXPAND / COLLAPSE ───
+function toggleSection(btn, id){
+  const content = document.getElementById(id);
+  const isOpen = content.classList.contains('open');
+  btn.classList.toggle('open');
+  content.classList.toggle('open');
+  content.style.maxHeight = isOpen ? '0' : content.scrollHeight + 'px';
+  trackExplore();
+}
+
+function toggleCard(id){
+  if(expandedCards.has(id)){
+    expandedCards.delete(id);
+  } else {
+    expandedCards.add(id);
+    trackExplore();
+  }
+  renderHotspots();
+  updateComparison();
+}
+
+function toggleAvoidCard(header){
+  const card = header.closest('.location-card');
+  const content = card.querySelector('.expand-content');
+  const btn = card.querySelector('.expand-trigger');
+  if(content){
+    const isOpen = content.classList.contains('open');
+    btn.classList.toggle('open');
+    content.classList.toggle('open');
+    content.style.maxHeight = isOpen ? '0' : content.scrollHeight + 'px';
+  }
+  trackExplore();
+}
+
+// ─── EMAIL GATE ───
+function trackExplore(){
+  exploredCount++;
+  if(exploredCount >= 3 && !gateShown && !gateDismissed){
+    setTimeout(() => {
+      document.getElementById('emailGate').classList.add('active');
+      gateShown = true;
+    }, 800);
+  }
+}
+function closeGate(){
+  document.getElementById('emailGate').classList.remove('active');
+  gateDismissed = true;
+}
+function submitGate(e){
+  e.preventDefault();
+  const name = document.getElementById('gateName').value;
+  const email = document.getElementById('gateEmail').value;
+  if(name && email){
+    closeGate();
+    // In production, this would submit to an email service
+    alert('Thanks, ' + name + '! Check your inbox for the full Hotspot Database.');
+  }
+}
+
+// ─── COMPARISON ───
+function toggleCompare(id){
+  if(comparedLocations.has(id)){
+    comparedLocations.delete(id);
+  } else {
+    if(comparedLocations.size >= 3){
+      alert('You can compare up to 3 locations at a time.');
+      document.getElementById('cmp-' + id).checked = false;
+      return;
+    }
+    comparedLocations.add(id);
+  }
+  updateComparison();
+}
+
+function clearComparison(){
+  comparedLocations.clear();
+  document.querySelectorAll('.compare-check input').forEach(cb => cb.checked = false);
+  updateComparison();
+}
+
+function updateComparison(){
+  const wrap = document.getElementById('comparisonWrap');
+  const table = document.getElementById('compTable');
+  if(comparedLocations.size < 2){
+    wrap.classList.remove('active');
+    return;
+  }
+  wrap.classList.add('active');
+  const locs = hotspots.filter(l => comparedLocations.has(l.id));
+  const categories = [
+    {label:'Nightly Rate', key:'nightlyRate', fmt:v=>'£'+v, higher:true},
+    {label:'Occupancy', key:'occupancy', fmt:v=>v+'%', higher:true},
+    {label:'Avg Monthly Revenue', key:null, calc:getRevenue, fmt:v=>'£'+Math.round(v).toLocaleString(), higher:true},
+    {label:'Estimated Rent', key:'estimatedRent', fmt:v=>'£'+v.toLocaleString(), higher:false},
+    {label:'Profit Margin', key:null, calc:getMargin, fmt:v=>v.toFixed(0)+'%', higher:true},
+    {label:'Est. Monthly Profit', key:null, calc:l=>getRevenue(l)-l.estimatedRent, fmt:v=>'£'+Math.round(v).toLocaleString(), higher:true},
+    {label:'Rate-to-Rent Ratio', key:null, calc:getROI, fmt:v=>v.toFixed(1)+'x', higher:true}
+  ];
+  let html = '<thead><tr><th>Category</th>';
+  locs.forEach(l => { html += `<th>${l.name}</th>`; });
+  html += '</tr></thead><tbody>';
+  categories.forEach(cat => {
+    const vals = locs.map(l => cat.key ? l[cat.key] : cat.calc(l));
+    const best = cat.higher ? Math.max(...vals) : Math.min(...vals);
+    html += '<tr><td class="cat">' + cat.label + '</td>';
+    vals.forEach(v => {
+      const isWinner = v === best;
+      html += `<td class="${isWinner ? 'winner' : ''}">${cat.fmt(v)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+  wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ─── VALIDATOR ───
+function startValidation(){
+  const input = document.getElementById('validatorInput').value.trim();
+  if(!input) return;
+  const checklist = document.getElementById('validatorChecklist');
+  const items = document.getElementById('checklistItems');
+  checklist.style.display = 'block';
+  items.innerHTML = '';
+  validationSteps.forEach((step, i) => {
+    const div = document.createElement('div');
+    div.className = 'check-step';
+    div.onclick = function(){ toggleCheckStep(this, i); };
+    div.innerHTML = `
+      <input type="checkbox" id="vs-${i}" onclick="event.stopPropagation();toggleCheckStep(this.parentElement,${i})">
+      <div>
+        <div class="step-num">Step ${i+1}</div>
+        <div class="step-title">${step.title}</div>
+        <div class="step-desc">${step.desc.replace(/\[council name\]/g, input)}</div>
+      </div>
+    `;
+    items.appendChild(div);
+  });
+  updateScore();
+  checklist.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function toggleCheckStep(el, idx){
+  const cb = el.querySelector('input[type=checkbox]');
+  cb.checked = !cb.checked;
+  el.classList.toggle('checked', cb.checked);
+  updateScore();
+}
+
+function updateScore(){
+  const checks = document.querySelectorAll('#checklistItems input[type=checkbox]');
+  let checked = 0;
+  checks.forEach(c => { if(c.checked) checked++; });
+  const score = Math.round((checked / 5) * 100);
+  const fill = document.getElementById('scoreFill');
+  const num = document.getElementById('scoreNum');
+  fill.style.width = score + '%';
+  num.textContent = score + '/100';
+  num.className = 'score-num ' + (score <= 20 ? 'low' : score <= 60 ? 'mid' : 'high');
+}
+
+// ─── FILTER CONTROLS ───
+document.getElementById('budgetSlider').addEventListener('input', function(){
+  maxBudget = parseInt(this.value);
+  document.getElementById('budgetValue').textContent = '£' + maxBudget.toLocaleString();
+  renderHotspots();
+});
+
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    selectedType = this.dataset.type;
+    renderHotspots();
+  });
+});
+
+document.getElementById('sortSelect').addEventListener('change', function(){
+  sortBy = this.value;
+  renderHotspots();
+});
+
+// ─── INIT ───
+renderHotspots();
+renderAvoid();
+</script>
+</body>
+</html>

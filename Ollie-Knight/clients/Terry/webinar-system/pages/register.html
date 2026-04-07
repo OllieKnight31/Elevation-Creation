@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Webinar: How 25 Everyday People Launched Profitable Airbnbs in Under 90 Days | Property Labs</title>
+<meta name="description" content="Join this free 90-minute live training and discover the unconventional method a 21-year-old uni student used to build a 14-unit Airbnb portfolio with none of his own money.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- GA4 Global Site Tag -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXXXXX');
+</script>
+
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1939039799920431');
+fbq('track', 'PageView');
+</script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #0a0f0d;
+  --bg-secondary: #0d1410;
+  --bg-tertiary: #101816;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --bg-card-hover: rgba(255, 255, 255, 0.06);
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --accent-primary: #10B981;
+  --accent-secondary: #059669;
+  --accent-glow: rgba(16, 185, 129, 0.3);
+  --accent-gradient: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #059669 0%, #10B981 100%);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.45);
+  --text-accent: #10B981;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+  --section-padding: 100px 0;
+  --container-width: 1170px;
+  --container-narrow: 800px;
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+}
+
+html { line-height: 1.15; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: clip;
+}
+
+/* Grain texture overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+h1 { font-size: clamp(2.5rem, 5vw, 4.5rem); }
+h2 { font-size: clamp(2rem, 4vw, 3.5rem); }
+h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
+h4 { font-size: clamp(1.25rem, 2vw, 1.5rem); }
+
+.gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+p { color: var(--text-secondary); font-size: 1.125rem; line-height: 1.7; max-width: 65ch; }
+a { color: var(--accent-primary); text-decoration: none; transition: var(--transition-smooth); }
+a:hover { color: var(--text-primary); }
+
+.container { width: 100%; max-width: var(--container-width); margin: 0 auto; padding: 0 24px; }
+.container--narrow { max-width: var(--container-narrow); }
+.section { padding: var(--section-padding); position: relative; }
+.grid { display: grid; gap: 32px; }
+.grid--2 { grid-template-columns: repeat(2, 1fr); }
+.grid--3 { grid-template-columns: repeat(3, 1fr); }
+.text-center { text-align: center; }
+
+/* ===== SCROLL ANIMATIONS ===== */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ===== NAVIGATION ===== */
+.navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 16px 0; transition: var(--transition-smooth); background: transparent; }
+.navbar.scrolled { background: rgba(10, 15, 13, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-glass); padding: 12px 0; }
+.navbar__inner { display: flex; align-items: center; justify-content: space-between; max-width: var(--container-width); margin: 0 auto; padding: 0 24px; }
+.navbar__logo { font-family: var(--font-body); font-size: 1.5rem; color: var(--text-primary); letter-spacing: 0.02em; font-weight: 800; text-decoration: none; }
+.navbar__logo span { color: var(--accent-primary); }
+.navbar__countdown { display: flex; align-items: center; gap: 20px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 10px 28px; }
+.navbar__countdown-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent-primary); font-weight: 700; white-space: nowrap; }
+.navbar__countdown-time { display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.navbar__countdown-unit { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.navbar__countdown-num { font-size: 1.6rem; font-weight: 800; color: #ffffff; line-height: 1; min-width: 2ch; text-align: center; font-family: var(--font-body); }
+.navbar__countdown-unit-label { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); }
+.navbar__countdown-sep { font-size: 1.4rem; color: rgba(255,255,255,0.3); font-weight: 700; align-self: flex-start; margin-top: 2px; line-height: 1.4; }
+.navbar__cta { padding: 10px 24px; font-size: 0.875rem; }
+
+/* ===== BUTTONS ===== */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 36px; border: none; border-radius: var(--radius-full); font-family: var(--font-body); font-size: 1rem; font-weight: 600; letter-spacing: 0.02em; cursor: pointer; transition: var(--transition-smooth); text-decoration: none; position: relative; overflow: hidden; }
+.btn--primary { background: var(--accent-gradient); color: var(--bg-primary); box-shadow: 0 4px 24px var(--accent-glow); }
+.btn--primary:hover { transform: translateY(-2px); box-shadow: 0 8px 40px var(--accent-glow); background: var(--accent-gradient-hover); color: var(--bg-primary); }
+.btn--primary:active { transform: translateY(0); }
+.btn--large { padding: 20px 48px; font-size: 1.125rem; }
+.btn__arrow { transition: transform 0.3s ease; }
+.btn:hover .btn__arrow { transform: translateX(4px); }
+.btn--pulse { animation: pulse-glow 3s infinite; }
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 4px 24px var(--accent-glow); }
+  50% { box-shadow: 0 4px 48px var(--accent-glow), 0 0 80px rgba(16, 185, 129, 0.15); }
+}
+
+/* ===== CARDS ===== */
+.card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 32px; transition: var(--transition-smooth); position: relative; overflow: hidden; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-primary), transparent); opacity: 0; transition: opacity 0.3s ease; }
+.card:hover { background: var(--bg-card-hover); border-color: rgba(16, 185, 129, 0.15); transform: translateY(-4px); }
+.card:hover::before { opacity: 1; }
+.glass--accent { border-color: rgba(16, 185, 129, 0.15); background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(10, 15, 13, 0.8)); }
+
+/* ===== HERO ===== */
+.hero { min-height: 100vh; display: flex; align-items: center; position: relative; padding: 120px 0 80px; overflow: hidden; }
+.hero__bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
+.hero__gradient-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.4; }
+.hero__gradient-orb--1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%); top: -200px; right: -100px; }
+.hero__gradient-orb--2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(5, 150, 105, 0.2) 0%, transparent 70%); bottom: -150px; left: -100px; }
+.hero__gradient-orb--3 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.hero__content { position: relative; z-index: 1; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 60px; align-items: center; }
+.hero__text { max-width: 620px; }
+.hero__badge { display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--radius-full); font-size: 0.8rem; color: var(--accent-primary); font-weight: 600; margin-bottom: 28px; letter-spacing: 0.06em; text-transform: uppercase; }
+.hero__badge-dot { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; animation: dot-pulse 2s infinite; box-shadow: 0 0 6px rgba(239, 68, 68, 0.6); }
+@keyframes dot-pulse { 0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(239,68,68,0.6); } 50% { opacity: 0.3; box-shadow: 0 0 2px rgba(239,68,68,0.3); } }
+.hero__headline { font-size: clamp(2.75rem, 5.5vw, 4.25rem); line-height: 1.08; margin-bottom: 24px; letter-spacing: -0.03em; }
+.hero__subheadline { font-size: clamp(1.05rem, 1.8vw, 1.2rem); color: var(--text-secondary); line-height: 1.75; margin-bottom: 36px; max-width: 540px; }
+.hero__subheadline strong { color: var(--text-primary); font-weight: 600; }
+.hero__trust { display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 0.85rem; color: var(--text-muted); }
+.hero__trust svg { flex-shrink: 0; }
+.hero__proof-strip { display: flex; gap: 32px; margin-top: 40px; padding-top: 32px; border-top: 1px solid var(--border-glass); flex-wrap: wrap; }
+.hero__proof-item { font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+.hero__proof-item::before { content: ''; width: 6px; height: 6px; background: var(--accent-primary); border-radius: 50%; flex-shrink: 0; }
+
+/* Hero Bento Grid */
+.hero__bento { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.hero__bento-card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 28px 24px; text-align: center; transition: var(--transition-smooth); }
+.hero__bento-card:hover { border-color: rgba(16, 185, 129, 0.2); background: var(--bg-card-hover); }
+.hero__bento-number { font-family: var(--font-body); font-size: 2.25rem; font-weight: 800; color: var(--accent-primary); line-height: 1; margin-bottom: 6px; }
+.hero__bento-label { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+.hero__bento-card--highlight { border-color: rgba(16, 185, 129, 0.2); background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(10, 15, 13, 0.8)); }
+
+/* ===== SOCIAL PROOF TICKER ===== */
+.ticker { padding: 20px 0; border-top: 1px solid var(--border-glass); border-bottom: 1px solid var(--border-glass); background: var(--bg-secondary); overflow: hidden; position: relative; }
+.ticker::before,
+.ticker::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ticker::before { left: 0; background: linear-gradient(90deg, var(--bg-secondary), transparent); }
+.ticker::after { right: 0; background: linear-gradient(270deg, var(--bg-secondary), transparent); }
+.ticker__track {
+  display: flex;
+  gap: 48px;
+  animation: ticker-scroll 35s linear infinite;
+  width: max-content;
+}
+.ticker__track:hover { animation-play-state: paused; }
+.ticker__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.ticker__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  flex-shrink: 0;
+}
+.ticker__name { font-weight: 700; color: var(--text-primary); }
+.ticker__result { color: var(--accent-primary); font-weight: 600; }
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ===== SECTION HEADERS ===== */
+.section-header { text-align: center; max-width: 700px; margin: 0 auto 60px; }
+.section-header__label { display: inline-block; font-family: var(--font-body); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent-primary); margin-bottom: 16px; }
+.section-header__title { margin-bottom: 16px; }
+.section-header__text { color: var(--text-secondary); font-size: 1.1rem; margin: 0 auto; }
+
+/* ===== LEARN CARDS ===== */
+.learn-card { padding: 40px; text-align: left; }
+.learn-card__icon { width: 56px; height: 56px; border-radius: 14px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 1.5rem; }
+.learn-card__number { font-family: var(--font-body); font-size: 3.5rem; color: rgba(16, 185, 129, 0.15); line-height: 1; margin-bottom: 16px; font-weight: 800; }
+.learn-card__title { font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 12px; }
+.learn-card__text { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7; max-width: 100%; }
+
+/* ===== RESULTS BENTO GRID ===== */
+.results-bento { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: auto auto; gap: 20px; }
+.results-bento__card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 32px 28px;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.results-bento__card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.results-bento__card:hover { background: var(--bg-card-hover); border-color: rgba(16, 185, 129, 0.2); transform: translateY(-4px); }
+.results-bento__card:hover::before { opacity: 1; }
+.results-bento__card--wide { grid-column: span 2; }
+.results-bento__card--featured {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(10, 15, 13, 0.9));
+  border-color: rgba(16, 185, 129, 0.2);
+}
+.results-bento__avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--bg-primary);
+  flex-shrink: 0;
+  margin-bottom: 20px;
+}
+.results-bento__name { font-family: var(--font-body); font-weight: 700; font-size: 1.1rem; color: var(--text-primary); margin-bottom: 2px; }
+.results-bento__role { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px; }
+.results-bento__stat {
+  font-family: var(--font-body);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+.results-bento__stat-label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
+.results-bento__quote {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  font-style: italic;
+  border-left: 2px solid rgba(16, 185, 129, 0.3);
+  padding-left: 16px;
+  margin-top: auto;
+}
+
+/* ===== PROBLEM SECTION ===== */
+.problem { background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%); }
+.problem__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.problem__list { list-style: none; }
+.problem__list-item { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-glass); }
+.problem__list-item:last-child { border-bottom: none; }
+.problem__list-icon { width: 24px; height: 24px; flex-shrink: 0; margin-top: 2px; color: #ef4444; font-size: 1.2rem; font-weight: 700; }
+.problem__list-text { color: var(--text-secondary); font-size: 1rem; line-height: 1.6; }
+
+/* ===== HOST ===== */
+.host { background: var(--bg-secondary); }
+.host__grid { display: grid; grid-template-columns: 380px 1fr; gap: 60px; align-items: center; }
+.host__image-wrapper { position: relative; }
+.host__image { width: 100%; height: 480px; border-radius: var(--radius-lg); object-fit: cover; border: 1px solid var(--border-glass); background: var(--bg-card); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.9rem; overflow: hidden; }
+.host__image-badge { position: absolute; bottom: -16px; right: -16px; background: var(--accent-gradient); color: var(--bg-primary); padding: 16px 24px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.9rem; box-shadow: 0 8px 32px var(--accent-glow); }
+.host__bio { font-size: 1.05rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; max-width: 100%; }
+.host__credentials { list-style: none; margin-top: 28px; }
+.host__credential { display: flex; align-items: center; gap: 12px; padding: 10px 0; color: var(--text-secondary); font-size: 1rem; }
+.host__credential-icon { color: var(--accent-primary); font-size: 1.1rem; flex-shrink: 0; }
+.host__anti-guru { margin-top: 28px; padding: 20px 24px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); }
+.host__anti-guru p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; max-width: 100%; font-style: italic; }
+
+/* ===== FAQ ===== */
+.faq__item { border: 1px solid var(--border-glass); border-radius: var(--radius-sm); margin-bottom: 12px; overflow: hidden; transition: var(--transition-smooth); }
+.faq__item.active { border-color: rgba(16, 185, 129, 0.2); }
+.faq__question { width: 100%; background: var(--bg-card); border: none; padding: 20px 24px; color: var(--text-primary); font-family: var(--font-body); font-size: 1rem; font-weight: 600; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: var(--transition-smooth); }
+.faq__question:hover { background: var(--bg-card-hover); }
+.faq__icon { font-size: 1.25rem; color: var(--accent-primary); transition: transform 0.3s ease; flex-shrink: 0; }
+.faq__item.active .faq__icon { transform: rotate(45deg); }
+.faq__answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.faq__answer-inner { padding: 0 24px 20px; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7; }
+
+/* ===== COUNTDOWN ===== */
+.countdown { display: flex; gap: 16px; justify-content: center; }
+.countdown__block { text-align: center; min-width: 80px; }
+.countdown__number { font-family: var(--font-body); font-size: 2.5rem; font-weight: 800; color: var(--accent-primary); line-height: 1; font-variant-numeric: tabular-nums; }
+.countdown__label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
+.countdown__separator { font-size: 2rem; color: var(--text-muted); align-self: flex-start; margin-top: 4px; }
+
+/* ===== FINAL CTA ===== */
+.final-cta { background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%); text-align: center; position: relative; overflow: hidden; }
+.final-cta__glow { position: absolute; width: 800px; height: 400px; background: radial-gradient(ellipse, rgba(16, 185, 129, 0.08) 0%, transparent 70%); bottom: 0; left: 50%; transform: translateX(-50%); }
+
+/* ===== MODAL ===== */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 2000; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal { background: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--radius-lg); padding: 48px 40px; max-width: 480px; width: 100%; position: relative; transform: translateY(20px) scale(0.97); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.modal-overlay.active .modal { transform: translateY(0) scale(1); }
+.modal__close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-glass); background: var(--bg-card); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: var(--transition-smooth); }
+.modal__close:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
+.modal__title { font-family: var(--font-display); font-size: 1.75rem; text-align: center; margin-bottom: 8px; }
+.modal__subtitle { text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 32px; max-width: 100%; }
+.modal__spots { text-align: center; margin-bottom: 24px; }
+.modal__spots-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-full); font-size: 0.8rem; color: #f87171; font-weight: 600; }
+.modal__spots-dot { width: 6px; height: 6px; background: #ef4444; border-radius: 50%; animation: dot-pulse 2s infinite; }
+.modal__trust { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 16px; font-size: 0.8rem; color: var(--text-muted); }
+.modal__trust svg { flex-shrink: 0; }
+
+/* Form inputs */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+.form-group input { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--font-body); font-size: 1rem; transition: var(--transition-smooth); outline: none; }
+.form-group input:focus { border-color: var(--accent-primary); background: rgba(16, 185, 129, 0.05); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+.form-group input::placeholder { color: var(--text-muted); }
+.form-submit { width: 100%; padding: 18px; font-size: 1.1rem; margin-top: 8px; }
+.form-error { border-color: #ef4444 !important; }
+
+/* ===== MOBILE FLOATING CTA ===== */
+.floating-cta { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1500; padding: 12px 16px; background: linear-gradient(180deg, transparent 0%, rgba(10, 15, 13, 0.95) 30%); transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: none; }
+.floating-cta.visible { transform: translateY(0); }
+.floating-cta__btn { width: 100%; height: 60px; font-size: 1rem; font-weight: 700; border-radius: var(--radius-full); border: none; background: var(--accent-gradient); color: var(--bg-primary); cursor: pointer; font-family: var(--font-body); box-shadow: 0 -4px 24px var(--accent-glow); display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+/* ===== FOOTER ===== */
+.footer { padding: 40px 0; border-top: 1px solid var(--border-glass); text-align: center; }
+.footer__text { font-size: 0.85rem; color: var(--text-muted); max-width: 100%; margin: 0 auto; }
+.footer__links { display: flex; gap: 24px; justify-content: center; margin-top: 12px; }
+.footer__links a { font-size: 0.85rem; color: var(--text-muted); }
+.footer__links a:hover { color: var(--accent-primary); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .hero__content { grid-template-columns: 1fr; gap: 40px; }
+  .hero__text { text-align: center; max-width: 100%; margin: 0 auto; }
+  .hero__subheadline { margin: 0 auto 36px; }
+  .hero__proof-strip { justify-content: center; }
+  .hero__bento { max-width: 500px; margin: 0 auto; }
+  .problem__grid { grid-template-columns: 1fr; gap: 40px; }
+  .host__grid { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+  .host__image { height: 350px; max-width: 350px; margin: 0 auto; }
+  .host__credentials { text-align: left; max-width: 400px; margin: 28px auto 0; }
+  .host__anti-guru { max-width: 400px; margin: 28px auto 0; }
+  .results-bento { grid-template-columns: repeat(2, 1fr); }
+  .results-bento__card--wide { grid-column: span 1; }
+}
+
+@media (max-width: 768px) {
+  :root { --section-padding: 60px 0; }
+  .grid--3 { grid-template-columns: 1fr; }
+  .grid--2 { grid-template-columns: 1fr; }
+  .navbar__logo { font-size: 1.2rem; }
+  .navbar__countdown { display: none; }
+  .countdown__number { font-size: 1.75rem; }
+  .countdown__block { min-width: 60px; }
+  .floating-cta { display: block; }
+  .modal { padding: 36px 24px; }
+  .results-bento { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .results-bento__card { padding: 24px 20px; }
+  .results-bento__stat { font-size: 1.4rem; }
+  .ticker__track { gap: 32px; }
+}
+
+@media (max-width: 480px) {
+  .container { padding: 0 16px; }
+  .card { padding: 24px; }
+  .hero__bento { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .hero__bento-card { padding: 20px 16px; }
+  .hero__bento-number { font-size: 1.75rem; }
+  .hero__proof-strip { gap: 16px; }
+  .results-bento { grid-template-columns: 1fr; }
+  .results-bento__card--wide { grid-column: span 1; }
+}
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes float-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes counter-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar__inner">
+      <a href="#" class="navbar__logo">Property <span>Labs</span></a>
+      <div class="navbar__countdown">
+        <span class="navbar__countdown-label">Starts In</span>
+        <div class="navbar__countdown-time">
+          <div class="navbar__countdown-unit">
+            <span class="navbar__countdown-num" id="nav-days">00</span>
+            <span class="navbar__countdown-unit-label">Days</span>
+          </div>
+          <span class="navbar__countdown-sep">:</span>
+          <div class="navbar__countdown-unit">
+            <span class="navbar__countdown-num" id="nav-hours">00</span>
+            <span class="navbar__countdown-unit-label">Hours</span>
+          </div>
+          <span class="navbar__countdown-sep">:</span>
+          <div class="navbar__countdown-unit">
+            <span class="navbar__countdown-num" id="nav-minutes">00</span>
+            <span class="navbar__countdown-unit-label">Min</span>
+          </div>
+          <span class="navbar__countdown-sep">:</span>
+          <div class="navbar__countdown-unit">
+            <span class="navbar__countdown-num" style="color: var(--accent-primary);" id="nav-seconds">00</span>
+            <span class="navbar__countdown-unit-label">Sec</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn--primary navbar__cta" data-open-modal>Register Free <span class="btn__arrow">&rarr;</span></button>
+    </div>
+  </nav>
+
+  <!-- ============ HERO SECTION ============ -->
+  <section class="hero" id="hero">
+    <div class="hero__bg">
+      <div class="hero__gradient-orb hero__gradient-orb--1"></div>
+      <div class="hero__gradient-orb hero__gradient-orb--2"></div>
+      <div class="hero__gradient-orb hero__gradient-orb--3"></div>
+    </div>
+
+    <div class="container">
+      <div class="hero__content">
+        <!-- Left: Text Content -->
+        <div class="hero__text">
+          <div class="hero__badge">
+            <span class="hero__badge-dot"></span>
+            Free Live Event &mdash; Monday, April 13
+          </div>
+
+          <h1 class="hero__headline">
+            How 25 Everyday People Launched <span class="gradient-text">Profitable Airbnbs</span> in Under 90 Days
+          </h1>
+
+          <p class="hero__subheadline">
+            Discover the unconventional method a 21-year-old uni student used to build a 14-unit Airbnb portfolio with <strong>&pound;0 of his own money</strong> &mdash; even if you have no savings, no experience, and a full-time job.
+          </p>
+
+          <button class="btn btn--primary btn--large btn--pulse" data-open-modal>
+            Reserve My Free Seat <span class="btn__arrow">&rarr;</span>
+          </button>
+
+          <div class="hero__trust">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Free. No credit card required. Unsubscribe anytime.
+          </div>
+
+          <div class="hero__proof-strip">
+            <span class="hero__proof-item">25+ Success Stories</span>
+            <span class="hero__proof-item">&pound;0 Own Money Required</span>
+            <span class="hero__proof-item">90 Day Guarantee</span>
+          </div>
+        </div>
+
+        <!-- Right: Bento Proof Grid -->
+        <div class="hero__bento">
+          <div class="hero__bento-card hero__bento-card--highlight">
+            <div class="hero__bento-number" data-counter="14">0</div>
+            <div class="hero__bento-label">Airbnb Units Built</div>
+          </div>
+          <div class="hero__bento-card">
+            <div class="hero__bento-number" data-counter="16" data-prefix="&pound;" data-suffix="K">0</div>
+            <div class="hero__bento-label">Peak Monthly Revenue</div>
+          </div>
+          <div class="hero__bento-card">
+            <div class="hero__bento-number" data-counter="25" data-prefix="&pound;" data-suffix="K">0</div>
+            <div class="hero__bento-label">Raised in 5 Weeks (Ehab)</div>
+          </div>
+          <div class="hero__bento-card hero__bento-card--highlight">
+            <div class="hero__bento-number" data-counter="5">0</div>
+            <div class="hero__bento-label">Airbnbs in 3 Months (Dylan)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SOCIAL PROOF TICKER ============ -->
+  <section class="ticker" aria-label="Student success stories">
+    <div class="ticker__track" id="ticker-track">
+      <div class="ticker__item"><span class="ticker__dot"></span><span class="ticker__name">Ehab</span> raised <span class="ticker__result">&pound;25,000 in 5 weeks</span> &mdash; university student</div>
+      <div class="ticker__item"><span class="ticker__dot"></span><span class="ticker__name">Dylan</span> built <span class="ticker__result">5 Airbnbs in 3 months</span> &mdash; &pound;12K highest profit month</div>
+      <div class="ticker__item"><span class="ticker__dot"></span><span class="ticker__name">Andrew</span> raised <span class="ticker__result">&pound;13K in his first month</span> &mdash; Masters student + accountant</div>
+      <div class="ticker__item"><span class="ticker__dot"></span><span class="ticker__name">Elite Kleans</span> earning <span class="ticker__result">&pound;2.2K/month passive</span> from just 1 unit</div>
+      <div class="ticker__item"><span class="ticker__dot"></span><span class="ticker__name">Terry</span> built <span class="ticker__result">14 units generating &pound;16K/month</span> &mdash; as a uni student</div>
+      <!-- Duplicate for seamless loop -->
+      <div class="ticker__item"><span class="ticker__dot"></span><span class="ticker__name">Ehab</span> raised <span class="ticker__result">&pound;25,000 in 5 weeks</span> &mdash; university student</div>
+      <div class="ticker__item"><span class="ticker__dot"></span><span class="ticker__name">Dylan</span> built <span class="ticker__result">5 Airbnbs in 3 months</span> &mdash; &pound;12K highest profit month</div>
+      <div class="ticker__item"><span class="ticker__dot"></span><span class="ticker__name">Andrew</span> raised <span class="ticker__result">&pound;13K in his first month</span> &mdash; Masters student + accountant</div>
+      <div class="ticker__item"><span class="ticker__dot"></span><span class="ticker__name">Elite Kleans</span> earning <span class="ticker__result">&pound;2.2K/month passive</span> from just 1 unit</div>
+      <div class="ticker__item"><span class="ticker__dot"></span><span class="ticker__name">Terry</span> built <span class="ticker__result">14 units generating &pound;16K/month</span> &mdash; as a uni student</div>
+    </div>
+  </section>
+
+  <!-- ============ WHAT YOU'LL DISCOVER ============ -->
+  <section class="section" id="learn">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-header__label">What You'll Discover</span>
+        <h2 class="section-header__title">90 Minutes That Could Change <span class="gradient-text">Everything</span></h2>
+        <p class="section-header__text">This isn't another vague "mindset" session. Terry breaks down the exact steps behind 25 real success stories &mdash; and shows you how to replicate them.</p>
+      </div>
+
+      <div class="grid grid--3">
+        <div class="card learn-card reveal reveal-delay-1">
+          <div class="learn-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8l-4 4-4-4"/><path d="M12 12v6"/></svg>
+          </div>
+          <h3 class="learn-card__title">How to Raise Capital From People Already in Your Phone Book</h3>
+          <p class="learn-card__text">The little-known approach that let Ehab raise &pound;25,000 in 5 weeks as a university student. No bank loans. No savings. No rich parents required.</p>
+        </div>
+        <div class="card learn-card reveal reveal-delay-2">
+          <div class="learn-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          </div>
+          <h3 class="learn-card__title">Launch Your First Airbnb With &pound;0 of Your Own Money</h3>
+          <p class="learn-card__text">Why saving for a deposit is the old way. Terry will show you the exact structure Andrew used to raise &pound;13K in month one &mdash; while finishing his Masters.</p>
+        </div>
+        <div class="card learn-card reveal reveal-delay-3">
+          <div class="learn-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <h3 class="learn-card__title">The Property Analysis Shortcut That Guarantees Profit</h3>
+          <p class="learn-card__text">Dylan used this to scale to 5 Airbnbs in 3 months and hit &pound;12K in his best profit month. No expensive tools or software needed &mdash; just a simple framework.</p>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 48px;" class="reveal">
+        <button class="btn btn--primary btn--large" data-open-modal>
+          I Want In &mdash; Save My Seat <span class="btn__arrow">&rarr;</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STUDENT RESULTS — BENTO GRID ============ -->
+  <section class="section" id="results" style="background: var(--bg-secondary);">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-header__label">Real People, Real Results</span>
+        <h2 class="section-header__title">They Started <span class="gradient-text">Exactly Where You Are</span></h2>
+        <p class="section-header__text">Not trust fund kids. Not property moguls. Regular people with jobs, studies, and zero experience &mdash; who followed a system and got results.</p>
+      </div>
+
+      <div class="results-bento">
+        <!-- Ehab — wide card -->
+        <div class="results-bento__card results-bento__card--wide results-bento__card--featured reveal reveal-delay-1">
+          <div class="results-bento__avatar">E</div>
+          <div class="results-bento__name">Ehab</div>
+          <div class="results-bento__role">University Student</div>
+          <div class="results-bento__stat">&pound;25,000 raised in 5 weeks</div>
+          <div class="results-bento__stat-label">2 Airbnb properties &bull; Still at university</div>
+          <div class="results-bento__quote">"I raised &pound;25,000 in just 5 weeks. As a uni student, I never thought this was possible. The system Terry taught me completely changed my trajectory."</div>
+        </div>
+
+        <!-- Dylan — wide card -->
+        <div class="results-bento__card results-bento__card--wide reveal reveal-delay-2">
+          <div class="results-bento__avatar">D</div>
+          <div class="results-bento__name">Dylan</div>
+          <div class="results-bento__role">Working Professional</div>
+          <div class="results-bento__stat">5 Airbnbs in 3 months</div>
+          <div class="results-bento__stat-label">&pound;12K highest profit month</div>
+          <div class="results-bento__quote">"Terry's system took all the guesswork out. &pound;12K in my best profit month. If you're on the fence, just get in the room &mdash; the information alone is worth it."</div>
+        </div>
+
+        <!-- Andrew -->
+        <div class="results-bento__card results-bento__card--wide reveal reveal-delay-3">
+          <div class="results-bento__avatar">A</div>
+          <div class="results-bento__name">Andrew</div>
+          <div class="results-bento__role">Masters Student &amp; Junior Accountant</div>
+          <div class="results-bento__stat">&pound;13K raised in month one</div>
+          <div class="results-bento__stat-label">3 Airbnb units &bull; Balancing studies + full-time job</div>
+          <div class="results-bento__quote">"I raised &pound;13K in my first month and now manage 3 units. You don't need to wait until you've 'made it' &mdash; you can start right now."</div>
+        </div>
+
+        <!-- Elite Kleans -->
+        <div class="results-bento__card results-bento__card--wide results-bento__card--featured reveal reveal-delay-4">
+          <div class="results-bento__avatar">EK</div>
+          <div class="results-bento__name">Elite Kleans</div>
+          <div class="results-bento__role">Small Business Owner</div>
+          <div class="results-bento__stat">&pound;2.2K/month passive income</div>
+          <div class="results-bento__stat-label">From just 1 Airbnb unit</div>
+          <div class="results-bento__quote">"One unit, &pound;2,200 a month passive. The system works &mdash; even if you're building something else alongside it."</div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 48px;" class="reveal">
+        <p style="margin: 0 auto 24px; font-size: 1.1rem; color: var(--text-secondary); font-style: italic;">These aren't outliers. They're ordinary people who followed a proven system.</p>
+        <button class="btn btn--primary" data-open-modal>
+          Join Them &mdash; Reserve My Seat <span class="btn__arrow">&rarr;</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ "SOUND FAMILIAR?" SECTION ============ -->
+  <section class="section problem" id="problem">
+    <div class="container">
+      <div class="problem__grid">
+        <div class="reveal">
+          <span class="section-header__label" style="text-align: left; display: block;">Sound Familiar?</span>
+          <h2 style="margin-bottom: 16px;">You Did Everything &ldquo;Right&rdquo; &mdash; But <span class="gradient-text">Freedom Still Feels Far Away</span></h2>
+          <p style="margin-bottom: 32px;">You went to uni, got the job, earn decent money. But between rent, bills, and life &mdash; you're running in place. You know there has to be more than this. You're not wrong.</p>
+
+          <ul class="problem__list">
+            <li class="problem__list-item">
+              <span class="problem__list-icon">&times;</span>
+              <span class="problem__list-text">You're earning a good salary but have no passive income &mdash; and no clear path to building it</span>
+            </li>
+            <li class="problem__list-item">
+              <span class="problem__list-icon">&times;</span>
+              <span class="problem__list-text">You think you need tens of thousands saved before you can start in property</span>
+            </li>
+            <li class="problem__list-item">
+              <span class="problem__list-icon">&times;</span>
+              <span class="problem__list-text">You've consumed endless YouTube videos and podcasts but haven't taken the first step</span>
+            </li>
+            <li class="problem__list-item">
+              <span class="problem__list-icon">&times;</span>
+              <span class="problem__list-text">You're scared of making an expensive mistake with money you can't afford to lose</span>
+            </li>
+            <li class="problem__list-item">
+              <span class="problem__list-icon">&times;</span>
+              <span class="problem__list-text">You feel like property investing is for people with connections and capital &mdash; not people like you</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="reveal reveal-delay-2">
+          <div class="card glass--accent" style="padding: 48px;">
+            <p style="color: var(--accent-primary); font-size: 1.15rem; margin-bottom: 16px; font-weight: 600;">What if none of that were true?</p>
+            <h3 style="font-size: 1.6rem; margin-bottom: 20px; line-height: 1.3;">What if you could launch your first profitable Airbnb in 90 days &mdash; without using a single pound of your own money?</h3>
+            <p style="font-size: 1rem; line-height: 1.7; margin-bottom: 28px; max-width: 100%;">25 people already did it. Students, 9-to-5 professionals, complete beginners. On Monday, Terry will show you exactly how &mdash; step by step, in 90 minutes.</p>
+            <button class="btn btn--primary" data-open-modal>
+              Show Me How <span class="btn__arrow">&rarr;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT TERRY ============ -->
+  <section class="section host" id="about">
+    <div class="container">
+      <div class="host__grid">
+        <div class="host__image-wrapper reveal">
+          <div class="host__image">
+            <!-- Replace with Terry's photo -->
+            <span>Terry Dwobeng Photo</span>
+          </div>
+          <div class="host__image-badge">14 Units &bull; &pound;16K/mo Peak</div>
+        </div>
+
+        <div class="reveal reveal-delay-1">
+          <span class="section-header__label">Your Host</span>
+          <h2 style="margin-bottom: 20px;">Meet <span class="gradient-text">Terry Dwobeng</span></h2>
+          <p class="host__bio">This isn't another property guru trying to sell you a course from a rented Lamborghini. Terry is a practitioner who still manages his own Airbnb portfolio today.</p>
+          <p class="host__bio">Growing up in South London &mdash; immigrant family, no trust fund, no property connections &mdash; he built a 14-unit Airbnb portfolio generating &pound;16K per month in revenue while studying at the University of Warwick. He was 21. He used none of his own money.</p>
+          <p class="host__bio">Through Property Labs, Terry has now helped 25+ everyday people follow the same path. The youngest was still at university. The busiest had a full-time job and a Masters degree.</p>
+
+          <ul class="host__credentials">
+            <li class="host__credential">
+              <span class="host__credential-icon">&#10003;</span>
+              14-unit Airbnb portfolio built from scratch
+            </li>
+            <li class="host__credential">
+              <span class="host__credential-icon">&#10003;</span>
+              &pound;16K/month peak revenue as a uni student
+            </li>
+            <li class="host__credential">
+              <span class="host__credential-icon">&#10003;</span>
+              Zero of his own money invested
+            </li>
+            <li class="host__credential">
+              <span class="host__credential-icon">&#10003;</span>
+              25+ students now running profitable Airbnbs
+            </li>
+            <li class="host__credential">
+              <span class="host__credential-icon">&#10003;</span>
+              University of Warwick graduate
+            </li>
+          </ul>
+
+          <div class="host__anti-guru">
+            <p>"Let's be honest: Terry will mention a programme at the end for people who want hands-on support. But the first 60+ minutes are pure, actionable training &mdash; the kind of content most people charge hundreds for. Show up for the training. Stay for the Q&amp;A. The offer is there if you want it."</p>
+          </div>
+
+          <div style="margin-top: 32px;">
+            <button class="btn btn--primary" data-open-modal>
+              Join Terry's Free Training <span class="btn__arrow">&rarr;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section" id="faq" style="background: var(--bg-secondary);">
+    <div class="container container--narrow">
+      <div class="section-header reveal">
+        <span class="section-header__label">FAQ</span>
+        <h2 class="section-header__title">Got Questions?</h2>
+      </div>
+
+      <div class="reveal">
+        <div class="faq__item">
+          <button class="faq__question" onclick="toggleFaq(this)">
+            Is this webinar really free?
+            <span class="faq__icon">+</span>
+          </button>
+          <div class="faq__answer">
+            <div class="faq__answer-inner">100% free. No credit card, no "trial", no hidden fees. Terry is sharing the exact system he and his students use because he knows the training speaks for itself. Register, show up, take notes.</div>
+          </div>
+        </div>
+
+        <div class="faq__item">
+          <button class="faq__question" onclick="toggleFaq(this)">
+            What's the catch? Will there be a sales pitch?
+            <span class="faq__icon">+</span>
+          </button>
+          <div class="faq__answer">
+            <div class="faq__answer-inner">Transparency time: yes, Terry will mention a programme at the end for people who want hands-on support. He'd be doing you a disservice if he didn't. But the first 60+ minutes are pure training &mdash; real framework, real numbers, real student case studies. Most attendees say it's the most valuable free session they've ever seen on Airbnb investing. The offer is completely optional.</div>
+          </div>
+        </div>
+
+        <div class="faq__item">
+          <button class="faq__question" onclick="toggleFaq(this)">
+            I have no property experience. Is this for me?
+            <span class="faq__icon">+</span>
+          </button>
+          <div class="faq__answer">
+            <div class="faq__answer-inner">This was built for you. Terry started with zero experience as a 21-year-old uni student. Most of his successful students &mdash; Ehab (university student), Andrew (Masters student and junior accountant) &mdash; had no property background when they started. The system is designed specifically for complete beginners.</div>
+          </div>
+        </div>
+
+        <div class="faq__item">
+          <button class="faq__question" onclick="toggleFaq(this)">
+            I don't have any money saved. Can I still do this?
+            <span class="faq__icon">+</span>
+          </button>
+          <div class="faq__answer">
+            <div class="faq__answer-inner">That's literally the point. Terry built his entire 14-unit portfolio with &pound;0 of his own money. Ehab raised &pound;25K in 5 weeks. Andrew raised &pound;13K in his first month. On Monday, Terry will show you the exact method they used. You don't need savings to start.</div>
+          </div>
+        </div>
+
+        <div class="faq__item">
+          <button class="faq__question" onclick="toggleFaq(this)">
+            Can I do this alongside my 9-to-5?
+            <span class="faq__icon">+</span>
+          </button>
+          <div class="faq__answer">
+            <div class="faq__answer-inner">Yes &mdash; and in fact, having a job makes it easier. Most of Terry's students run their Airbnbs alongside full-time work or university studies. Andrew does it while completing his Masters and working as a junior accountant. Your day job gives you credibility and stability while you build.</div>
+          </div>
+        </div>
+
+        <div class="faq__item">
+          <button class="faq__question" onclick="toggleFaq(this)">
+            Will there be a replay?
+            <span class="faq__icon">+</span>
+          </button>
+          <div class="faq__answer">
+            <div class="faq__answer-inner">This is a live-only event. There may not be a replay available, so we strongly recommend attending live. Plus, you'll be able to ask Terry questions directly during the live Q&amp;A &mdash; that interaction alone is worth showing up for.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="section final-cta" id="final-cta">
+    <div class="final-cta__glow"></div>
+    <div class="container" style="position: relative; z-index: 1;">
+      <div class="section-header reveal">
+        <span class="section-header__label">Don't Wait</span>
+        <h2 class="section-header__title">Your First Profitable Airbnb Could Be <span class="gradient-text">90 Days Away</span></h2>
+        <p class="section-header__text">25 people already did it. Same situation as you. Same doubts. Different decision.</p>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 40px;" class="reveal">
+        <div class="countdown" id="countdown">
+          <div class="countdown__block">
+            <div class="countdown__number" id="countdown-days">00</div>
+            <div class="countdown__label">Days</div>
+          </div>
+          <div class="countdown__separator">:</div>
+          <div class="countdown__block">
+            <div class="countdown__number" id="countdown-hours">00</div>
+            <div class="countdown__label">Hours</div>
+          </div>
+          <div class="countdown__separator">:</div>
+          <div class="countdown__block">
+            <div class="countdown__number" id="countdown-minutes">00</div>
+            <div class="countdown__label">Minutes</div>
+          </div>
+          <div class="countdown__separator">:</div>
+          <div class="countdown__block">
+            <div class="countdown__number" id="countdown-seconds">00</div>
+            <div class="countdown__label">Seconds</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center;" class="reveal">
+        <button class="btn btn--primary btn--large btn--pulse" data-open-modal>
+          Reserve My Free Seat Now <span class="btn__arrow">&rarr;</span>
+        </button>
+        <p style="margin-top: 16px; font-size: 0.9rem; color: var(--text-muted);">Monday, April 13 at 7:00 PM GMT &bull; 90 Minutes &bull; 100% Free</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer__text">&copy; 2026 Property Labs. All rights reserved.</p>
+      <div class="footer__links">
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms-of-service">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ REGISTRATION MODAL ============ -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <button class="modal__close" id="modal-close" aria-label="Close">&times;</button>
+      <h3 class="modal__title">Reserve Your Free Seat</h3>
+      <p class="modal__subtitle">Monday, April 13 at 7:00 PM GMT &bull; 90 Minutes</p>
+
+      <div class="modal__spots">
+        <span class="modal__spots-badge">
+          <span class="modal__spots-dot"></span>
+          Limited live seats available
+        </span>
+      </div>
+
+      <form id="registration-form" novalidate>
+        <div class="form-group">
+          <label for="firstName">First Name *</label>
+          <input type="text" id="firstName" name="firstName" placeholder="Your first name" required autocomplete="given-name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <!-- Hidden UTM fields -->
+        <input type="hidden" name="utm_source" id="utm_source">
+        <input type="hidden" name="utm_medium" id="utm_medium">
+        <input type="hidden" name="utm_campaign" id="utm_campaign">
+        <input type="hidden" name="utm_term" id="utm_term">
+        <input type="hidden" name="utm_content" id="utm_content">
+        <input type="hidden" name="fbclid" id="fbclid">
+        <input type="hidden" name="gclid" id="gclid">
+        <input type="hidden" name="funnel_source" id="funnel_source" value="paid">
+
+        <button type="submit" class="btn btn--primary form-submit btn--pulse">
+          Reserve My Free Seat <span class="btn__arrow">&rarr;</span>
+        </button>
+      </form>
+
+      <div class="modal__trust">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Your information is 100% secure. No spam, ever.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MOBILE FLOATING CTA ============ -->
+  <div class="floating-cta" id="floating-cta">
+    <button class="floating-cta__btn" data-open-modal>
+      Reserve My Free Seat <span class="btn__arrow">&rarr;</span>
+    </button>
+  </div>
+
+<script>
+/* ============================================
+   PROPERTY LABS — WEBINAR FUNNEL JS
+   Registration Page (Paid Traffic) — v3
+   ============================================ */
+
+// ============ UTM & SOURCE TRACKING ============
+(function initTracking() {
+  var funnelSource = 'paid';
+
+  var params = new URLSearchParams(window.location.search);
+  var utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+  var clickIds = ['fbclid', 'gclid'];
+  var utmData = {};
+
+  utmKeys.forEach(function(key) {
+    var val = params.get(key);
+    if (val) utmData[key] = val;
+  });
+
+  clickIds.forEach(function(key) {
+    var val = params.get(key);
+    if (val) utmData[key] = val;
+  });
+
+  var existing = {};
+  try { existing = JSON.parse(sessionStorage.getItem('pl_tracking') || '{}'); } catch(e) {}
+
+  if (Object.keys(utmData).length > 0 || !existing.funnel_source) {
+    var trackingData = Object.assign({}, existing, utmData, { funnel_source: funnelSource });
+    sessionStorage.setItem('pl_tracking', JSON.stringify(trackingData));
+  }
+
+  // Populate hidden fields
+  var stored = {};
+  try { stored = JSON.parse(sessionStorage.getItem('pl_tracking') || '{}'); } catch(e) {}
+
+  utmKeys.concat(clickIds).forEach(function(key) {
+    var field = document.querySelector('input[name="' + key + '"]');
+    if (field && stored[key]) field.value = stored[key];
+  });
+
+  var resolvedSource = stored.funnel_source || funnelSource;
+  window.PL_TRACKING = stored;
+  window.PL_TRACKING.funnel_source = resolvedSource;
+
+  if (typeof gtag === 'function') {
+    gtag('set', 'user_properties', {
+      funnel_source: resolvedSource,
+      utm_source: stored.utm_source || '(not set)',
+      utm_medium: stored.utm_medium || '(not set)'
+    });
+  }
+})();
+
+// ============ NAVBAR SCROLL EFFECT ============
+(function initNavbar() {
+  var navbar = document.getElementById('navbar');
+  if (!navbar) return;
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 50) { navbar.classList.add('scrolled'); }
+    else { navbar.classList.remove('scrolled'); }
+  }, { passive: true });
+})();
+
+// ============ COUNTDOWN TIMER ============
+(function initCountdown() {
+  // April 13, 2026 at 7:00 PM UTC
+  var webinarDate = new Date('2026-04-13T19:00:00Z').getTime();
+
+  function updateCountdown() {
+    var now = Date.now();
+    var diff = webinarDate - now;
+
+    if (diff <= 0) {
+      updateElements('00', '00', '00', '00');
+      return;
+    }
+
+    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    updateElements(
+      String(days).padStart(2, '0'),
+      String(hours).padStart(2, '0'),
+      String(minutes).padStart(2, '0'),
+      String(seconds).padStart(2, '0')
+    );
+  }
+
+  function updateElements(d, h, m, s) {
+    var ids = [
+      ['countdown-days', 'nav-days'],
+      ['countdown-hours', 'nav-hours'],
+      ['countdown-minutes', 'nav-minutes'],
+      ['countdown-seconds', 'nav-seconds']
+    ];
+    var vals = [d, h, m, s];
+    for (var i = 0; i < ids.length; i++) {
+      for (var j = 0; j < ids[i].length; j++) {
+        var el = document.getElementById(ids[i][j]);
+        if (el) el.textContent = vals[i];
+      }
+    }
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+})();
+
+// ============ ANIMATED NUMBER COUNTERS ============
+(function initCounters() {
+  var counters = document.querySelectorAll('[data-counter]');
+  if (!counters.length) return;
+
+  function animateCounter(el) {
+    var target = parseInt(el.getAttribute('data-counter'), 10);
+    var prefix = el.getAttribute('data-prefix') || '';
+    var suffix = el.getAttribute('data-suffix') || '';
+    var duration = 1800;
+    var start = 0;
+    var startTime = null;
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      var progress = Math.min((timestamp - startTime) / duration, 1);
+      // Ease out cubic
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var current = Math.round(eased * target);
+      el.innerHTML = prefix + current + suffix;
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(function(el) { observer.observe(el); });
+  } else {
+    counters.forEach(animateCounter);
+  }
+})();
+
+// ============ MODAL LOGIC ============
+(function initModal() {
+  var overlay = document.getElementById('modal-overlay');
+  var closeBtn = document.getElementById('modal-close');
+  if (!overlay || !closeBtn) return;
+
+  // Open modal from any CTA button
+  document.querySelectorAll('[data-open-modal]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      // Focus first input after animation
+      setTimeout(function() {
+        var firstInput = overlay.querySelector('input[type="text"]');
+        if (firstInput) firstInput.focus();
+      }, 350);
+    });
+  });
+
+  // Close modal
+  function closeModal() {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeModal();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+  });
+})();
+
+// ============ FAQ TOGGLE ============
+function toggleFaq(button) {
+  var item = button.closest('.faq__item');
+  var answer = item.querySelector('.faq__answer');
+  var isActive = item.classList.contains('active');
+
+  document.querySelectorAll('.faq__item').forEach(function(faqItem) {
+    faqItem.classList.remove('active');
+    faqItem.querySelector('.faq__answer').style.maxHeight = '0';
+  });
+
+  if (!isActive) {
+    item.classList.add('active');
+    answer.style.maxHeight = answer.scrollHeight + 'px';
+  }
+}
+
+// ============ FORM HANDLING ============
+(function initForms() {
+  var form = document.getElementById('registration-form');
+  if (!form) return;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var submitBtn = form.querySelector('button[type="submit"]');
+    var firstName = document.getElementById('firstName').value.trim();
+    var email = document.getElementById('email').value.trim();
+
+    // Clear previous errors
+    document.querySelectorAll('.form-error').forEach(function(el) { el.classList.remove('form-error'); });
+
+    // Validate
+    var valid = true;
+    if (!firstName) {
+      document.getElementById('firstName').classList.add('form-error');
+      valid = false;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('email').classList.add('form-error');
+      valid = false;
+    }
+    if (!valid) return;
+
+    // Loading state
+    var originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Registering... <span class="btn__arrow" style="animation: spin 1s linear infinite;">&#8635;</span>';
+
+    // Store registration data
+    var registrationData = {
+      firstName: firstName,
+      email: email,
+      registeredAt: new Date().toISOString(),
+      funnel_source: (window.PL_TRACKING || {}).funnel_source || 'paid'
+    };
+    localStorage.setItem('pl_registration', JSON.stringify(registrationData));
+
+    // Fire Meta Pixel Lead event
+    if (typeof window.fbq === 'function') {
+      var tracking = window.PL_TRACKING || {};
+      window.fbq('track', 'Lead', {
+        content_name: 'Webinar Registration',
+        content_category: tracking.funnel_source || 'paid',
+        value: 0,
+        currency: 'GBP'
+      });
+    }
+
+    // Fire GA4 generate_lead event
+    if (typeof gtag === 'function') {
+      gtag('event', 'generate_lead', {
+        currency: 'GBP',
+        value: 0,
+        funnel_source: (window.PL_TRACKING || {}).funnel_source || 'paid'
+      });
+    }
+
+    // Redirect to thank you page
+    setTimeout(function() {
+      window.location.href = '/booked';
+    }, 500);
+  });
+})();
+
+// ============ SCROLL ANIMATIONS (IntersectionObserver) ============
+(function initScrollAnimations() {
+  var reveals = document.querySelectorAll('.reveal');
+  if (!reveals.length) return;
+
+  if (!('IntersectionObserver' in window)) {
+    // Fallback: show everything
+    reveals.forEach(function(el) { el.classList.add('visible'); });
+    return;
+  }
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  reveals.forEach(function(el) { observer.observe(el); });
+})();
+
+// ============ MOBILE FLOATING CTA ============
+(function initFloatingCTA() {
+  var floatingCta = document.getElementById('floating-cta');
+  var hero = document.getElementById('hero');
+  if (!floatingCta || !hero) return;
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        floatingCta.classList.remove('visible');
+      } else {
+        floatingCta.classList.add('visible');
+      }
+    });
+  }, { threshold: 0 });
+
+  observer.observe(hero);
+})();
+
+// ============ SMOOTH SCROLL ============
+document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+  anchor.addEventListener('click', function(e) {
+    var href = this.getAttribute('href');
+    if (href === '#') return;
+    var target = document.querySelector(href);
+    if (target) {
+      e.preventDefault();
+      var offset = 80;
+      var position = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: position, behavior: 'smooth' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

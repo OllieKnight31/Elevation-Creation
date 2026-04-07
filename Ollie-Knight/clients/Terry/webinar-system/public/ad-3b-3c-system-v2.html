@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 1080px;
+    height: 1350px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0a0f0d;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .container {
+    width: 1080px;
+    height: 1350px;
+    position: relative;
+    display: flex;
+  }
+  .left-content {
+    width: 50%;
+    height: 1350px;
+    padding: 0 50px 100px 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+  }
+  .glow {
+    position: absolute;
+    top: 35%;
+    left: 20%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(62,207,160,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .steps {
+    margin-bottom: 60px;
+  }
+  .step {
+    margin-bottom: 24px;
+  }
+  .step .number {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 28px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 2px;
+  }
+  .step .word {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 72px;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+  }
+  .step .word.white { color: #FFFFFF; }
+  .step .word.green { color: #3ECFA0; }
+  .system-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 26px;
+    color: #3ECFA0;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    margin-bottom: 50px;
+  }
+  .quote {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 24px;
+    color: #3ECFA0;
+    font-style: italic;
+    line-height: 1.4;
+    border-left: 3px solid rgba(62,207,160,0.4);
+    padding-left: 20px;
+  }
+  .quote .attr {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 10px;
+    display: block;
+  }
+  .right-photo {
+    width: 50%;
+    height: 1350px;
+    position: relative;
+    overflow: hidden;
+  }
+  .right-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+  .right-photo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #0a0f0d 0%, transparent 30%),
+                linear-gradient(180deg, transparent 70%, rgba(10,15,13,0.8) 100%);
+    z-index: 1;
+  }
+  .bottom-strip {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(180deg, transparent 0%, #0a0f0d 30%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  .bottom-strip span {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: #3ECFA0;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="glow"></div>
+  <div class="left-content">
+    <div class="steps">
+      <div class="step">
+        <div class="number">1.</div>
+        <div class="word white">CREDIBILITY</div>
+      </div>
+      <div class="step">
+        <div class="number">2.</div>
+        <div class="word green">CAPITAL</div>
+      </div>
+      <div class="step">
+        <div class="number">3.</div>
+        <div class="word white">CASH FLOW</div>
+      </div>
+    </div>
+    <div class="system-label">The 3C System</div>
+    <div class="quote">
+      "Capital follows conviction."
+      <span class="attr">— Terry Dwobeng</span>
+    </div>
+  </div>
+  <div class="right-photo">
+    <img src="/images/terry-blue-jacket.jpg" alt="Terry">
+  </div>
+  <div class="bottom-strip">
+    <span>FREE TRAINING — APRIL 13</span>
+  </div>
+</div>
+</body>
+</html>

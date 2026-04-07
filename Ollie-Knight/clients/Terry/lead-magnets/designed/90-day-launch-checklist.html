@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 90-Day Airbnb Launch Checklist | Property Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-raised: #1a1a1a;
+    --border: #2a2a2a;
+    --coral: #FF5A5F;
+    --coral-dim: rgba(255, 90, 95, 0.12);
+    --coral-glow: rgba(255, 90, 95, 0.25);
+    --text: #f0f0f0;
+    --text-secondary: #999;
+    --text-muted: #666;
+    --white: #fff;
+    --phase-green: #34D399;
+    --phase-blue: #60A5FA;
+    --phase-purple: #A78BFA;
+    --phase-amber: #FBBF24;
+    --phase-coral: #FF5A5F;
+  }
+
+  html { font-size: 15px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    min-height: 45vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 64px 24px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--coral-glow) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  .cover-brand {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--coral);
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .cover h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 2.8rem;
+    line-height: 1.15;
+    color: var(--white);
+    max-width: 600px;
+    position: relative;
+  }
+
+  .cover h1 span {
+    color: var(--coral);
+  }
+
+  .cover-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-top: 16px;
+    max-width: 500px;
+    line-height: 1.5;
+    position: relative;
+  }
+
+  .cover-author {
+    margin-top: 32px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative;
+  }
+
+  .cover-author strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .cover-line {
+    width: 48px;
+    height: 3px;
+    background: var(--coral);
+    border-radius: 2px;
+    margin-top: 32px;
+    position: relative;
+  }
+
+  /* ── Intro ── */
+  .intro {
+    text-align: center;
+    max-width: 620px;
+    margin: 0 auto 48px;
+    padding: 0 24px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  /* ── Timeline + Phases ── */
+  .phases {
+    position: relative;
+    padding-left: 40px;
+    padding-bottom: 32px;
+  }
+
+  .phases::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      var(--phase-green),
+      var(--phase-blue),
+      var(--phase-purple),
+      var(--phase-amber),
+      var(--phase-coral)
+    );
+    border-radius: 1px;
+  }
+
+  .phase {
+    position: relative;
+    margin-bottom: 36px;
+  }
+
+  .phase-dot {
+    position: absolute;
+    left: -40px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .phase-dot-inner {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .phase[data-phase="1"] .phase-dot { border-color: var(--phase-green); }
+  .phase[data-phase="1"] .phase-dot-inner { background: var(--phase-green); }
+  .phase[data-phase="2"] .phase-dot { border-color: var(--phase-blue); }
+  .phase[data-phase="2"] .phase-dot-inner { background: var(--phase-blue); }
+  .phase[data-phase="3"] .phase-dot { border-color: var(--phase-purple); }
+  .phase[data-phase="3"] .phase-dot-inner { background: var(--phase-purple); }
+  .phase[data-phase="4"] .phase-dot { border-color: var(--phase-amber); }
+  .phase[data-phase="4"] .phase-dot-inner { background: var(--phase-amber); }
+  .phase[data-phase="5"] .phase-dot { border-color: var(--phase-coral); }
+  .phase[data-phase="5"] .phase-dot-inner { background: var(--phase-coral); }
+
+  .phase-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .phase-number {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .phase[data-phase="1"] .phase-number { background: rgba(52,211,153,0.12); color: var(--phase-green); }
+  .phase[data-phase="2"] .phase-number { background: rgba(96,165,250,0.12); color: var(--phase-blue); }
+  .phase[data-phase="3"] .phase-number { background: rgba(167,139,250,0.12); color: var(--phase-purple); }
+  .phase[data-phase="4"] .phase-number { background: rgba(251,191,36,0.12); color: var(--phase-amber); }
+  .phase[data-phase="5"] .phase-number { background: rgba(255,90,95,0.12); color: var(--phase-coral); }
+
+  .phase-title-block {
+    flex: 1;
+  }
+
+  .phase-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--white);
+  }
+
+  .phase-weeks {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .phase-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 14px;
+    padding-left: 2px;
+  }
+
+  /* ── Checklist Items ── */
+  .checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+
+  .checklist li:hover { background: var(--surface); }
+
+  .checkbox {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    margin-top: 2px;
+    position: relative;
+    background: transparent;
+  }
+
+  .phase[data-phase="1"] .checkbox { border-color: rgba(52,211,153,0.35); }
+  .phase[data-phase="2"] .checkbox { border-color: rgba(96,165,250,0.35); }
+  .phase[data-phase="3"] .checkbox { border-color: rgba(167,139,250,0.35); }
+  .phase[data-phase="4"] .checkbox { border-color: rgba(251,191,36,0.35); }
+  .phase[data-phase="5"] .checkbox { border-color: rgba(255,90,95,0.35); }
+
+  .checklist li span {
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.45;
+  }
+
+  .checklist li span strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .checkpoint {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border-left: 3px solid;
+  }
+
+  .phase[data-phase="1"] .checkpoint { background: rgba(52,211,153,0.06); border-color: var(--phase-green); color: var(--phase-green); }
+  .phase[data-phase="2"] .checkpoint { background: rgba(96,165,250,0.06); border-color: var(--phase-blue); color: var(--phase-blue); }
+  .phase[data-phase="3"] .checkpoint { background: rgba(167,139,250,0.06); border-color: var(--phase-purple); color: var(--phase-purple); }
+  .phase[data-phase="4"] .checkpoint { background: rgba(251,191,36,0.06); border-color: var(--phase-amber); color: var(--phase-amber); }
+  .phase[data-phase="5"] .checkpoint { background: rgba(255,90,95,0.06); border-color: var(--phase-coral); color: var(--phase-coral); }
+
+  /* ── Quick Rules ── */
+  .rules-section {
+    margin: 48px auto 40px;
+    max-width: 800px;
+    padding: 0 24px;
+  }
+
+  .rules-box {
+    background: var(--surface);
+    border: 1px solid var(--coral);
+    border-radius: 12px;
+    padding: 28px 28px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rules-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--coral), #ff8a8e);
+  }
+
+  .rules-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .rules-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .rules-list {
+    list-style: none;
+    counter-reset: rules;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .rules-list li {
+    counter-increment: rules;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .rules-list li::before {
+    content: counter(rules);
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--coral-dim);
+    color: var(--coral);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  .rules-list li strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    text-align: center;
+    padding: 48px 24px 32px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .cta-section h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+
+  .cta-section p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    max-width: 460px;
+    margin: 0 auto 28px;
+    line-height: 1.6;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    background: var(--coral);
+    color: var(--white);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 14px 36px;
+    border-radius: 8px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 24px rgba(255,90,95,0.3);
+  }
+
+  .cta-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 32px rgba(255,90,95,0.45);
+  }
+
+  .cta-subtext {
+    margin-top: 20px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 1px solid var(--border);
+    max-width: 800px;
+    margin: 16px auto 0;
+  }
+
+  .footer-brand {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .footer-url {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ── Print Styles ── */
+  @media print {
+    @page {
+      size: A4;
+      margin: 12mm 14mm;
+    }
+
+    html { font-size: 10.5px; }
+
+    body {
+      background: #fff !important;
+      color: #1a1a1a !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .cover {
+      min-height: auto;
+      padding: 24px 0 20px;
+    }
+
+    .cover::before { display: none; }
+
+    .cover h1 { font-size: 2rem; color: #1a1a1a !important; }
+    .cover h1 span { color: var(--coral) !important; }
+    .cover-subtitle { color: #555 !important; }
+    .cover-author { color: #777 !important; }
+    .cover-author strong { color: #444 !important; }
+
+    .intro { color: #555 !important; margin-bottom: 24px; }
+
+    .page { padding: 0; }
+
+    .phases { padding-left: 32px; }
+    .phases::before { left: 8px; }
+    .phase-dot { left: -32px; width: 20px; height: 20px; }
+
+    .phase { margin-bottom: 18px; }
+    .phase-header { padding: 10px 14px; margin-bottom: 8px; border-color: #ddd; background: #f8f8f8 !important; }
+    .phase-title { color: #1a1a1a !important; }
+    .phase-weeks { color: #888 !important; }
+    .phase-desc { margin-bottom: 8px; color: #666 !important; }
+
+    .checklist li { padding: 4px 8px; }
+    .checklist li:hover { background: transparent; }
+    .checklist li span { color: #333 !important; font-size: 0.82rem; }
+    .checklist li span strong { color: #1a1a1a !important; }
+
+    .checkbox { border-color: #999 !important; }
+
+    .checkpoint { font-size: 0.72rem; padding: 6px 10px; }
+
+    .phase[data-phase="3"] { page-break-before: always; }
+
+    .rules-section { margin: 20px auto 16px; padding: 0; }
+    .rules-box { padding: 16px 18px 14px; border-color: var(--coral); }
+    .rules-box::before { display: none; }
+    .rules-title { color: #1a1a1a !important; }
+    .rules-subtitle { color: #777 !important; }
+    .rules-list li { font-size: 0.78rem; color: #444 !important; gap: 8px; }
+    .rules-list li strong { color: #1a1a1a !important; }
+
+    .cta-section { padding: 20px 0 12px; }
+    .cta-section h2 { color: #1a1a1a !important; font-size: 1.2rem; }
+    .cta-section p { color: #555 !important; font-size: 0.8rem; }
+    .cta-btn { box-shadow: none; padding: 10px 28px; font-size: 0.8rem; }
+    .cta-subtext { color: #777 !important; }
+
+    .footer { padding: 16px 0; margin-top: 8px; border-color: #ddd; }
+    .footer-brand, .footer-url { color: #999 !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cover -->
+<section class="cover">
+  <div class="cover-brand">Property Labs</div>
+  <h1>The <span>90-Day</span> Airbnb Launch Checklist</h1>
+  <p class="cover-subtitle">Every step from zero to your first profitable Airbnb. Tick them off as you go.</p>
+  <p class="cover-author">By <strong>Terry Dwobeng</strong> | Property Labs</p>
+  <div class="cover-line"></div>
+</section>
+
+<!-- Intro -->
+<div class="page">
+  <p class="intro">
+    Most people spend months "researching" and never actually launch. This checklist is the exact sequence I'd follow if I was starting from scratch today. No theory. No fluff. Just the steps, in order. Print it out. Stick it on your wall. Start ticking.
+  </p>
+</div>
+
+<!-- Phases -->
+<div class="page">
+  <div class="phases">
+
+    <!-- Phase 1 -->
+    <div class="phase" data-phase="1">
+      <div class="phase-dot"><div class="phase-dot-inner"></div></div>
+      <div class="phase-header">
+        <span class="phase-number">Phase 1</span>
+        <div class="phase-title-block">
+          <div class="phase-title">Credibility</div>
+          <div class="phase-weeks">Weeks 1 - 2</div>
+        </div>
+      </div>
+      <p class="phase-desc">Before you touch a property, you need to know your stuff and look like you know your stuff.</p>
+      <ul class="checklist">
+        <li><div class="checkbox"></div><span>Research your target area (shortlist 3 cities or boroughs)</span></li>
+        <li><div class="checkbox"></div><span>Analyse 10 existing Airbnb listings in each area (note pricing, photos, reviews)</span></li>
+        <li><div class="checkbox"></div><span>Calculate average nightly rates and occupancy for your target areas</span></li>
+        <li><div class="checkbox"></div><span>Complete a property management basics course (free ones count)</span></li>
+        <li><div class="checkbox"></div><span>Set up your business Instagram or social media presence</span></li>
+        <li><div class="checkbox"></div><span>Create your investor credibility one-pager (who you are, what you do, your plan)</span></li>
+        <li><div class="checkbox"></div><span>Join 3 local property networking groups (Facebook, Meetup, or in-person)</span></li>
+        <li><div class="checkbox"></div><span>Attend at least 1 property meetup or event (show your face, collect contacts)</span></li>
+      </ul>
+      <div class="checkpoint">Checkpoint: You can confidently explain your Airbnb strategy to anyone in under 2 minutes.</div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase" data-phase="2">
+      <div class="phase-dot"><div class="phase-dot-inner"></div></div>
+      <div class="phase-header">
+        <span class="phase-number">Phase 2</span>
+        <div class="phase-title-block">
+          <div class="phase-title">Capital</div>
+          <div class="phase-weeks">Weeks 3 - 5</div>
+        </div>
+      </div>
+      <p class="phase-desc">You don't need a mortgage. You need a plan and the right conversations.</p>
+      <ul class="checklist">
+        <li><div class="checkbox"></div><span>List 20 people in your network who might invest or lend</span></li>
+        <li><div class="checkbox"></div><span>Practise your pitch with a trusted friend (get honest feedback)</span></li>
+        <li><div class="checkbox"></div><span>Approach your first 5 potential investors</span></li>
+        <li><div class="checkbox"></div><span>Follow up with everyone who said "let me think about it"</span></li>
+        <li><div class="checkbox"></div><span>Secure your first investment commitment</span></li>
+        <li><div class="checkbox"></div><span>Open a business bank account (keep everything separate from personal)</span></li>
+        <li><div class="checkbox"></div><span>Get a basic legal agreement template (joint venture or loan agreement)</span></li>
+        <li><div class="checkbox"></div><span><strong>Total capital target: &pound;5k-&pound;25k secured</strong></span></li>
+      </ul>
+      <div class="checkpoint">Checkpoint: Money is committed and sitting in a business account, ready to deploy.</div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase" data-phase="3">
+      <div class="phase-dot"><div class="phase-dot-inner"></div></div>
+      <div class="phase-header">
+        <span class="phase-number">Phase 3</span>
+        <div class="phase-title-block">
+          <div class="phase-title">Property</div>
+          <div class="phase-weeks">Weeks 6 - 8</div>
+        </div>
+      </div>
+      <p class="phase-desc">This is where most people stall. Don't overthink it. Run the numbers, make a decision, move.</p>
+      <ul class="checklist">
+        <li><div class="checkbox"></div><span>Contact 10 letting agents in your target area</span></li>
+        <li><div class="checkbox"></div><span>View at least 5 properties</span></li>
+        <li><div class="checkbox"></div><span>Run each one through the Deal Analyser (if it doesn't stack, move on)</span></li>
+        <li><div class="checkbox"></div><span>Negotiate terms (rent-to-rent or management agreement)</span></li>
+        <li><div class="checkbox"></div><span>Secure your first property</span></li>
+        <li><div class="checkbox"></div><span>Get landlord permission for short-term lets (in writing)</span></li>
+        <li><div class="checkbox"></div><span>Check local council regulations and any licensing requirements</span></li>
+        <li><div class="checkbox"></div><span>Arrange insurance (short-term let cover, not standard landlord insurance)</span></li>
+      </ul>
+      <div class="checkpoint">Checkpoint: You have keys in your hand and a signed agreement.</div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase" data-phase="4">
+      <div class="phase-dot"><div class="phase-dot-inner"></div></div>
+      <div class="phase-header">
+        <span class="phase-number">Phase 4</span>
+        <div class="phase-title-block">
+          <div class="phase-title">Launch</div>
+          <div class="phase-weeks">Weeks 9 - 11</div>
+        </div>
+      </div>
+      <p class="phase-desc">Speed matters here. The faster you go live, the faster you earn. Don't wait for perfect.</p>
+      <ul class="checklist">
+        <li><div class="checkbox"></div><span>Furnish the property <strong>(budget: &pound;2k-&pound;4k, no more)</strong></span></li>
+        <li><div class="checkbox"></div><span>Professional photography -- or use your iPhone with good natural lighting</span></li>
+        <li><div class="checkbox"></div><span>Write a compelling Airbnb listing title and description</span></li>
+        <li><div class="checkbox"></div><span>Set competitive pricing (first 5 bookings at a discount to build reviews)</span></li>
+        <li><div class="checkbox"></div><span>Create a house manual and guest welcome pack</span></li>
+        <li><div class="checkbox"></div><span>Set up your cleaning system (reliable cleaner on speed dial)</span></li>
+        <li><div class="checkbox"></div><span>Automate messaging (check-in instructions, check-out reminders)</span></li>
+        <li><div class="checkbox"></div><span><strong>Go live on Airbnb + Booking.com</strong></span></li>
+      </ul>
+      <div class="checkpoint">Checkpoint: Your listing is live and bookable. You're in business.</div>
+    </div>
+
+    <!-- Phase 5 -->
+    <div class="phase" data-phase="5">
+      <div class="phase-dot"><div class="phase-dot-inner"></div></div>
+      <div class="phase-header">
+        <span class="phase-number">Phase 5</span>
+        <div class="phase-title-block">
+          <div class="phase-title">Cash Flow</div>
+          <div class="phase-weeks">Week 12</div>
+        </div>
+      </div>
+      <p class="phase-desc">Now prove the model works. Track everything.</p>
+      <ul class="checklist">
+        <li><div class="checkbox"></div><span>First booking confirmed</span></li>
+        <li><div class="checkbox"></div><span>First 5-star review received</span></li>
+        <li><div class="checkbox"></div><span>Monthly P&amp;L tracked in a spreadsheet (revenue minus all costs)</span></li>
+        <li><div class="checkbox"></div><span>Systems documented so someone else could run it</span></li>
+        <li><div class="checkbox"></div><span>Plan for unit #2 started</span></li>
+      </ul>
+      <div class="checkpoint">Checkpoint: You have a profitable, running Airbnb and a clear path to the next one.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Terry's Quick Rules -->
+<div class="rules-section">
+  <div class="rules-box">
+    <div class="rules-title">Terry's Quick Rules</div>
+    <div class="rules-subtitle">Non-negotiable. Learned the expensive way so you don't have to.</div>
+    <ol class="rules-list">
+      <li><strong>Never spend more than &pound;4k furnishing a 2-bed.</strong> You're not designing a show home. You're building a business.</li>
+      <li><strong>Target minimum 65% occupancy.</strong> Below that, your numbers won't work long-term.</li>
+      <li><strong>If the deal doesn't make &pound;500/month profit, walk away.</strong> There are plenty of deals. Don't force one that's marginal.</li>
+      <li><strong>Always have a 3-month cash reserve.</strong> Things break. Bookings dip. Be ready.</li>
+      <li><strong>Your first unit is the hardest -- it gets easier after that.</strong> The skills, systems, and confidence you build on unit one carry straight into unit two.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Want Help Completing This in Half the Time?</h2>
+  <p>Get hands-on guidance, strategy, and accountability from someone who's done it. Book a free 30-minute strategy call.</p>
+  <a href="https://calendly.com/d/cxst-rp2-k95/property-labs-strategy-call-lm" class="cta-btn">Book Your Free Strategy Call</a>
+  <p class="cta-subtext">Or join the free live training on April 13, 2026 -- details at propertylabs.to</p>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-brand">Property Labs</div>
+  <div class="footer-url">propertylabs.to</div>
+</footer>
+
+</body>
+</html>

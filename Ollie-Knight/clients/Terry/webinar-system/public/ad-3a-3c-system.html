@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 1080px;
+    height: 1350px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0a0f0d;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .container {
+    width: 1080px;
+    height: 1350px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(62,207,160,0.1) 0%, rgba(62,207,160,0.03) 40%, transparent 70%);
+    pointer-events: none;
+  }
+  .steps {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .step {
+    margin-bottom: 30px;
+  }
+  .step .number {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 36px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 4px;
+  }
+  .step .word {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 96px;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+  }
+  .step .word.white { color: #FFFFFF; }
+  .step .word.green { color: #3ECFA0; }
+  .system-label {
+    position: relative;
+    z-index: 2;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 30px;
+    color: #3ECFA0;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+  }
+  .bottom-text {
+    position: absolute;
+    bottom: 50px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 2;
+  }
+  .bottom-text span {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 26px;
+    color: #FFFFFF;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="glow"></div>
+  <div class="steps">
+    <div class="step">
+      <div class="number">1.</div>
+      <div class="word white">CREDIBILITY</div>
+    </div>
+    <div class="step">
+      <div class="number">2.</div>
+      <div class="word green">CAPITAL</div>
+    </div>
+    <div class="step">
+      <div class="number">3.</div>
+      <div class="word white">CASH FLOW</div>
+    </div>
+  </div>
+  <div class="system-label">The 3C System</div>
+  <div class="bottom-text">
+    <span>Free Live Training — April 13th — 7PM BST</span>
+  </div>
+</div>
+</body>
+</html>

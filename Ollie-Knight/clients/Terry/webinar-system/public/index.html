@@ -1,0 +1,3292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Property Labs — Webinar Funnel Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --surface2: #141414;
+    --border: #1e1e1e;
+    --accent: #3ECFA0;
+    --accent2: #888888;
+    --green: #22c55e;
+    --yellow: #3ECFA0;
+    --red: #ef4444;
+    --text: #e8e8e8;
+    --text2: #808080;
+    --text3: #4a4a4a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* ─── TOP NAV ─── */
+  .nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 12px; }
+  .nav-logo {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: #1a1a1a; border: 1px solid #2a2a2a;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; color: #3ECFA0;
+  }
+  .nav-title { font-weight: 700; font-size: 16px; }
+  .nav-subtitle { font-size: 11px; color: var(--text2); margin-top: 1px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .last-updated { font-size: 12px; color: var(--text3); }
+  .live-badge {
+    background: rgba(34,197,94,0.15); color: var(--green);
+    border: 1px solid rgba(34,197,94,0.3);
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  .live-badge.stale {
+    background: rgba(245,158,11,0.15); color: var(--yellow);
+    border-color: rgba(245,158,11,0.3);
+  }
+  .live-badge.stale .live-dot { background: var(--yellow); animation: none; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+  /* Settings gear button */
+  .btn-icon {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 16px; transition: all 0.2s; flex-shrink: 0;
+  }
+  .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── MAIN LAYOUT ─── */
+  .main { padding: 24px 28px; max-width: 1600px; margin: 0 auto; }
+
+  /* ─── SECTION HEADER ─── */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .section-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
+
+  /* ─── CONTROLS ─── */
+  .controls {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .control-group { display: flex; align-items: center; gap: 8px; }
+  .control-label { font-size: 12px; color: var(--text2); }
+  select, input[type="date"] {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 8px 12px; border-radius: 8px;
+    font-size: 13px; cursor: pointer; outline: none;
+    transition: border-color 0.2s;
+  }
+  select:hover, input[type="date"]:hover { border-color: var(--accent); }
+  .btn {
+    padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.2s;
+  }
+  .btn-primary {
+    background: #3ECFA0; color: #000000;
+  }
+  .btn-primary:hover { background: #2BB88A; }
+  .btn-ghost {
+    background: var(--surface2); color: var(--text); border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm {
+    padding: 5px 10px; font-size: 11px; font-weight: 600;
+    border-radius: 6px; cursor: pointer; border: none; transition: all 0.2s;
+  }
+  .btn-sm-accent { background: rgba(62,207,160,0.08); color: var(--text); border: 1px solid rgba(62,207,160,0.15); }
+  .btn-sm-accent:hover { background: rgba(62,207,160,0.15); color: #fff; }
+  .btn-sm-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-sm-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .divider { width: 1px; height: 28px; background: var(--border); }
+
+  /* ─── DATA SOURCES PANEL ─── */
+  .data-sources-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .ds-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .ds-title {
+    font-size: 12px; font-weight: 700; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ds-collapse-btn {
+    background: none; border: none; color: var(--text3);
+    cursor: pointer; font-size: 13px; padding: 2px 6px;
+    border-radius: 4px; transition: all 0.2s;
+  }
+  .ds-collapse-btn:hover { color: var(--text); }
+  .ds-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .ds-row {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    transition: border-color 0.2s;
+  }
+  .ds-row:hover { border-color: rgba(255,255,255,0.15); }
+  .ds-row.connected { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.04); }
+  .ds-row.error { border-color: rgba(239,68,68,0.25); }
+  .ds-icon { font-size: 18px; flex-shrink: 0; }
+  .ds-info { flex: 1; min-width: 0; }
+  .ds-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .ds-status-text { font-size: 10px; color: var(--text3); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ds-status-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    background: #333; opacity: 1;
+    transition: all 0.3s ease;
+    border: 1px solid #444;
+  }
+  .ds-status-dot.green {
+    background: var(--green); opacity: 1;
+    border-color: var(--green);
+    box-shadow: 0 0 8px rgba(34,197,94,0.6), 0 0 16px rgba(34,197,94,0.3);
+    animation: ds-glow 2s ease-in-out infinite;
+  }
+  .ds-status-dot.warning {
+    background: var(--yellow); opacity: 1;
+    border-color: var(--yellow);
+    box-shadow: 0 0 8px rgba(245,158,11,0.6), 0 0 16px rgba(245,158,11,0.3);
+    animation: ds-glow-warn 2s ease-in-out infinite;
+  }
+  @keyframes ds-glow-warn {
+    0%, 100% { box-shadow: 0 0 8px rgba(245,158,11,0.6), 0 0 16px rgba(245,158,11,0.3); }
+    50% { box-shadow: 0 0 14px rgba(245,158,11,0.9), 0 0 24px rgba(245,158,11,0.5); }
+  }
+  .ds-status-dot.checking {
+    background: var(--yellow); opacity: 1;
+    border-color: var(--yellow);
+    box-shadow: 0 0 6px rgba(245,158,11,0.4);
+    animation: ds-pulse-check 1.5s ease-in-out infinite;
+  }
+  @keyframes ds-glow {
+    0%, 100% { box-shadow: 0 0 8px rgba(34,197,94,0.6), 0 0 16px rgba(34,197,94,0.3); }
+    50% { box-shadow: 0 0 14px rgba(34,197,94,0.9), 0 0 24px rgba(34,197,94,0.5); }
+  }
+  @keyframes ds-pulse-check {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .ds-action { flex-shrink: 0; }
+
+  /* ─── CAMPAIGN SELECTOR ─── */
+  .campaign-selector {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .cs-left { display: flex; align-items: center; gap: 14px; }
+  .cs-right { display: flex; align-items: center; gap: 12px; }
+  .cs-dropdown-wrap select {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 8px 14px; border-radius: 8px;
+    font-size: 14px; font-weight: 700; cursor: pointer; outline: none;
+    min-width: 200px;
+  }
+  .cs-dropdown-wrap select:hover { border-color: var(--accent); }
+  .cs-dates {
+    font-size: 13px; color: var(--text2);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .cs-date-range { white-space: nowrap; }
+  .cs-status {
+    font-size: 12px; color: var(--text2);
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 5px 12px; border-radius: 6px;
+    display: flex; align-items: center; gap: 6px;
+    white-space: nowrap;
+  }
+  .cs-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    display: inline-block;
+  }
+  .cs-dot.active { background: var(--green); box-shadow: 0 0 6px rgba(34,197,94,0.4); }
+  .cs-dot.upcoming { background: var(--yellow); }
+  .cs-dot.past { background: var(--text3); }
+  .cs-dot.all { background: var(--accent2); }
+
+  /* ─── DATA SOURCE EXPANDABLE DETAILS ─── */
+  .ds-card { display: flex; flex-direction: column; }
+  .ds-expand-panel {
+    display: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 14px;
+    margin-top: -1px;
+  }
+  .ds-card.expanded .ds-expand-panel { display: block; }
+  .ds-card.expanded .ds-row { border-radius: 8px 8px 0 0; }
+  .ds-expand-panel .ds-detail-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .ds-expand-panel .ds-detail-label {
+    font-size: 10px; color: var(--text3); text-transform: uppercase;
+    letter-spacing: 0.5px; min-width: 60px; flex-shrink: 0;
+  }
+  .ds-expand-panel .ds-endpoint {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 6px 10px; font-size: 11px;
+    color: var(--accent); font-family: monospace;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .ds-expand-panel .ds-copy-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); padding: 4px 8px; border-radius: 4px;
+    cursor: pointer; font-size: 11px; transition: all 0.2s; flex-shrink: 0;
+  }
+  .ds-expand-panel .ds-copy-btn:hover { color: var(--text); border-color: var(--accent); }
+  .ds-expand-panel .ds-steps {
+    font-size: 11px; color: var(--text2); line-height: 1.7;
+    margin: 8px 0;
+  }
+  .ds-expand-panel .ds-steps ol { margin: 0; padding-left: 16px; }
+  .ds-expand-panel .ds-steps li { margin-bottom: 2px; }
+  .ds-expand-panel .ds-btn-row {
+    display: flex; gap: 8px; margin-top: 10px;
+  }
+  .ds-expand-panel .ds-link-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 6px 12px; border-radius: 6px;
+    font-size: 11px; cursor: pointer; text-decoration: none;
+    transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .ds-expand-panel .ds-link-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .ds-expand-panel .ds-test-btn {
+    background: rgba(62,207,160,0.06); border: 1px solid rgba(62,207,160,0.12);
+    color: var(--text); padding: 6px 12px; border-radius: 6px;
+    font-size: 11px; cursor: pointer; transition: all 0.2s;
+  }
+  .ds-expand-panel .ds-test-btn:hover { background: rgba(62,207,160,0.1); }
+  .ds-expand-panel .ds-test-result {
+    font-size: 11px; margin-top: 6px; padding: 6px 10px;
+    border-radius: 4px; display: none;
+  }
+  .ds-expand-panel .ds-test-result.ok {
+    display: block; background: rgba(34,197,94,0.1);
+    color: var(--green); border: 1px solid rgba(34,197,94,0.2);
+  }
+  .ds-expand-panel .ds-test-result.fail {
+    display: block; background: rgba(239,68,68,0.1);
+    color: var(--red); border: 1px solid rgba(239,68,68,0.2);
+  }
+
+  /* ─── KPI CARDS ─── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .kpi-card:hover { border-color: #2a2a2a; transform: translateY(-1px); }
+  .kpi-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.yellow::before { background: var(--yellow); }
+  .kpi-card.red::before { background: var(--red); }
+  .kpi-card.blue::before { background: var(--text2); }
+  .kpi-card.purple::before { background: var(--accent); }
+  .kpi-card.emerald::before { background: var(--accent); }
+  .kpi-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; margin-bottom: 10px; }
+  .kpi-value { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+  .kpi-value.green { color: var(--green); }
+  .kpi-value.yellow { color: var(--yellow); }
+  .kpi-value.red { color: var(--red); }
+  .kpi-value.blue { color: var(--text); }
+  .kpi-value.white { color: var(--text); }
+  .kpi-value.emerald { color: var(--accent); }
+  .kpi-meta { display: flex; align-items: center; gap: 8px; }
+  .kpi-change {
+    font-size: 12px; font-weight: 600; padding: 2px 7px; border-radius: 5px;
+  }
+  .kpi-change.up { background: rgba(34,197,94,0.12); color: var(--green); }
+  .kpi-change.down { background: rgba(239,68,68,0.12); color: var(--red); }
+  .kpi-change.neutral { background: rgba(139,149,168,0.12); color: var(--text2); }
+  .kpi-bench { font-size: 11px; color: var(--text3); }
+  .status-badge {
+    position: absolute; top: 16px; right: 16px;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .status-badge.green { background: rgba(34,197,94,0.12); }
+  .status-badge.yellow { background: rgba(245,158,11,0.12); }
+  .status-badge.red { background: rgba(239,68,68,0.12); }
+
+  /* ─── CHARTS ROW ─── */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+  }
+  .chart-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .chart-subtitle { font-size: 12px; color: var(--text2); margin-bottom: 20px; }
+  .chart-wrap { position: relative; height: 220px; }
+
+  /* ─── FUNNEL ─── */
+  .funnel-section {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 24px; margin-bottom: 24px;
+  }
+  .funnel-flow {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr) repeat(0, 0);
+    gap: 0;
+    align-items: stretch;
+    overflow-x: auto;
+  }
+  .funnel-flow-inner {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    min-width: 900px;
+  }
+  .fn-step {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 8px 12px;
+    position: relative; min-width: 80px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .fn-step:hover { border-color: #2a2a2a; box-shadow: 0 0 0 1px #2a2a2a; }
+  .fn-step.worst { border-color: var(--red) !important; box-shadow: 0 0 0 2px rgba(239,68,68,0.25) !important; }
+  .fn-step-icon { font-size: 18px; margin-bottom: 6px; }
+  .fn-step-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; text-align: center; line-height: 1.3; margin-bottom: 8px; }
+  .fn-step-val { font-size: 20px; font-weight: 900; color: var(--text); line-height: 1; }
+  .fn-step-sub { font-size: 10px; color: var(--text3); margin-top: 3px; }
+  .fn-step-pct-of-reg {
+    font-size: 10px; color: var(--text3); margin-top: 5px;
+    background: var(--surface); padding: 2px 6px; border-radius: 4px;
+  }
+  .fn-connector {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 0 4px; flex-shrink: 0; width: 80px;
+  }
+  .fn-arrow-line {
+    width: 100%; height: 2px; position: relative;
+    margin-bottom: 0;
+  }
+  .fn-arrow-line::after {
+    content: '\u25B6';
+    position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+    font-size: 10px;
+  }
+  .fn-conv {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 8px 6px; border-radius: 8px; width: 100%;
+    border: 1px solid transparent;
+    transition: transform 0.2s;
+    cursor: default;
+  }
+  .fn-conv:hover { transform: scale(1.06); }
+  .fn-conv.green { background: rgba(34,197,94,0.10); border-color: rgba(34,197,94,0.25); }
+  .fn-conv.yellow { background: rgba(245,158,11,0.10); border-color: rgba(245,158,11,0.25); }
+  .fn-conv.red { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); }
+  .fn-conv-pct { font-size: 17px; font-weight: 900; line-height: 1; }
+  .fn-conv.green .fn-conv-pct { color: var(--green); }
+  .fn-conv.yellow .fn-conv-pct { color: var(--yellow); }
+  .fn-conv.red .fn-conv-pct { color: var(--red); }
+  .fn-conv-label { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; text-align: center; }
+  .fn-conv-bench { font-size: 9px; color: var(--text3); text-align: center; }
+  .fn-conv-status { font-size: 11px; }
+  .funnel-worst-callout {
+    margin-top: 20px; padding: 12px 16px; border-radius: 8px;
+    background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2);
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .funnel-best-callout {
+    background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.2);
+  }
+  .callout-icon { font-size: 20px; flex-shrink: 0; }
+  .callout-text { font-size: 12px; line-height: 1.5; }
+  .callout-text strong { font-size: 13px; }
+  .funnel-table-wrap { margin-top: 20px; overflow-x: auto; }
+  .funnel-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+  .funnel-table th { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+  .funnel-table td { padding: 9px 12px; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+  .funnel-table tr:last-child td { border-bottom: none; }
+  .drop-bar-track { width: 120px; height: 6px; border-radius: 3px; background: var(--surface2); overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .drop-bar-fill { height: 100%; border-radius: 3px; }
+  .opportunity-tag { font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+  .opp-high { background: rgba(239,68,68,0.12); color: var(--red); }
+  .opp-med { background: rgba(245,158,11,0.12); color: var(--yellow); }
+  .opp-good { background: rgba(34,197,94,0.12); color: var(--green); }
+
+  /* ─── BOTTOM GRID ─── */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .table-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px;
+    font-weight: 600; padding: 8px 12px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .pill {
+    display: inline-block; padding: 3px 8px; border-radius: 5px;
+    font-size: 11px; font-weight: 600;
+  }
+  .pill-green { background: rgba(34,197,94,0.12); color: var(--green); }
+  .pill-yellow { background: rgba(245,158,11,0.12); color: var(--yellow); }
+  .pill-red { background: rgba(239,68,68,0.12); color: var(--red); }
+  .pill-blue { background: rgba(62,207,160,0.08); color: var(--accent); }
+
+  /* ─── ALERT BANNER ─── */
+  .alert-banner {
+    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .alert-icon { font-size: 18px; }
+  .alert-text { font-size: 13px; }
+  .alert-text strong { color: var(--red); }
+
+  /* ─── SHOW RATE GAUGE ─── */
+  .gauge-section {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;
+  }
+  .gauge-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; text-align: center;
+  }
+  .gauge-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; margin-bottom: 12px; }
+  .gauge-wrap { position: relative; width: 110px; height: 60px; margin: 0 auto 8px; }
+  .gauge-bg, .gauge-fill { position: absolute; }
+  .gauge-value { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+  .gauge-target { font-size: 11px; color: var(--text3); }
+  .gauge-bar-track {
+    width: 100%; height: 8px; border-radius: 4px;
+    background: var(--surface2); overflow: hidden; margin: 8px 0 4px;
+  }
+  .gauge-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+
+  /* ─── REVENUE SPLIT ─── */
+  .revenue-split { display: flex; flex-direction: column; gap: 10px; }
+  .rev-tier-row { display: flex; align-items: center; gap: 12px; }
+  .rev-tier-name { font-size: 12px; color: var(--text2); width: 100px; flex-shrink: 0; }
+  .rev-tier-bar-track { flex: 1; height: 6px; border-radius: 3px; background: var(--surface2); overflow: hidden; }
+  .rev-tier-bar-fill { height: 100%; border-radius: 3px; }
+  .rev-tier-val { font-size: 12px; font-weight: 700; width: 70px; text-align: right; flex-shrink: 0; }
+
+  /* ─── UTM ATTRIBUTION PANEL ─── */
+  .utm-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 24px; overflow: hidden;
+  }
+  .utm-panel-header {
+    padding: 16px 20px; display: flex; align-items: center;
+    justify-content: space-between; border-bottom: 1px solid var(--border);
+    cursor: pointer; user-select: none;
+  }
+  .utm-panel-header:hover { background: rgba(255,255,255,0.02); }
+  .utm-panel-title {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .utm-panel-toggle {
+    font-size: 12px; color: var(--text3); transition: transform 0.2s;
+  }
+  .utm-panel-toggle.open { transform: rotate(180deg); }
+  .utm-panel-body {
+    padding: 20px; display: none;
+  }
+  .utm-panel-body.open { display: block; }
+  .utm-inner-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .utm-chart-wrap { position: relative; height: 200px; }
+  .utm-table-wrap { overflow: auto; max-height: 240px; }
+  .utm-table { width: 100%; border-collapse: collapse; }
+  .utm-table th { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: left; position: sticky; top: 0; background: var(--surface); }
+  .utm-table td { padding: 8px 10px; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .utm-table tr:last-child td { border-bottom: none; }
+  .utm-no-data { color: var(--text3); font-size: 12px; font-style: italic; padding: 20px 0; text-align: center; }
+  .utm-source-bar {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  }
+  .utm-source-name { font-size: 12px; color: var(--text2); width: 80px; flex-shrink: 0; }
+  .utm-bar-track { flex: 1; height: 6px; border-radius: 3px; background: var(--surface2); overflow: hidden; }
+  .utm-bar-fill { height: 100%; border-radius: 3px; }
+  .utm-source-count { font-size: 12px; font-weight: 700; width: 32px; text-align: right; flex-shrink: 0; }
+
+  /* ─── TRAFFIC SOURCE SPLIT ─── */
+  .traffic-source-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 24px; overflow: hidden;
+  }
+  .ts-header {
+    padding: 14px 20px; display: flex; align-items: center;
+    justify-content: space-between; border-bottom: 1px solid var(--border);
+  }
+  .ts-title {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ts-body { padding: 20px; }
+  .ts-split {
+    display: flex; align-items: center; justify-content: center; gap: 0;
+  }
+  .ts-source-block {
+    display: flex; align-items: center; gap: 12px; padding: 12px 24px;
+    flex: 1; justify-content: center;
+  }
+  .ts-source-icon { font-size: 28px; }
+  .ts-source-info { display: flex; flex-direction: column; gap: 2px; }
+  .ts-source-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .ts-source-value { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .ts-paid .ts-source-value { color: #3ECFA0; }
+  .ts-organic .ts-source-value { color: #22c55e; }
+  .ts-direct .ts-source-value { color: #888; }
+  .ts-source-pct {
+    font-size: 18px; font-weight: 700; padding: 4px 10px; border-radius: 6px;
+    min-width: 50px; text-align: center;
+  }
+  .ts-paid .ts-source-pct { color: #3ECFA0; background: rgba(62,207,160,0.1); }
+  .ts-organic .ts-source-pct { color: #22c55e; background: rgba(34,197,94,0.1); }
+  .ts-direct .ts-source-pct { color: #888; background: rgba(136,136,136,0.1); }
+  .ts-divider {
+    width: 1px; height: 48px; background: var(--border); flex-shrink: 0;
+  }
+  .ts-bar-container {
+    display: flex; height: 8px; border-radius: 4px; overflow: hidden;
+    background: var(--surface2); margin-top: 16px;
+  }
+  .ts-bar-fill { height: 100%; transition: width 0.6s ease; }
+  .ts-bar-paid { background: #3ECFA0; }
+  .ts-bar-organic { background: #22c55e; }
+  .ts-bar-direct { background: #555; }
+  @media (max-width: 768px) {
+    .ts-split { flex-direction: column; gap: 8px; }
+    .ts-divider { width: 80%; height: 1px; }
+    .ts-source-block { padding: 8px 16px; }
+  }
+
+  /* ─── EDIT DATA MODAL ─── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 1000; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 28px; width: 680px; max-height: 90vh; overflow-y: auto;
+    max-width: calc(100vw - 40px);
+  }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .modal-title { font-size: 18px; font-weight: 700; }
+  .modal-close { background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; padding: 4px; }
+  .modal-close:hover { color: var(--text); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 11px; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-input {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 9px 12px; border-radius: 8px;
+    font-size: 13px; outline: none; transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: #3a3a3a; }
+  .form-section-title {
+    font-size: 12px; font-weight: 700; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    padding: 10px 0 6px; border-top: 1px solid var(--border); margin-top: 4px;
+    grid-column: span 2;
+  }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ─── SETTINGS MODAL ─── */
+  .settings-modal {
+    width: 520px;
+  }
+  .settings-section {
+    margin-bottom: 24px;
+  }
+  .settings-section-title {
+    font-size: 12px; font-weight: 700; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .settings-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+  }
+  .settings-label {
+    font-size: 12px; color: var(--text2); width: 160px; flex-shrink: 0;
+  }
+  .settings-input {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 8px 12px; border-radius: 8px;
+    font-size: 12px; outline: none; transition: border-color 0.2s;
+    font-family: 'SF Mono', 'Consolas', monospace;
+  }
+  .settings-input:focus { border-color: #3a3a3a; }
+  .settings-input::placeholder { color: var(--text3); font-style: italic; }
+  .settings-desc { font-size: 11px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
+  .settings-status-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: 6px; margin-top: 8px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; color: var(--text2);
+  }
+  .settings-status-row.success { background: rgba(34,197,94,0.07); border-color: rgba(34,197,94,0.2); color: var(--green); }
+  .settings-status-row.error { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.2); color: var(--red); }
+  .toggle-switch {
+    position: relative; width: 36px; height: 20px; flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; transition: 0.2s;
+  }
+  .toggle-slider:before {
+    position: absolute; content: ''; width: 14px; height: 14px;
+    left: 2px; bottom: 2px; background: var(--text3);
+    border-radius: 50%; transition: 0.2s;
+  }
+  input:checked + .toggle-slider { background: rgba(62,207,160,0.15); border-color: #3ECFA0; }
+  input:checked + .toggle-slider:before { transform: translateX(16px); background: #3ECFA0; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1200px) {
+    .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    .funnel-steps { grid-template-columns: repeat(4, 1fr); height: auto; }
+    .ds-grid { grid-template-columns: repeat(2, 1fr); }
+    .utm-inner-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .main { padding: 16px; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .charts-grid, .bottom-grid { grid-template-columns: 1fr; }
+    .gauge-section { grid-template-columns: 1fr 1fr; }
+    .ds-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .no-data { color: var(--text3); font-style: italic; font-size: 12px; }
+
+  /* Tooltip */
+  .tooltip-trigger { position: relative; cursor: help; }
+  .tooltip-trigger:hover .tooltip-box { display: block; }
+  .tooltip-box {
+    display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%); background: #141414; border: 1px solid var(--border);
+    color: var(--text); font-size: 11px; padding: 6px 10px; border-radius: 6px;
+    white-space: nowrap; z-index: 99; pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+
+  /* ── Status Bar ── */
+  .status-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 8px 28px; display: flex; align-items: center; gap: 24px; font-size: 11px; overflow-x: auto; }
+  .status-bar .sb-label { color: var(--text3); font-weight: 600; white-space: nowrap; }
+  .status-bar .sb-item { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--text2); }
+  .status-bar .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green { background: var(--green); box-shadow: 0 0 4px rgba(34,197,94,0.5); }
+  .dot-amber { background: var(--yellow); box-shadow: 0 0 4px rgba(245,158,11,0.5); }
+  .dot-red { background: var(--red); box-shadow: 0 0 4px rgba(239,68,68,0.5); }
+  .status-bar .sb-item { cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.15s; }
+  .status-bar .sb-item:hover { background: rgba(255,255,255,0.05); }
+
+  /* ── Connection Modal ── */
+  #conn-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9998; }
+  #conn-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; width: 100%; max-width: 480px; z-index: 9999; }
+  #conn-modal h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  #conn-modal .cm-status { font-size: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; color: var(--text2); }
+  #conn-modal .cm-instructions { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; padding: 12px 16px; background: var(--surface2); border-radius: 8px; border: 1px solid var(--border); }
+  #conn-modal .cm-instructions ol { padding-left: 18px; margin: 8px 0 0; }
+  #conn-modal .cm-instructions li { margin-bottom: 6px; }
+  #conn-modal label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+  #conn-modal input[type="text"] { width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 13px; outline: none; margin-bottom: 16px; font-family: monospace; }
+  #conn-modal input[type="text"]:focus { border-color: #333; }
+  #conn-modal .cm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  #conn-modal .cm-btn { padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.15s; }
+  #conn-modal .cm-btn-primary { background: var(--accent); color: #000; }
+  #conn-modal .cm-btn-primary:hover { opacity: 0.9; }
+  #conn-modal .cm-btn-cancel { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  #conn-modal .cm-btn-cancel:hover { background: var(--border); }
+  #conn-modal .cm-success { display: none; text-align: center; padding: 20px 0; }
+  #conn-modal .cm-success .check { font-size: 40px; margin-bottom: 8px; color: var(--green); }
+  #conn-modal .cm-success p { color: var(--green); font-weight: 600; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="status-bar">
+  <span class="sb-label">Connections</span>
+  <span class="sb-item" onclick="openConn('gsheets')" id="conn-gsheets"><span class="dot dot-green"></span> Google Sheets</span>
+  <span class="sb-item" onclick="openConn('wj')" id="conn-wj"><span class="dot dot-green"></span> WebinarJam</span>
+  <span class="sb-item" onclick="openConn('meta')" id="conn-meta"><span class="dot dot-green"></span> Meta Ads API</span>
+  <span class="sb-item" onclick="openConn('calendly')" id="conn-calendly"><span class="dot dot-green"></span> Calendly</span>
+  <span class="sb-item" onclick="openConn('utm')" id="conn-utm"><span class="dot dot-green"></span> UTM Tracking</span>
+  <span class="sb-item" onclick="openConn('ghl')" id="conn-ghl"><span class="dot dot-amber"></span> GoHighLevel</span>
+</div>
+
+<div id="conn-modal-overlay" onclick="closeConn()"></div>
+<div id="conn-modal">
+  <h3 id="cm-title"></h3>
+  <div class="cm-status" id="cm-status"></div>
+  <div id="cm-form">
+    <div class="cm-instructions" id="cm-instructions"></div>
+    <label id="cm-input-label">API KEY</label>
+    <input type="text" id="cm-input" placeholder="Paste your API key here...">
+    <div class="cm-actions">
+      <button class="cm-btn cm-btn-cancel" onclick="closeConn()">Cancel</button>
+      <button class="cm-btn cm-btn-primary" onclick="connectAPI()">Connect</button>
+    </div>
+  </div>
+  <div class="cm-success" id="cm-success">
+    <div class="check">&#10003;</div>
+    <p id="cm-success-text">Connected successfully</p>
+  </div>
+</div>
+
+<script>
+// ── Currency Switcher ──
+var currencySymbols = { GBP: '\u00a3', USD: '$', EUR: '\u20ac' };
+var currentCurrency = 'GBP';
+function switchCurrency(code) {
+  var oldSym = currencySymbols[currentCurrency];
+  var newSym = currencySymbols[code];
+  currentCurrency = code;
+  var walker = document.createTreeWalker(document.querySelector('.main') || document.body, NodeFilter.SHOW_TEXT, null);
+  while (walker.nextNode()) {
+    if (walker.currentNode.textContent.indexOf(oldSym) !== -1) {
+      walker.currentNode.textContent = walker.currentNode.textContent.split(oldSym).join(newSym);
+    }
+  }
+}
+
+var connData = {
+  gsheets: { name: 'Google Sheets', label: 'SPREADSHEET ID', placeholder: 'e.g. 1AbCdEfGhIjKlM...', instructions: '<strong>How to connect Google Sheets:</strong><ol><li>Open your Google Sheet and copy the ID from the URL<br><code style="color:#60a5fa;font-size:11px;">docs.google.com/spreadsheets/d/<strong>[THIS-ID]</strong>/edit</code></li><li>Share the sheet with the service account email</li><li>Paste the Spreadsheet ID below</li></ol>' },
+  wj: { name: 'WebinarJam', label: 'API KEY', placeholder: 'e.g. wj_abc123...', instructions: '<strong>How to connect WebinarJam:</strong><ol><li>Log in to <strong>WebinarJam</strong> &rarr; Account &rarr; API</li><li>Copy your API Key</li><li>Set up a Zapier webhook to forward registration + attendance events</li><li>Paste your API key below</li></ol>' },
+  meta: { name: 'Meta Ads API', label: 'ACCESS TOKEN', placeholder: 'e.g. EAABsbCS1...', instructions: '<strong>How to connect Meta Ads:</strong><ol><li>Go to <strong>Meta Business Manager</strong> &rarr; Business Settings</li><li>Navigate to <strong>System Users</strong> &rarr; Generate Token</li><li>Select permissions: <code>ads_read</code>, <code>read_insights</code></li><li>Copy the token and paste below</li></ol>' },
+  calendly: { name: 'Calendly', label: 'PERSONAL ACCESS TOKEN', placeholder: 'e.g. eyJra...', instructions: '<strong>How to connect Calendly:</strong><ol><li>Go to <strong>Calendly</strong> &rarr; Integrations &rarr; API &amp; Webhooks</li><li>Generate a <strong>Personal Access Token</strong></li><li>Create a webhook subscription for <code>invitee.created</code> events</li><li>Paste your token below</li></ol>' },
+  utm: { name: 'UTM Tracking', label: 'TRACKING DOMAIN', placeholder: 'e.g. yoursite.com', instructions: '<strong>How to enable UTM Tracking:</strong><ol><li>The tracking snippet is automatically added to your funnel pages</li><li>It captures <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code> from URL params</li><li>Data flows to the UTM Attribution tab on each registration</li><li>Enter your tracking domain below to verify</li></ol>' },
+  ghl: { name: 'GoHighLevel', label: 'API KEY', placeholder: 'e.g. ghl_abc123...', instructions: '<strong>How to connect GoHighLevel:</strong><ol><li>Go to <strong>GHL</strong> &rarr; Settings &rarr; API Keys</li><li>Create a new API key with <code>contacts.read</code> and <code>opportunities.read</code> permissions</li><li>Set up webhook triggers for pipeline stage changes</li><li>Paste your API key below</li></ol>' }
+};
+var currentConn = null;
+function openConn(id) {
+  currentConn = id;
+  var d = connData[id];
+  var el = document.getElementById('conn-' + id);
+  var isConnected = el.querySelector('.dot').classList.contains('dot-green');
+  document.getElementById('cm-title').textContent = d.name;
+  document.getElementById('cm-status').innerHTML = '<span class="dot ' + (isConnected ? 'dot-green' : 'dot-amber') + '"></span> ' + (isConnected ? 'Connected' : 'Not connected');
+  document.getElementById('cm-instructions').innerHTML = d.instructions;
+  document.getElementById('cm-input-label').textContent = d.label;
+  document.getElementById('cm-input').placeholder = d.placeholder;
+  document.getElementById('cm-input').value = isConnected ? '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022' : '';
+  document.getElementById('cm-form').style.display = 'block';
+  document.getElementById('cm-success').style.display = 'none';
+  document.getElementById('conn-modal-overlay').style.display = 'block';
+  document.getElementById('conn-modal').style.display = 'block';
+}
+function closeConn() {
+  document.getElementById('conn-modal-overlay').style.display = 'none';
+  document.getElementById('conn-modal').style.display = 'none';
+  currentConn = null;
+}
+function connectAPI() {
+  var val = document.getElementById('cm-input').value.trim();
+  if (!val) return;
+  var el = document.getElementById('conn-' + currentConn);
+  el.querySelector('.dot').className = 'dot dot-green';
+  document.getElementById('cm-form').style.display = 'none';
+  document.getElementById('cm-success').style.display = 'block';
+  document.getElementById('cm-success-text').textContent = connData[currentConn].name + ' connected successfully';
+  setTimeout(closeConn, 1500);
+}
+</script>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-logo">PL</div>
+    <div>
+      <div class="nav-title">PROPERTY LABS &mdash; WEBINAR FUNNEL TRACKER</div>
+      <div class="nav-subtitle">Property Labs</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="last-updated" id="lastUpdated">Last updated: &mdash;</span>
+    <div class="live-badge" id="liveBadge"><div class="live-dot"></div> <span id="liveBadgeText">LIVE</span></div>
+    <select id="currency-select" onchange="switchCurrency(this.value)" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer;outline:none;">
+      <option value="GBP">&pound; GBP</option>
+      <option value="EUR">&euro; EUR</option>
+      <option value="USD">$ USD</option>
+    </select>
+    <button class="btn-icon" onclick="openSettingsModal()" title="Settings — Connect live data">&#9881;</button>
+    <button class="btn btn-ghost" onclick="openModal()">&#x1F4C5; Webinar Settings</button>
+    <button class="btn btn-primary" onclick="exportPDF()">&#x2193; Export</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- CAMPAIGN SELECTOR + CONTROLS -->
+  <div class="campaign-selector" id="campaignSelector">
+    <div class="cs-left">
+      <div class="cs-dropdown-wrap">
+        <select id="campaignSelect" onchange="switchCampaign()">
+          <option value="all">All Time</option>
+        </select>
+      </div>
+      <div class="cs-dates" id="csDates">
+        <span class="cs-date-range" id="csDateRange">&mdash;</span>
+      </div>
+      <div class="cs-status" id="csStatus">
+        <span class="cs-dot" id="csDot"></span>
+        <span id="csStatusText">Loading...</span>
+      </div>
+    </div>
+    <div class="cs-right">
+      <button class="btn-sm btn-sm-accent" onclick="openNewCampaignModal()">&#x2795; New</button>
+      <button class="btn-sm btn-sm-ghost" id="editCampaignBtn" onclick="openEditCampaignModal()" style="display:none;">&#x270F;&#xFE0F; Edit</button>
+      <button class="btn-sm btn-sm-ghost" id="deleteCampaignBtn" onclick="deleteCampaign()" style="display:none;color:var(--red);border-color:var(--red);">&#x1F5D1; Delete</button>
+      <div class="divider"></div>
+      <div class="control-group">
+        <span class="control-label">Compare:</span>
+        <select id="compareSelect">
+          <option value="none">No comparison</option>
+          <option value="target">Target benchmarks</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW CAMPAIGN MODAL -->
+  <div class="modal-overlay" id="newCampaignOverlay" style="display:none;" onclick="if(event.target===this)closeNewCampaignModal()">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <div style="font-size:15px;font-weight:700;">Create New Campaign</div>
+        <button class="modal-close" onclick="closeNewCampaignModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:20px;">
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Campaign Name</label>
+          <input type="text" id="ncName" placeholder="e.g. Airbnb Launch — April 2026" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;outline:none;">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Start Date</label>
+            <input type="date" id="ncStart" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;outline:none;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Webinar Date</label>
+            <input type="date" id="ncWebinar" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;outline:none;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">End Date</label>
+            <input type="date" id="ncEnd" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;outline:none;">
+          </div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Notes (optional)</label>
+          <input type="text" id="ncNotes" placeholder="e.g. Facebook + Instagram campaign" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;outline:none;">
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button class="btn btn-ghost" onclick="closeNewCampaignModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="createCampaign()">Create &amp; Activate</button>
+        </div>
+        <div id="ncError" style="color:var(--red);font-size:12px;margin-top:10px;display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT CAMPAIGN MODAL -->
+  <div class="modal-overlay" id="editCampaignOverlay" style="display:none;" onclick="if(event.target===this)closeEditCampaignModal()">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <div style="font-size:15px;font-weight:700;">Edit Campaign</div>
+        <button class="modal-close" onclick="closeEditCampaignModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:20px;">
+        <input type="hidden" id="ecIndex">
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Campaign Name</label>
+          <input type="text" id="ecName" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;outline:none;">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Start Date</label>
+            <input type="date" id="ecStart" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;outline:none;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Webinar Date</label>
+            <input type="date" id="ecWebinar" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;outline:none;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">End Date</label>
+            <input type="date" id="ecEnd" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;outline:none;">
+          </div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Notes (optional)</label>
+          <input type="text" id="ecNotes" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;outline:none;">
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button class="btn btn-ghost" onclick="closeEditCampaignModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveCampaignEdit()">Save Changes</button>
+        </div>
+        <div id="ecError" style="color:var(--red);font-size:12px;margin-top:10px;display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA SOURCES PANEL (hidden — connections now shown in top status bar) -->
+  <div class="data-sources-panel" id="dataSourcesPanel" style="display:none !important;">
+    <div class="ds-header">
+      <div class="ds-title">
+        <span>&#x1F4E1;</span> Data Sources
+      </div>
+      <button class="ds-collapse-btn" onclick="toggleDataSources()" id="dsCollapseBtn">&#x25B2; Hide</button>
+    </div>
+    <div id="dsGridWrap">
+      <div class="ds-grid">
+
+        <!-- Meta Ads -->
+        <div class="ds-card" id="ds-meta-card">
+          <div class="ds-row" id="ds-meta">
+            <div class="ds-icon">&#x1F4E2;</div>
+            <div class="ds-info">
+              <div class="ds-name">Meta Ads</div>
+              <div class="ds-status-text" id="ds-meta-text">Checking...</div>
+            </div>
+            <div class="ds-status-dot checking" id="ds-meta-dot"></div>
+            <div class="ds-action">
+              <button class="btn-sm btn-sm-ghost" onclick="toggleDSCard('meta')" id="ds-meta-btn">Setup &rarr;</button>
+            </div>
+          </div>
+          <div class="ds-expand-panel" id="ds-meta-panel">
+            <div class="ds-detail-row">
+              <span class="ds-detail-label">Endpoint</span>
+              <span class="ds-endpoint" id="ds-meta-endpoint">POST https://webinar-system-five.vercel.app/api?source=meta</span>
+              <button class="ds-copy-btn" onclick="copyEndpoint('meta')">Copy</button>
+            </div>
+            <div class="ds-steps">
+              <strong>How to connect:</strong>
+              <ol>
+                <li>Go to <strong>Meta Business Manager</strong> &rarr; Business Settings &rarr; System Users</li>
+                <li>Create a System User or select an existing one</li>
+                <li>Click <strong>Generate New Token</strong> &mdash; select <code>ads_read</code> permission</li>
+                <li>Copy the access token and set it as <code>META_ACCESS_TOKEN</code> in Vercel env vars</li>
+                <li>The tracker will automatically pull your ad campaign data</li>
+              </ol>
+            </div>
+            <div class="ds-btn-row">
+              <a href="https://business.facebook.com/settings/system-users" target="_blank" class="ds-link-btn">Open Meta Business Manager &nearr;</a>
+              <button class="ds-test-btn" onclick="testConnection('meta')">Test Connection</button>
+            </div>
+            <div class="ds-test-result" id="ds-meta-result"></div>
+          </div>
+        </div>
+
+        <!-- WebinarJam -->
+        <div class="ds-card" id="ds-wj-card">
+          <div class="ds-row" id="ds-wj">
+            <div class="ds-icon">&#x1F3A5;</div>
+            <div class="ds-info">
+              <div class="ds-name">WebinarJam</div>
+              <div class="ds-status-text" id="ds-wj-text">Checking...</div>
+            </div>
+            <div class="ds-status-dot checking" id="ds-wj-dot"></div>
+            <div class="ds-action">
+              <button class="btn-sm btn-sm-ghost" onclick="toggleDSCard('wj')" id="ds-wj-btn">Setup &rarr;</button>
+            </div>
+          </div>
+          <div class="ds-expand-panel" id="ds-wj-panel">
+            <div class="ds-detail-row">
+              <span class="ds-detail-label">Endpoint</span>
+              <span class="ds-endpoint" id="ds-wj-endpoint">POST https://webinar-system-five.vercel.app/api?source=webinarjam</span>
+              <button class="ds-copy-btn" onclick="copyEndpoint('wj')">Copy</button>
+            </div>
+            <div class="ds-steps">
+              <strong>How to connect:</strong>
+              <ol>
+                <li>Log into <strong>WebinarJam</strong> &rarr; select your webinar</li>
+                <li>Go to <strong>Configuration</strong> &rarr; <strong>Integrations</strong> tab</li>
+                <li>Scroll to <strong>API / Webhook Notifications</strong></li>
+                <li>Paste the endpoint URL above as the <strong>Notification URL</strong></li>
+                <li>Select events: <em>Registration, Attended, No-show, Left early</em></li>
+                <li>Click <strong>Save</strong></li>
+              </ol>
+            </div>
+            <div class="ds-btn-row">
+              <a href="https://app.webinarjam.com" target="_blank" class="ds-link-btn">Open WebinarJam &nearr;</a>
+              <button class="ds-test-btn" onclick="testConnection('wj')">Test Connection</button>
+            </div>
+            <div class="ds-test-result" id="ds-wj-result"></div>
+          </div>
+        </div>
+
+        <!-- Calendly -->
+        <div class="ds-card" id="ds-cal-card">
+          <div class="ds-row" id="ds-cal">
+            <div class="ds-icon">&#x1F4C5;</div>
+            <div class="ds-info">
+              <div class="ds-name">Calendly</div>
+              <div class="ds-status-text" id="ds-cal-text">Checking...</div>
+            </div>
+            <div class="ds-status-dot checking" id="ds-cal-dot"></div>
+            <div class="ds-action">
+              <button class="btn-sm btn-sm-ghost" onclick="toggleDSCard('cal')" id="ds-cal-btn">Setup &rarr;</button>
+            </div>
+          </div>
+          <div class="ds-expand-panel" id="ds-cal-panel">
+            <div class="ds-detail-row">
+              <span class="ds-detail-label">Endpoint</span>
+              <span class="ds-endpoint" id="ds-cal-endpoint">POST https://webinar-system-five.vercel.app/api?source=calendly</span>
+              <button class="ds-copy-btn" onclick="copyEndpoint('cal')">Copy</button>
+            </div>
+            <div class="ds-steps">
+              <strong>How to connect:</strong>
+              <ol>
+                <li>Log into <strong>Calendly</strong> &rarr; click <strong>Integrations &amp; Apps</strong></li>
+                <li>Scroll to <strong>API &amp; Webhooks</strong> section</li>
+                <li>Click <strong>Webhook Subscriptions</strong></li>
+                <li>Click <strong>+ New Webhook</strong></li>
+                <li>Paste the endpoint URL above</li>
+                <li>Select events: <code>invitee.created</code> and <code>invitee.canceled</code></li>
+                <li>Set scope to your organisation, click <strong>Create</strong></li>
+              </ol>
+            </div>
+            <div class="ds-btn-row">
+              <a href="https://calendly.com/integrations" target="_blank" class="ds-link-btn">Open Calendly Integrations &nearr;</a>
+              <button class="ds-test-btn" onclick="testConnection('cal')">Test Connection</button>
+            </div>
+            <div class="ds-test-result" id="ds-cal-result"></div>
+          </div>
+        </div>
+
+        <!-- UTM Tracker -->
+        <div class="ds-card" id="ds-utm-card">
+          <div class="ds-row" id="ds-utm">
+            <div class="ds-icon">&#x1F517;</div>
+            <div class="ds-info">
+              <div class="ds-name">UTM Tracker</div>
+              <div class="ds-status-text" id="ds-utm-text">Checking...</div>
+            </div>
+            <div class="ds-status-dot checking" id="ds-utm-dot"></div>
+            <div class="ds-action">
+              <button class="btn-sm btn-sm-ghost" onclick="toggleDSCard('utm')" id="ds-utm-btn">Setup &rarr;</button>
+            </div>
+          </div>
+          <div class="ds-expand-panel" id="ds-utm-panel">
+            <div class="ds-steps">
+              <strong>Status: Auto-deployed</strong>
+              <p style="margin-top:6px;">UTM tracking is already live on your funnel pages. It automatically captures visitor attribution data when they arrive with <code>?utm_source=...</code> parameters from your ad campaigns.</p>
+              <p style="margin-top:6px;">No additional setup needed &mdash; data flows in automatically when ads are running.</p>
+            </div>
+            <div class="ds-btn-row">
+              <button class="ds-test-btn" onclick="testConnection('utm')">Check UTM Data</button>
+            </div>
+            <div class="ds-test-result" id="ds-utm-result"></div>
+          </div>
+        </div>
+
+        <!-- GoHighLevel -->
+        <div class="ds-card" id="ds-ghl-card">
+          <div class="ds-row" id="ds-ghl">
+            <div class="ds-icon">&#x26A1;</div>
+            <div class="ds-info">
+              <div class="ds-name">GoHighLevel CRM</div>
+              <div class="ds-status-text" id="ds-ghl-text">Connected</div>
+            </div>
+            <div class="ds-status-dot ok" id="ds-ghl-dot"></div>
+            <div class="ds-action">
+              <button class="btn-sm btn-sm-ghost" onclick="toggleDSCard('ghl')" id="ds-ghl-btn">Details &rarr;</button>
+            </div>
+          </div>
+          <div class="ds-expand-panel" id="ds-ghl-panel">
+            <div class="ds-steps">
+              <strong>Status: Connected via API</strong>
+              <p style="margin-top:6px;">GHL is connected via Private Integration API. Registration forms automatically create contacts with <code>webinar-registered</code> tag.</p>
+              <ul style="margin-top:8px; padding-left:20px;">
+                <li><strong>Location ID:</strong> <code>hQmTEm5KyP9EkhgO8iXx</code></li>
+                <li><strong>Pipeline:</strong> Property Labs Webinar Funnel (9 stages)</li>
+                <li><strong>Tags:</strong> 13 webinar tags configured</li>
+                <li><strong>Custom Fields:</strong> 13 fields configured</li>
+                <li><strong>Workflows:</strong> 9 automation workflows (draft)</li>
+              </ul>
+            </div>
+            <div class="ds-btn-row">
+              <a href="https://app.gohighlevel.com/v2/location/hQmTEm5KyP9EkhgO8iXx/dashboard" target="_blank" class="ds-link-btn">Open GHL Dashboard &nearr;</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERT BANNER -->
+  <div class="alert-banner" id="alertBanner" style="display:none;">
+    <span class="alert-icon">&#x1F534;</span>
+    <span class="alert-text">
+      <strong>Show-up rate critical</strong> &mdash; Industry average is 35-45%. You're losing
+      <strong id="missedAttendees">&mdash;</strong> potential attendees per webinar. Fix: Add SMS reminder sequence in GHL now.
+    </span>
+  </div>
+
+  <!-- KPI CARDS (12 cards) -->
+  <div class="section-header">
+    <span class="section-title">Key Performance Indicators</span>
+    <span style="font-size:11px;color:var(--text3);">&#x1F7E2; On target &nbsp; &#x1F7E1; Watch &nbsp; &#x1F534; Action needed</span>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="status-badge blue">&#x1F4B0;</div>
+      <div class="kpi-label">Ad Spend</div>
+      <div class="kpi-value white" id="kpi-spend">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change neutral" id="kpi-spend-change">&mdash;</span>
+        <span class="kpi-bench">Budget tracker</span>
+      </div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="status-badge blue">&#x1F4E2;</div>
+      <div class="kpi-label">Impressions</div>
+      <div class="kpi-value white" id="kpi-impressions">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change neutral" id="kpi-impressions-change">&mdash;</span>
+        <span class="kpi-bench">Ad reach</span>
+      </div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="status-badge blue">&#x2705;</div>
+      <div class="kpi-label">Registrations</div>
+      <div class="kpi-value white" id="kpi-regs">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change neutral" id="kpi-regs-change">&mdash;</span>
+        <span class="kpi-bench">Target: 100+/session</span>
+      </div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="status-badge blue">&#x1F441;</div>
+      <div class="kpi-label">Attendees</div>
+      <div class="kpi-value white" id="kpi-attendees">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change neutral" id="kpi-attendees-change">&mdash;</span>
+        <span class="kpi-bench">Live viewers</span>
+      </div>
+    </div>
+    <div class="kpi-card red" id="showCard">
+      <div class="status-badge red" id="showStatus">&#x1F534;</div>
+      <div class="kpi-label">Show-Up Rate</div>
+      <div class="kpi-value red" id="kpi-show">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change down" id="kpi-show-bench">vs 40% target</span>
+        <span class="kpi-bench" id="kpi-attendees-label">&mdash; attendees</span>
+      </div>
+    </div>
+    <div class="kpi-card green">
+      <div class="status-badge green">&#x1F3AF;</div>
+      <div class="kpi-label">Stay to Pitch</div>
+      <div class="kpi-value green" id="kpi-staypitch">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change neutral" id="kpi-staypitch-pct">&mdash;% of attendees</span>
+        <span class="kpi-bench">Target: 60-75%</span>
+      </div>
+    </div>
+    <div class="kpi-card emerald">
+      <div class="status-badge green">&#x1F5B1;</div>
+      <div class="kpi-label">CTA Clicks</div>
+      <div class="kpi-value emerald" id="kpi-cta">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change neutral" id="kpi-cta-pct">&mdash;% of stayed</span>
+        <span class="kpi-bench">Target: 10-20%</span>
+      </div>
+    </div>
+    <div class="kpi-card green">
+      <div class="status-badge green" id="callStatus">&#x1F4DE;</div>
+      <div class="kpi-label">Calls Booked</div>
+      <div class="kpi-value green" id="kpi-calls">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change neutral" id="kpi-callrate">&mdash;% of attendees</span>
+        <span class="kpi-bench">Target: 10-15%</span>
+      </div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="status-badge yellow">&#x1F7E1;</div>
+      <div class="kpi-label">Call Show Rate</div>
+      <div class="kpi-value yellow" id="kpi-callshow">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change neutral" id="kpi-callshow-label">&mdash; showed</span>
+        <span class="kpi-bench">Target: 70-80%</span>
+      </div>
+    </div>
+    <div class="kpi-card green">
+      <div class="status-badge green" id="closeStatus">&#x1F3C6;</div>
+      <div class="kpi-label">Buyers</div>
+      <div class="kpi-value green" id="kpi-buyers">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change neutral" id="kpi-closerate">&mdash;% close rate</span>
+        <span class="kpi-bench">Target: 25-35%</span>
+      </div>
+    </div>
+    <div class="kpi-card green">
+      <div class="status-badge green">&#x1F4B7;</div>
+      <div class="kpi-label">Revenue (GBP)</div>
+      <div class="kpi-value green" id="kpi-revenue">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change up" id="kpi-rpr">RPR: &mdash;</span>
+        <span class="kpi-bench">Target: &pound;40+ RPR</span>
+      </div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="status-badge" id="roasStatus">&#x1F7E1;</div>
+      <div class="kpi-label">ROAS</div>
+      <div class="kpi-value blue" id="kpi-roas">&mdash;</div>
+      <div class="kpi-meta">
+        <span class="kpi-change neutral" id="kpi-spend-label">Spend: &mdash;</span>
+        <span class="kpi-bench">Target: 3-5x</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRAFFIC SOURCE SPLIT -->
+  <div class="traffic-source-card" id="trafficSourceCard">
+    <div class="ts-header">
+      <span class="ts-title">Traffic Source Breakdown</span>
+      <span class="pill pill-blue" id="tsTotal">0 registrations</span>
+    </div>
+    <div class="ts-body">
+      <div class="ts-split">
+        <div class="ts-source-block ts-paid" id="tsPaidBlock">
+          <div class="ts-source-icon">&#x1F4B0;</div>
+          <div class="ts-source-info">
+            <div class="ts-source-label">Paid Traffic</div>
+            <div class="ts-source-value" id="tsPaidCount">0</div>
+          </div>
+          <div class="ts-source-pct" id="tsPaidPct">0%</div>
+        </div>
+        <div class="ts-divider"></div>
+        <div class="ts-source-block ts-organic" id="tsOrganicBlock">
+          <div class="ts-source-icon">&#x1F331;</div>
+          <div class="ts-source-info">
+            <div class="ts-source-label">Organic Traffic</div>
+            <div class="ts-source-value" id="tsOrganicCount">0</div>
+          </div>
+          <div class="ts-source-pct" id="tsOrganicPct">0%</div>
+        </div>
+        <div class="ts-divider"></div>
+        <div class="ts-source-block ts-direct" id="tsDirectBlock">
+          <div class="ts-source-icon">&#x1F517;</div>
+          <div class="ts-source-info">
+            <div class="ts-source-label">Direct / Other</div>
+            <div class="ts-source-value" id="tsDirectCount">0</div>
+          </div>
+          <div class="ts-source-pct" id="tsDirectPct">0%</div>
+        </div>
+      </div>
+      <div class="ts-bar-container">
+        <div class="ts-bar-fill ts-bar-paid" id="tsBarPaid" style="width:0%"></div>
+        <div class="ts-bar-fill ts-bar-organic" id="tsBarOrganic" style="width:0%"></div>
+        <div class="ts-bar-fill ts-bar-direct" id="tsBarDirect" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONVERSION RATE GAUGES -->
+  <div class="section-header" style="margin-top:8px;">
+    <span class="section-title">Conversion Rates</span>
+  </div>
+  <div class="gauge-section">
+    <div class="gauge-card">
+      <div class="gauge-label">Registration Rate</div>
+      <div class="gauge-value white" id="g-regrate">&mdash;</div>
+      <div class="gauge-bar-track"><div class="gauge-bar-fill" id="g-regrate-bar" style="background:#3ECFA0;width:0%"></div></div>
+      <div class="gauge-target">Target: 25-35% &middot; LP clicks&#x2192;registrations</div>
+    </div>
+    <div class="gauge-card">
+      <div class="gauge-label">Show-Up Rate</div>
+      <div class="gauge-value red" id="g-showrate">&mdash;</div>
+      <div class="gauge-bar-track"><div class="gauge-bar-fill" id="g-showrate-bar" style="background:var(--red);width:0%"></div></div>
+      <div class="gauge-target">Target: 40-55% &middot; registered&#x2192;attended</div>
+    </div>
+    <div class="gauge-card">
+      <div class="gauge-label">Call Book Rate</div>
+      <div class="gauge-value green" id="g-bookrate">&mdash;</div>
+      <div class="gauge-bar-track"><div class="gauge-bar-fill" id="g-bookrate-bar" style="background:var(--green);width:0%"></div></div>
+      <div class="gauge-target">Target: 10-15% &middot; attendees&#x2192;calls</div>
+    </div>
+    <div class="gauge-card">
+      <div class="gauge-label">Close Rate</div>
+      <div class="gauge-value green" id="g-closerate">&mdash;</div>
+      <div class="gauge-bar-track"><div class="gauge-bar-fill" id="g-closerate-bar" style="background:var(--green);width:0%"></div></div>
+      <div class="gauge-target">Target: 25-35% &middot; calls&#x2192;buyers</div>
+    </div>
+  </div>
+
+  <!-- FUNNEL FLOW -->
+  <div class="funnel-section">
+    <div class="section-header" style="margin-bottom:20px;">
+      <span class="section-title">Full Funnel Flow &mdash; Conversion Rates Between Every Step</span>
+      <span style="font-size:11px;color:var(--text3);">&#x1F7E2; On target &nbsp;&#x1F7E1; Below target &nbsp;&#x1F534; Needs fix</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <div class="funnel-flow-inner" id="funnelFlow"></div>
+    </div>
+    <div id="funnelCallouts" style="margin-top:16px;display:flex;flex-direction:column;gap:8px;"></div>
+    <div class="funnel-table-wrap">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;margin-top:4px;">Step-by-Step Breakdown</div>
+      <table class="funnel-table">
+        <thead>
+          <tr>
+            <th>Transition</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Your Rate</th>
+            <th>Benchmark</th>
+            <th>Conversion Bar</th>
+            <th>Drop-off #</th>
+            <th>Opportunity</th>
+          </tr>
+        </thead>
+        <tbody id="funnelTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Registrations vs Attendees &mdash; Weekly Trend</div>
+      <div class="chart-subtitle">Track show-up rate improvement over time</div>
+      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Revenue by Offer Tier</div>
+      <div class="chart-subtitle">Current session breakdown</div>
+      <div class="chart-wrap"><canvas id="tierChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- UTM ATTRIBUTION PANEL -->
+  <div class="utm-panel" id="utmPanel">
+    <div class="utm-panel-header" onclick="toggleUTMPanel()">
+      <div class="utm-panel-title">
+        <span>&#x1F517;</span> UTM Attribution &amp; Traffic Sources
+        <span class="pill pill-blue" style="margin-left:8px;" id="utmTotalBadge">No data yet</span>
+      </div>
+      <span class="utm-panel-toggle open" id="utmToggleIcon">&#x25BC;</span>
+    </div>
+    <div class="utm-panel-body open" id="utmPanelBody">
+      <div class="utm-inner-grid">
+        <!-- Source breakdown bars -->
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Registrations by Traffic Source</div>
+          <div id="utmSourceBars">
+            <div class="utm-no-data">No UTM data yet. Once registrations come through your funnel pages, organic vs paid attribution will appear here automatically.</div>
+          </div>
+          <div style="margin-top:16px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Source Chart</div>
+          <div class="utm-chart-wrap"><canvas id="utmSourceChart"></canvas></div>
+        </div>
+        <!-- Campaign table -->
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Top Campaigns</div>
+          <div class="utm-table-wrap">
+            <table class="utm-table">
+              <thead>
+                <tr>
+                  <th>Campaign</th>
+                  <th>Regs</th>
+                  <th>CPR</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody id="utmCampaignTableBody">
+                <tr>
+                  <td colspan="4" class="utm-no-data">Campaign data appears as registrations come in with UTM parameters</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:16px;padding:12px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
+            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;">How This Works</div>
+            <div style="font-size:11px;color:var(--text3);line-height:1.6;">
+              UTM tracking is automatic. When someone registers via your funnel pages, the footer code detects whether they came from an organic or paid funnel, captures all UTM parameters, and sends the data to your tracking sheet. Data updates each time the dashboard refreshes.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION TABLE -->
+  <div class="bottom-grid">
+    <!-- Ad Performance -->
+    <div class="table-card">
+      <div class="section-header">
+        <span class="section-title">Ad Performance</span>
+        <span class="pill pill-blue" id="totalSpend">&mdash;</span>
+      </div>
+      <table id="adTable">
+        <thead>
+          <tr>
+            <th>Campaign</th>
+            <th>Spend</th>
+            <th>Impressions</th>
+            <th>CTR</th>
+            <th>CPR</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="adTableBody">
+          <tr><td colspan="6" class="no-data" style="padding:20px;text-align:center;">Add campaigns via "Update Data"</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Email / SMS Performance -->
+    <div class="table-card">
+      <div class="section-header">
+        <span class="section-title">Email + SMS Performance</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Sequence</th><th>Type</th><th>Open / CTR</th><th>Status</th></tr>
+        </thead>
+        <tbody id="emailTableBody">
+          <tr><td>Confirmation</td><td>Email</td><td id="e-confirm">&mdash;</td><td><span class="pill pill-yellow">No Data</span></td></tr>
+          <tr><td>Day-Before</td><td>Email</td><td id="e-daybefore">&mdash;</td><td><span class="pill pill-yellow">No Data</span></td></tr>
+          <tr><td>1-Hour</td><td>Email</td><td id="e-1hr">&mdash;</td><td><span class="pill pill-yellow">No Data</span></td></tr>
+          <tr><td>SMS (Instant)</td><td>SMS</td><td id="sms-instant">&mdash;</td><td><span class="pill pill-red">NOT SET UP</span></td></tr>
+          <tr><td>SMS (1-Hour)</td><td>SMS</td><td id="sms-1hr">&mdash;</td><td><span class="pill pill-red">NOT SET UP</span></td></tr>
+          <tr><td>SMS (Live Now)</td><td>SMS</td><td id="sms-live">&mdash;</td><td><span class="pill pill-red">NOT SET UP</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REVENUE BREAKDOWN -->
+  <div class="bottom-grid">
+    <div class="chart-card">
+      <div class="chart-title" style="margin-bottom:16px;">Revenue Trend</div>
+      <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="table-card">
+      <div class="section-header"><span class="section-title">Revenue by Tier Breakdown</span></div>
+      <div class="revenue-split" id="revenueSplit" style="margin-top:12px;">
+        <div class="rev-tier-row">
+          <span class="rev-tier-name">Course</span>
+          <div class="rev-tier-bar-track"><div class="rev-tier-bar-fill" id="rb-course" style="background:#3ECFA0;width:0%"></div></div>
+          <span class="rev-tier-val" id="rv-course">&pound;0</span>
+        </div>
+        <div class="rev-tier-row">
+          <span class="rev-tier-name">Course+Finance</span>
+          <div class="rev-tier-bar-track"><div class="rev-tier-bar-fill" id="rb-course_finance" style="background:#888888;width:0%"></div></div>
+          <span class="rev-tier-val" id="rv-course_finance">&pound;0</span>
+        </div>
+        <div class="rev-tier-row">
+          <span class="rev-tier-name">Group</span>
+          <div class="rev-tier-bar-track"><div class="rev-tier-bar-fill" id="rb-group" style="background:var(--green);width:0%"></div></div>
+          <span class="rev-tier-val" id="rv-group">&pound;0</span>
+        </div>
+        <div class="rev-tier-row">
+          <span class="rev-tier-name">One-to-One</span>
+          <div class="rev-tier-bar-track"><div class="rev-tier-bar-fill" id="rb-one_to_one" style="background:var(--yellow);width:0%"></div></div>
+          <span class="rev-tier-val" id="rv-one_to_one">&pound;0</span>
+        </div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Revenue Per Registrant</div>
+              <div style="font-size:20px;font-weight:800;color:var(--text)" id="stat-rpr">&mdash;</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Revenue Per Attendee</div>
+              <div style="font-size:20px;font-weight:800;color:var(--text)" id="stat-rpa">&mdash;</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Avg Order Value</div>
+              <div style="font-size:20px;font-weight:800;color:var(--text)" id="stat-aov">&mdash;</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Total Buyers</div>
+              <div style="font-size:20px;font-weight:800;color:var(--text)" id="stat-buyers">&mdash;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- WEBINAR SETTINGS MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" style="width:520px;">
+    <div class="modal-header">
+      <span class="modal-title">Webinar Settings</span>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div style="margin-bottom:20px;">
+      <div class="form-section-title" style="margin-top:0;border-top:none;padding-top:0;">&#x1F4C5; Next Webinar</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Next Webinar Date</label>
+          <input class="form-input" type="date" id="f-next-webinar-date">
+        </div>
+        <div class="form-group">
+          <label>Session Name</label>
+          <input class="form-input" type="text" id="f-next-webinar-name" placeholder="e.g. Airbnb Launch — April 2026">
+        </div>
+      </div>
+      <div style="margin-top:10px;padding:12px 16px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
+        <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:6px;">Countdown</div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);" id="f-modal-countdown">--</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div class="form-section-title">&#x1F4CB; Webinar Schedule</div>
+      <div id="f-webinar-schedule" style="max-height:200px;overflow-y:auto;">
+        <div style="font-size:12px;color:var(--text3);font-style:italic;">Loading sessions...</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div class="form-section-title">&#x1F4E1; Data Automation Status</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8;">
+        All webinar metrics are now populated automatically via connected data sources:<br>
+        <span style="color:var(--text3);">&#x2022; <strong>Ad metrics</strong> &rarr; Meta Ads webhook</span><br>
+        <span style="color:var(--text3);">&#x2022; <strong>Registrations, Attendance, Watch time</strong> &rarr; WebinarJam webhook</span><br>
+        <span style="color:var(--text3);">&#x2022; <strong>Calls booked</strong> &rarr; Calendly webhook</span><br>
+        <span style="color:var(--text3);">&#x2022; <strong>UTM Attribution</strong> &rarr; Funnel page tracker (auto-deployed)</span><br>
+        <span style="color:var(--text3);font-size:11px;">Configure connections in the Data Sources panel or Settings (gear icon).</span>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveWebinarSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsOverlay" onclick="closeSettingsOutside(event)">
+  <div class="modal settings-modal">
+    <div class="modal-header">
+      <span class="modal-title">&#x2699;&#xFE0F; Settings &mdash; Connect Live Data</span>
+      <button class="modal-close" onclick="closeSettingsModal()">&#x2715;</button>
+    </div>
+
+    <!-- GAS Connection -->
+    <div class="settings-section">
+      <div class="settings-section-title">Google Apps Script Connection</div>
+      <div class="settings-row">
+        <span class="settings-label">GAS Web App URL</span>
+        <input class="settings-input" type="text" id="s-gas-url"
+          placeholder="https://script.google.com/macros/s/.../exec"
+          oninput="onGASUrlChange()">
+      </div>
+      <div class="settings-desc">
+        Deploy gas-main-app.gs as a Web App (Execute as: Me, Access: Anyone) and paste the URL above.
+      </div>
+      <div class="settings-group" style="margin-top:16px;">
+        <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:8px;font-weight:600;">Google Sheet (Direct Connection)</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" value="Configured on deploy" readonly
+            style="flex:1;background:#0a0a0a;color:#808080;border:1px solid #1e1e1e;border-radius:6px;padding:8px 12px;font-size:12px;">
+        </div>
+        <div style="margin-top:6px;font-size:11px;color:#4a4a4a;">
+          &#x2705; Sheet ID is configured via environment variables on deploy.
+        </div>
+      </div>
+      <div class="settings-row" style="margin-top:12px;">
+        <span class="settings-label">Enable Live Data</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="s-live-enabled" onchange="onLiveToggle()">
+          <span class="toggle-slider"></span>
+        </label>
+        <span style="font-size:12px;color:var(--text3);margin-left:4px;">Auto-refreshes every 5 min</span>
+      </div>
+      <div id="s-gas-status" class="settings-status-row" style="display:none;"></div>
+    </div>
+
+    <!-- Platform Status -->
+    <div class="settings-section">
+      <div class="settings-section-title">Platform Connection Status</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="settings-row" style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin:0;">
+          <span style="font-size:16px;">&#x1F4E2;</span>
+          <span class="settings-label" style="width:auto;flex:1;">Meta Ads API</span>
+          <span style="font-size:11px;color:var(--text3);" id="s-status-meta">Requires GAS deployment + META_ACCESS_TOKEN</span>
+        </div>
+        <div class="settings-row" style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin:0;">
+          <span style="font-size:16px;">&#x1F3A5;</span>
+          <span class="settings-label" style="width:auto;flex:1;">WebinarJam</span>
+          <span style="font-size:11px;color:var(--text3);" id="s-status-wj">Requires API Notification webhook set in WJ dashboard</span>
+        </div>
+        <div class="settings-row" style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin:0;">
+          <span style="font-size:16px;">&#x1F4C5;</span>
+          <span class="settings-label" style="width:auto;flex:1;">Calendly</span>
+          <span style="font-size:11px;color:var(--text3);" id="s-status-cal">Requires invitee.created webhook in Calendly Integrations</span>
+        </div>
+        <div class="settings-row" style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin:0;">
+          <span style="font-size:16px;">&#x1F517;</span>
+          <span class="settings-label" style="width:auto;flex:1;">UTM Tracker</span>
+          <span style="font-size:11px;color:var(--text3);" id="s-status-utm">Add utm-tracker.js to registration page + set GAS URL above</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="settings-section">
+      <div class="settings-section-title">Quick Reference</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" style="font-size:11px;padding:6px 12px;" onclick="testGASConnection()">&#x1F50C; Test GAS Connection</button>
+        <button class="btn btn-ghost" style="font-size:11px;padding:6px 12px;" onclick="forceFetchLiveData()">&#x1F504; Force Refresh Data</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeSettingsModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA STORE ─────────────────────────────────────────────────────
+const TIERS = { 'course': 500, 'course_finance': 1000, 'group': 3000, 'one_to_one': 5000 };
+
+// ─── LIVE DATA CONFIG ────────────────────────────────────────────────
+const SHEETS_CONFIG = {
+  GAS_WEBAPP_URL: localStorage.getItem('pl_gas_url') || '',
+  SPREADSHEET_ID: '',
+  VERCEL_URL: '',
+  PROXY_URL: 'http://localhost:3001',
+  USE_DIRECT_SHEETS: true,
+  ENABLED: localStorage.getItem('pl_live_enabled') !== 'false',
+  AUTO_REFRESH_INTERVAL: 5 * 60 * 1000,
+  API_BASE: '/api',
+  CALENDLY_SLUG: 'strategy-call',
+};
+
+let lastFetchTime = null;
+let autoRefreshTimer = null;
+let utmSourceChart = null;
+
+// Empty baseline — Terry's first webinar, no historical data
+const BASELINE_SESSION = {
+  date: '', name: '',
+  spend: 0, impressions: 0, clicks: 0, lpviews: 0,
+  regs: 0, smsOptins: 0, attendees: 0, stayToPitch: 0,
+  ctaClicks: 0, watchTime: 0,
+  callsBooked: 0, callsShowed: 0, buyers: 0,
+  revenue: 0,
+  tiers: { 'course': 0, 'course_finance': 0, 'group': 0, 'one_to_one': 0 }
+};
+
+// Load sessions from localStorage, validate, fallback to empty
+let sessions = (function() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('pl_sessions') || 'null');
+    if (Array.isArray(stored) && stored.length > 0 && stored[0].date) return stored;
+  } catch(e) { console.warn('[Dashboard] Corrupt localStorage, using empty'); }
+  return [];
+})();
+
+let trendData = JSON.parse(localStorage.getItem('pl_trend') || 'null') || [];
+
+// UTM data — populated from live fetch or manually loaded
+let utmData = JSON.parse(localStorage.getItem('pl_utm_breakdown') || 'null') || null;
+
+let currentIdx = 0;
+let trendChart, tierChart, revenueChart;
+
+// ─── FUNNEL STEP DEFINITIONS ─────────────────────────────────────────
+const FUNNEL_STEPS = [
+  { key: 'impressions', label: 'Impressions', color: '#808080', group: 'pre' },
+  { key: 'clicks', label: 'Link Clicks', color: '#808080', group: 'pre' },
+  { key: 'lpviews', label: 'LP Views', color: '#808080', group: 'pre' },
+  { key: 'regs', label: 'Registrations', color: '#3ECFA0', group: 'pre' },
+  { key: 'attendees', label: 'Attendees', color: '#ef4444', group: 'critical' },
+  { key: 'stayToPitch', label: 'Stay to Pitch', color: '#22c55e', group: 'post' },
+  { key: 'callsBooked', label: 'Calls Booked', color: '#22c55e', group: 'post' },
+  { key: 'buyers', label: 'Buyers', color: '#3ECFA0', group: 'revenue' },
+];
+
+// ─── CAMPAIGNS STATE ──────────────────────────────────────────────────
+let _campaigns = [];
+let _activeCampaign = null;
+
+// ─── DEMO MODE ───────────────────────────────────────────────────────
+function isDemoMode() {
+  return new URLSearchParams(window.location.search).get('demo') === 'true';
+}
+
+function getDemoData() {
+  return {
+    status: 'ok',
+    sessions: [{
+      date: '2026-04-13', name: 'Airbnb Launch — April 2026 (DEMO)',
+      spend: 400, impressions: 15000, clicks: 280, lpviews: 220,
+      regs: 120, smsOptins: 0, attendees: 48, stayToPitch: 35,
+      ctaClicks: 12, watchTime: 55,
+      callsBooked: 8, callsShowed: 6, buyers: 2,
+      revenue: 6000,
+      tiers: { 'course': 1, 'course_finance': 0, 'group': 0, 'one_to_one': 1 }
+    }],
+    campaigns: [{ name: 'Airbnb Launch — April 2026', start: '2026-03-25', end: '2026-04-20', webinar_date: '2026-04-13', active: true }],
+    active_campaign: { name: 'Airbnb Launch — April 2026', start: '2026-03-25', end: '2026-04-20', webinar_date: '2026-04-13' },
+    utmBreakdown: { total_registrations: 120, by_source: { paid: 95, organic: 18, direct: 7 }, by_campaign: { 'airbnb-launch-fb': { registrations: 65, cost_per_reg: 3.85, spend: 250 }, 'airbnb-launch-ig': { registrations: 30, cost_per_reg: 5.00, spend: 150 } } },
+    _source: 'demo'
+  };
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Connection status first — never block this
+  updateDataSourcesPanel();
+
+  try {
+    loadSessionFromData();
+  } catch(e) { console.warn('[Dashboard] Session init error:', e.message); }
+
+  try {
+    initCharts();
+    initUTMChart();
+  } catch(e) { console.warn('[Dashboard] Chart init error:', e.message); }
+
+  updateNextWebinarCard();
+  document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+
+  // Fetch live data from API (always available)
+  fetchLiveData();
+  startAutoRefresh();
+
+  // Restore UTM data display if cached
+  if (utmData) renderUTMPanel(utmData);
+
+  // Freshen badge every minute
+  setInterval(updateLiveBadge, 60000);
+
+  // Update next webinar countdown every minute
+  setInterval(updateNextWebinarCard, 60000);
+});
+
+function loadSessionFromData() {
+  if (!sessions.length) return;
+  const d = aggregateSessions(sessions);
+  renderDashboard(d);
+}
+
+function aggregateSessions(sessionList) {
+  if (!sessionList.length) return null;
+  if (sessionList.length === 1) return sessionList[0];
+  const agg = { date: sessionList[0].date, name: sessionList.length + ' sessions', tiers: { 'course':0, 'course_finance':0, 'group':0, 'one_to_one':0 } };
+  const numKeys = ['spend','impressions','clicks','lpviews','regs','smsOptins','attendees','stayToPitch','ctaClicks','callsBooked','callsShowed','buyers','revenue','watchTime'];
+  numKeys.forEach(k => agg[k] = 0);
+  sessionList.forEach(s => {
+    numKeys.forEach(k => agg[k] += (s[k] || 0));
+    if (s.tiers) { Object.keys(s.tiers).forEach(t => agg.tiers[t] = (agg.tiers[t] || 0) + (s.tiers[t] || 0)); }
+  });
+  agg.date = sessionList[sessionList.length - 1].date;
+  agg.name = sessionList.length === 1 ? sessionList[0].name : sessionList.length + ' sessions combined';
+  if (sessionList.length > 1) agg.watchTime = Math.round(agg.watchTime / sessionList.length);
+  return agg;
+}
+
+function renderDashboard(d) {
+  if (!d) return;
+  const emptyEl = document.getElementById('emptyStateOverlay');
+  if (emptyEl) emptyEl.remove();
+  updateKPIs(d);
+  updateGauges(d);
+  buildFunnel(d);
+  updateRevenueSplit(d);
+  updateCharts(d);
+  updateAlertBanner(d);
+}
+
+function renderEmptyState(campaign) {
+  let overlay = document.getElementById('emptyStateOverlay');
+  if (overlay) overlay.remove();
+
+  const zeroData = { spend:0, impressions:0, clicks:0, lpviews:0, regs:0, smsOptins:0, attendees:0, stayToPitch:0, ctaClicks:0, callsBooked:0, callsShowed:0, buyers:0, revenue:0, watchTime:0, tiers:{} };
+  updateKPIs(zeroData);
+  updateGauges(zeroData);
+  buildFunnel(zeroData);
+  updateRevenueSplit(zeroData);
+
+  const name = campaign ? campaign.name : 'this campaign';
+  const start = campaign ? campaign.start : '';
+  const startFmt = start ? new Date(start + 'T00:00:00').toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) : '';
+  const now = new Date(); now.setHours(0,0,0,0);
+  const startDate = start ? new Date(start + 'T00:00:00') : null;
+  const isUpcoming = startDate && now < startDate;
+
+  overlay = document.createElement('div');
+  overlay.id = 'emptyStateOverlay';
+  overlay.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(10,10,10,0.95);border:1px solid rgba(62,207,160,0.3);border-radius:16px;padding:40px 60px;text-align:center;z-index:100;backdrop-filter:blur(10px);';
+  overlay.innerHTML = '<div style="font-size:48px;margin-bottom:16px;">' + (isUpcoming ? '&#x1F4C5;' : '&#x1F4CA;') + '</div>'
+    + '<h2 style="color:#fff;margin:0 0 8px;font-size:20px;">' + (isUpcoming ? 'Campaign Not Started Yet' : 'No Data Yet') + '</h2>'
+    + '<p style="color:rgba(255,255,255,0.6);margin:0 0 16px;font-size:14px;">'
+    + (isUpcoming ? '"' + name + '" starts ' + startFmt + '.<br>Data will appear once the campaign window begins and ads are running.' : '"' + name + '" has no sessions recorded yet.<br>Data will appear as registrations and webinar events come in.')
+    + '</p>'
+    + '<button onclick="this.parentElement.remove()" style="background:rgba(62,207,160,0.15);border:1px solid rgba(62,207,160,0.3);color:#3ECFA0;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;">Dismiss</button>';
+  document.body.appendChild(overlay);
+}
+
+// ─── CAMPAIGN SELECTOR ──────────────────────────────────────────────
+function buildCampaignSelect(campaigns, activeCampaign) {
+  _campaigns = campaigns || [];
+  _activeCampaign = activeCampaign || null;
+
+  const sel = document.getElementById('campaignSelect');
+  if (!sel) return;
+
+  let html = '<option value="all">All Time &mdash; All Sessions</option>';
+  _campaigns.forEach((c, i) => {
+    const dateRange = formatDateShort(c.start) + ' \u2192 ' + formatDateShort(c.end);
+    html += '<option value="' + i + '"' + (c.active ? ' selected' : '') + '>' + c.name + ' | ' + dateRange + '</option>';
+  });
+  sel.innerHTML = html;
+
+  if (!_activeCampaign) {
+    sel.value = 'all';
+  }
+
+  updateCampaignStatus();
+  toggleEditDeleteButtons();
+}
+
+function formatDateShort(dateStr) {
+  if (!dateStr) return '\u2014';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+function updateCampaignStatus() {
+  const dotEl = document.getElementById('csDot');
+  const textEl = document.getElementById('csStatusText');
+  const rangeEl = document.getElementById('csDateRange');
+
+  if (!_activeCampaign) {
+    if (dotEl) dotEl.className = 'cs-dot all';
+    if (textEl) textEl.textContent = 'Showing all data';
+    if (rangeEl) rangeEl.textContent = '';
+    return;
+  }
+
+  const c = _activeCampaign;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const start = new Date(c.start + 'T00:00:00');
+  const end = new Date(c.end + 'T23:59:59');
+  const webinar = c.webinar_date ? new Date(c.webinar_date + 'T00:00:00') : null;
+  const totalDays = Math.round((end - start) / 86400000);
+  const daysIn = Math.round((now - start) / 86400000);
+
+  if (rangeEl) rangeEl.textContent = formatDateShort(c.start) + ' \u2192 ' + formatDateShort(c.end);
+
+  if (now < start) {
+    if (dotEl) dotEl.className = 'cs-dot upcoming';
+    if (textEl) textEl.textContent = 'Starts in ' + Math.abs(daysIn) + 'd \u00b7 ' + totalDays + '-day window';
+  } else if (now <= end) {
+    if (dotEl) dotEl.className = 'cs-dot active';
+    const daysLeft = webinar ? Math.round((webinar - now) / 86400000) : Math.round((end - now) / 86400000);
+    if (textEl) textEl.textContent = 'ACTIVE \u00b7 Day ' + (daysIn + 1) + '/' + totalDays + (daysLeft > 0 ? ' \u00b7 ' + daysLeft + 'd to webinar' : '');
+  } else {
+    if (dotEl) dotEl.className = 'cs-dot past';
+    if (textEl) textEl.textContent = 'Completed \u00b7 ' + totalDays + '-day window';
+  }
+}
+
+async function switchCampaign() {
+  const sel = document.getElementById('campaignSelect');
+  const val = sel.value;
+
+  try {
+    if (val === 'all') {
+      await fetch(SHEETS_CONFIG.API_BASE + '?source=campaign_update', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'activate_all' }),
+      });
+      _activeCampaign = null;
+    } else {
+      const idx = parseInt(val);
+      await fetch(SHEETS_CONFIG.API_BASE + '?source=campaign_update', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'activate', index: idx }),
+      });
+      _activeCampaign = _campaigns[idx] || null;
+      if (_activeCampaign?.webinar_date) {
+        localStorage.setItem('pl_next_webinar', _activeCampaign.webinar_date);
+        updateNextWebinarCard();
+      }
+    }
+    updateCampaignStatus();
+    fetchLiveData();
+  } catch (e) {
+    console.warn('[Dashboard] Campaign switch error:', e.message);
+  }
+}
+
+function openNewCampaignModal() {
+  document.getElementById('newCampaignOverlay').style.display = 'flex';
+  document.getElementById('ncError').style.display = 'none';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('ncStart').value = today;
+  document.getElementById('ncWebinar').value = '';
+  document.getElementById('ncEnd').value = '';
+  document.getElementById('ncName').value = '';
+  document.getElementById('ncNotes').value = '';
+  document.getElementById('ncName').focus();
+}
+
+function closeNewCampaignModal() {
+  document.getElementById('newCampaignOverlay').style.display = 'none';
+}
+
+async function createCampaign() {
+  const name = document.getElementById('ncName').value.trim();
+  const start = document.getElementById('ncStart').value;
+  const webinar = document.getElementById('ncWebinar').value;
+  const end = document.getElementById('ncEnd').value || webinar;
+  const notes = document.getElementById('ncNotes').value.trim();
+  const errEl = document.getElementById('ncError');
+
+  if (!name || !start || !end) {
+    errEl.textContent = 'Please fill in campaign name, start date, and end date.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  try {
+    errEl.style.display = 'none';
+    const resp = await fetch(SHEETS_CONFIG.API_BASE + '?source=campaign_update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', name, start, end, webinar_date: webinar, notes }),
+    });
+    const data = await resp.json();
+    if (data.status === 'ok') {
+      closeNewCampaignModal();
+      if (webinar) {
+        localStorage.setItem('pl_next_webinar', webinar);
+        updateNextWebinarCard();
+      }
+      fetchLiveData();
+    } else {
+      errEl.textContent = data.message || 'Failed to create campaign';
+      errEl.style.display = 'block';
+    }
+  } catch (e) {
+    errEl.textContent = 'Network error: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+// ─── EDIT / DELETE CAMPAIGNS ────────────────────────────────────────
+function openEditCampaignModal() {
+  const sel = document.getElementById('campaignSelect');
+  const idx = parseInt(sel.value);
+  if (isNaN(idx) || !_campaigns[idx]) return;
+
+  const c = _campaigns[idx];
+  document.getElementById('ecIndex').value = idx;
+  document.getElementById('ecName').value = c.name || '';
+  document.getElementById('ecStart').value = c.start || '';
+  document.getElementById('ecWebinar').value = c.webinar_date || '';
+  document.getElementById('ecEnd').value = c.end || '';
+  document.getElementById('ecNotes').value = c.notes || '';
+  document.getElementById('ecError').style.display = 'none';
+  document.getElementById('editCampaignOverlay').style.display = 'flex';
+  document.getElementById('ecName').focus();
+}
+
+function closeEditCampaignModal() {
+  document.getElementById('editCampaignOverlay').style.display = 'none';
+}
+
+async function saveCampaignEdit() {
+  const idx = parseInt(document.getElementById('ecIndex').value);
+  const name = document.getElementById('ecName').value.trim();
+  const start = document.getElementById('ecStart').value;
+  const webinar = document.getElementById('ecWebinar').value;
+  const end = document.getElementById('ecEnd').value;
+  const notes = document.getElementById('ecNotes').value.trim();
+  const errEl = document.getElementById('ecError');
+
+  if (!name || !start || !end) {
+    errEl.textContent = 'Campaign name, start date, and end date are required.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  try {
+    errEl.style.display = 'none';
+    const resp = await fetch(SHEETS_CONFIG.API_BASE + '?source=campaign_update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update', index: idx, name, start, end, webinar_date: webinar, notes }),
+    });
+    const data = await resp.json();
+    if (data.status === 'ok') {
+      closeEditCampaignModal();
+      fetchLiveData();
+    } else {
+      errEl.textContent = data.message || 'Failed to update campaign';
+      errEl.style.display = 'block';
+    }
+  } catch (e) {
+    errEl.textContent = 'Network error: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+async function deleteCampaign() {
+  const sel = document.getElementById('campaignSelect');
+  const idx = parseInt(sel.value);
+  if (isNaN(idx) || !_campaigns[idx]) return;
+
+  if (!confirm('Delete "' + _campaigns[idx].name + '"? This cannot be undone.')) return;
+
+  try {
+    await fetch(SHEETS_CONFIG.API_BASE + '?source=campaign_update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', index: idx }),
+    });
+    fetchLiveData();
+  } catch (e) {
+    console.warn('[Dashboard] Delete campaign error:', e.message);
+  }
+}
+
+function toggleEditDeleteButtons() {
+  const sel = document.getElementById('campaignSelect');
+  const isAll = sel.value === 'all';
+  const editBtn = document.getElementById('editCampaignBtn');
+  const deleteBtn = document.getElementById('deleteCampaignBtn');
+  if (editBtn) editBtn.style.display = isAll ? 'none' : '';
+  if (deleteBtn) deleteBtn.style.display = isAll ? 'none' : '';
+}
+
+// ─── KPIs (12 cards) ─────────────────────────────────────────────────
+function updateKPIs(d) {
+  const showRate = d.regs > 0 ? (d.attendees / d.regs * 100) : 0;
+  const bookRate = d.attendees > 0 ? (d.callsBooked / d.attendees * 100) : 0;
+  const stayRate = d.attendees > 0 ? (d.stayToPitch / d.attendees * 100) : 0;
+  const ctaRate = d.stayToPitch > 0 ? (d.ctaClicks / d.stayToPitch * 100) : 0;
+  const callShowRate = d.callsBooked > 0 ? (d.callsShowed / d.callsBooked * 100) : 0;
+  const closeRate = d.callsShowed > 0 ? (d.buyers / d.callsShowed * 100) : 0;
+  const roas = d.spend > 0 ? (d.revenue / d.spend) : 0;
+  const rpr = d.regs > 0 ? (d.revenue / d.regs) : 0;
+
+  // Spend
+  set('kpi-spend', '\u00a3' + (d.spend || 0).toLocaleString());
+  // Impressions
+  set('kpi-impressions', (d.impressions || 0).toLocaleString());
+  // Regs
+  set('kpi-regs', (d.regs || 0).toLocaleString());
+  set('kpi-regs-change', currentIdx > 0 ? delta(d.regs, sessions[currentIdx-1].regs) : '\u2014');
+  // Attendees
+  set('kpi-attendees', (d.attendees || 0).toLocaleString());
+  // Show rate
+  set('kpi-show', showRate.toFixed(1) + '%');
+  set('kpi-attendees-label', d.attendees + ' attendees');
+  colorEl('kpi-show', showRate >= 40 ? 'green' : showRate >= 25 ? 'yellow' : 'red');
+  // Stay to Pitch
+  set('kpi-staypitch', (d.stayToPitch || 0).toLocaleString());
+  set('kpi-staypitch-pct', stayRate.toFixed(1) + '% of attendees');
+  // CTA Clicks
+  set('kpi-cta', (d.ctaClicks || 0).toLocaleString());
+  set('kpi-cta-pct', ctaRate.toFixed(1) + '% of stayed');
+  // Calls
+  set('kpi-calls', d.callsBooked);
+  set('kpi-callrate', bookRate.toFixed(1) + '% of attendees');
+  colorEl('kpi-callrate', bookRate >= 10 ? 'green' : bookRate >= 5 ? 'yellow' : 'red');
+  // Call show rate
+  set('kpi-callshow', callShowRate > 0 ? callShowRate.toFixed(1) + '%' : '\u2014');
+  set('kpi-callshow-label', (d.callsShowed || 0) + ' showed');
+  // Buyers
+  set('kpi-buyers', d.buyers || 0);
+  set('kpi-closerate', closeRate > 0 ? closeRate.toFixed(1) + '% close rate' : '\u2014');
+  // Revenue
+  set('kpi-revenue', '\u00a3' + (d.revenue || 0).toLocaleString());
+  set('kpi-rpr', 'RPR: \u00a3' + rpr.toFixed(0));
+  const rprClass = rpr >= 40 ? 'up' : rpr >= 20 ? 'neutral' : 'down';
+  document.getElementById('kpi-rpr').className = 'kpi-change ' + rprClass;
+  // ROAS
+  set('kpi-roas', roas > 0 ? roas.toFixed(1) + 'x' : '\u2014');
+  set('kpi-spend-label', 'Spend: \u00a3' + (d.spend || 0).toLocaleString());
+  colorEl('kpi-roas', roas >= 3 ? 'white' : roas >= 1.5 ? 'white' : 'red');
+
+  // Revenue stats
+  set('stat-rpr', d.regs > 0 ? '\u00a3' + (d.revenue / d.regs).toFixed(0) : '\u2014');
+  set('stat-rpa', d.attendees > 0 ? '\u00a3' + (d.revenue / d.attendees).toFixed(0) : '\u2014');
+  set('stat-aov', d.buyers > 0 ? '\u00a3' + (d.revenue / d.buyers).toFixed(0) : '\u2014');
+  set('stat-buyers', d.buyers);
+  set('totalSpend', '\u00a3' + (d.spend || 0).toLocaleString() + ' total spend');
+}
+
+function updateAlertBanner(d) {
+  const banner = document.getElementById('alertBanner');
+  const showRate = d.regs > 0 ? (d.attendees / d.regs * 100) : 0;
+  if (showRate < 30 && d.regs > 0) {
+    const missed = Math.round(d.regs * 0.40) - d.attendees;
+    set('missedAttendees', Math.max(0, missed) + ' extra');
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ─── GAUGES ──────────────────────────────────────────────────────────
+function updateGauges(d) {
+  const regRate = d.lpviews > 0 ? (d.regs / d.lpviews * 100) : 0;
+  const showRate = d.regs > 0 ? (d.attendees / d.regs * 100) : 0;
+  const bookRate = d.attendees > 0 ? (d.callsBooked / d.attendees * 100) : 0;
+  const closeRate = d.callsShowed > 0 ? (d.buyers / d.callsShowed * 100) : 0;
+
+  gauge('g-regrate', regRate, 35, '#3ECFA0');
+  gauge('g-showrate', showRate, 40, showRate >= 40 ? 'var(--green)' : showRate >= 25 ? 'var(--yellow)' : 'var(--red)');
+  gauge('g-bookrate', bookRate, 10, bookRate >= 10 ? 'var(--green)' : 'var(--yellow)');
+  gauge('g-closerate', closeRate, 25, closeRate >= 25 ? 'var(--green)' : 'var(--yellow)');
+}
+
+function gauge(id, val, target, color) {
+  set(id, val > 0 ? val.toFixed(1) + '%' : '\u2014');
+  const bar = document.getElementById(id + '-bar');
+  if (bar) {
+    bar.style.background = color;
+    bar.style.width = Math.min(val / target * 70, 100) + '%';
+  }
+}
+
+// ─── FUNNEL (REDESIGNED) ─────────────────────────────────────────────
+const FUNNEL_TRANSITIONS = [
+  { label: 'CTR',         low: 1.0,  high: 2.0,  note: 'Ad clicks / impressions. Below 1% = creative or audience problem.' },
+  { label: 'LP Load',     low: 70,   high: 85,   note: 'LP views / link clicks. Below 70% = page speed or URL issue.' },
+  { label: 'Reg Rate',    low: 25,   high: 35,   note: 'Registrations / LP views. Below 20% = headline or offer problem.' },
+  { label: 'Show Rate',   low: 40,   high: 55,   note: 'Attendees / registrants. Below 30% = add SMS sequence.' },
+  { label: 'Stay Rate',   low: 60,   high: 75,   note: 'Stayed to pitch / attendees. Below 60% = content too slow.' },
+  { label: 'CTA Rate',    low: 10,   high: 20,   note: 'CTA clicks / stayed to pitch. Below 10% = weak close.' },
+  { label: 'Close Rate',  low: 25,   high: 35,   note: 'Buyers / calls showed. Below 20% = sales conversation problem.' },
+];
+
+const STEP_ICONS = ['\u{1F4E2}','\u{1F5B1}','\u{1F3E0}','\u{2705}','\u{1F441}','\u{1F3AF}','\u{1F4DE}','\u{1F3C6}'];
+
+function buildFunnel(d) {
+  const flow = document.getElementById('funnelFlow');
+  const callouts = document.getElementById('funnelCallouts');
+  const tbody = document.getElementById('funnelTableBody');
+
+  flow.innerHTML = '';
+  callouts.innerHTML = '';
+  tbody.innerHTML = '';
+
+  const vals = FUNNEL_STEPS.map(s => d[s.key] || 0);
+  const topVal = Math.max(vals[0], 1);
+
+  const convRates = FUNNEL_TRANSITIONS.map((t, i) => {
+    const from = vals[i];
+    const to = vals[i + 1];
+    return from > 0 ? (to / from * 100) : 0;
+  });
+
+  let worstIdx = -1, worstGap = 0, bestIdx = -1, bestScore = -999;
+  convRates.forEach((rate, i) => {
+    if (vals[i] === 0) return;
+    const tgt = FUNNEL_TRANSITIONS[i];
+    const gap = rate - tgt.low;
+    if (gap < worstGap) { worstGap = gap; worstIdx = i; }
+    if (gap > bestScore) { bestScore = gap; bestIdx = i; }
+  });
+
+  FUNNEL_STEPS.forEach((step, i) => {
+    const val = vals[i];
+    const pctOfStart = topVal > 0 ? (val / topVal * 100).toFixed(1) : '\u2014';
+    const isWorstStep = (i === worstIdx + 1);
+
+    flow.innerHTML += `
+      <div class="fn-step${isWorstStep ? ' worst' : ''}">
+        <div class="fn-step-icon">${STEP_ICONS[i]}</div>
+        <div class="fn-step-label">${step.label}</div>
+        <div class="fn-step-val">${val >= 10000 ? (val/1000).toFixed(1)+'k' : val.toLocaleString()}</div>
+        ${i > 0 ? `<div class="fn-step-pct-of-reg">${pctOfStart}% of start</div>` : ''}
+      </div>
+    `;
+
+    if (i < FUNNEL_STEPS.length - 1) {
+      const rate = convRates[i];
+      const t = FUNNEL_TRANSITIONS[i];
+      const cls = rate === 0 ? 'neutral' : rate >= t.high ? 'green' : rate >= t.low ? 'yellow' : 'red';
+      const emoji = rate === 0 ? '\u2014' : rate >= t.high ? '\u2705' : rate >= t.low ? '\u26A0\uFE0F' : '\u{1F534}';
+      const displayRate = rate > 0 ? rate.toFixed(1) + '%' : '\u2014';
+
+      flow.innerHTML += `
+        <div class="fn-connector">
+          <div class="fn-conv ${cls}" title="${t.note}">
+            <div class="fn-conv-status">${emoji}</div>
+            <div class="fn-conv-pct">${displayRate}</div>
+            <div class="fn-conv-label">${t.label}</div>
+            <div class="fn-conv-bench">tgt: ${t.low}\u2013${t.high}%</div>
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  if (worstIdx >= 0 && vals[worstIdx] > 0) {
+    const wt = FUNNEL_TRANSITIONS[worstIdx];
+    const wr = convRates[worstIdx];
+    const missed = Math.round(vals[worstIdx] * (wt.low / 100)) - vals[worstIdx + 1];
+    callouts.innerHTML += `
+      <div class="funnel-worst-callout">
+        <div class="callout-icon">\u{1F534}</div>
+        <div class="callout-text">
+          <strong>Biggest Drop: ${wt.label} (${wr.toFixed(1)}% vs ${wt.low}% target)</strong><br>
+          ${wt.note} Fixing this to target would add ~${Math.max(0,missed).toLocaleString()} more people through this step.
+        </div>
+      </div>`;
+  }
+  if (bestIdx >= 0 && bestIdx !== worstIdx && vals[bestIdx] > 0 && convRates[bestIdx] > 0) {
+    const bt = FUNNEL_TRANSITIONS[bestIdx];
+    const br = convRates[bestIdx];
+    callouts.innerHTML += `
+      <div class="funnel-worst-callout funnel-best-callout">
+        <div class="callout-icon">\u{1F7E2}</div>
+        <div class="callout-text">
+          <strong>Strongest Step: ${bt.label} (${br.toFixed(1)}% \u2014 above ${bt.high}% target)</strong><br>
+          This part of your funnel is working well. Maintain it while fixing the weak points.
+        </div>
+      </div>`;
+  }
+
+  FUNNEL_TRANSITIONS.forEach((t, i) => {
+    const from = vals[i];
+    const to = vals[i + 1];
+    const rate = from > 0 ? (to / from * 100) : 0;
+    const cls = rate === 0 ? 'neutral' : rate >= t.high ? 'green' : rate >= t.low ? 'yellow' : 'red';
+    const oppLabel = rate === 0 ? `<span class="opportunity-tag" style="background:rgba(139,149,168,0.1);color:var(--text3)">No Data</span>`
+                   : rate >= t.high ? `<span class="opportunity-tag opp-good">\u2705 On Target</span>`
+                   : rate >= t.low  ? `<span class="opportunity-tag opp-med">\u26A0\uFE0F Improve</span>`
+                   :                  `<span class="opportunity-tag opp-high">\u{1F534} Fix Now</span>`;
+    const dropOff = from > 0 ? (from - to).toLocaleString() : '\u2014';
+    const barPct = Math.min(rate / t.high * 100, 100);
+    const barColor = cls === 'green' ? 'var(--green)' : cls === 'red' ? 'var(--red)' : 'var(--yellow)';
+    const rateDisplay = rate > 0 ? `<strong style="color:${barColor}">${rate.toFixed(1)}%</strong>` : '<span style="color:var(--text3)">\u2014</span>';
+
+    tbody.innerHTML += `
+      <tr>
+        <td style="font-weight:600;color:var(--text)">${FUNNEL_STEPS[i].label} \u2192 ${FUNNEL_STEPS[i+1].label}</td>
+        <td style="color:var(--text2)">${from > 0 ? from.toLocaleString() : '\u2014'}</td>
+        <td style="color:var(--text2)">${to > 0 ? to.toLocaleString() : '\u2014'}</td>
+        <td>${rateDisplay}</td>
+        <td style="color:var(--text3)">${t.low}\u2013${t.high}%</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="drop-bar-track"><div class="drop-bar-fill" style="width:${barPct}%;background:${barColor}"></div></div>
+            <span style="font-size:11px;color:var(--text3)">${barPct.toFixed(0)}% to target</span>
+          </div>
+        </td>
+        <td style="color:var(--red);font-weight:700">${dropOff}</td>
+        <td>${oppLabel}</td>
+      </tr>`;
+  });
+}
+
+// ─── REVENUE SPLIT ───────────────────────────────────────────────────
+function updateRevenueSplit(d) {
+  const revCourse = (d.tiers['course'] || 0) * TIERS['course'];
+  const revCF = (d.tiers['course_finance'] || 0) * TIERS['course_finance'];
+  const revGroup = (d.tiers['group'] || 0) * TIERS['group'];
+  const revOTO = (d.tiers['one_to_one'] || 0) * TIERS['one_to_one'];
+  const total = revCourse + revCF + revGroup + revOTO || 1;
+
+  set('rv-course', '\u00a3' + revCourse.toLocaleString());
+  set('rv-course_finance', '\u00a3' + revCF.toLocaleString());
+  set('rv-group', '\u00a3' + revGroup.toLocaleString());
+  set('rv-one_to_one', '\u00a3' + revOTO.toLocaleString());
+
+  pct('rb-course', revCourse / total * 100);
+  pct('rb-course_finance', revCF / total * 100);
+  pct('rb-group', revGroup / total * 100);
+  pct('rb-one_to_one', revOTO / total * 100);
+}
+
+function pct(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.style.width = val + '%';
+}
+
+// ─── CHARTS ──────────────────────────────────────────────────────────
+function initCharts() {
+  Chart.defaults.color = '#808080';
+  Chart.defaults.borderColor = '#1e1e1e';
+  Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif';
+
+  const ctx1 = document.getElementById('trendChart').getContext('2d');
+  trendChart = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: trendData.map(d => d.week),
+      datasets: [
+        {
+          label: 'Registrations',
+          data: trendData.map(d => d.regs),
+          backgroundColor: 'rgba(62,207,160,0.15)',
+          borderColor: '#3ECFA0',
+          borderWidth: 2, borderRadius: 4,
+        },
+        {
+          label: 'Attendees',
+          data: trendData.map(d => d.attendees),
+          backgroundColor: 'rgba(255,255,255,0.06)',
+          borderColor: '#808080',
+          borderWidth: 2, borderRadius: 4,
+        },
+        {
+          label: 'Target Attendees (40%)',
+          data: trendData.map(d => Math.round(d.regs * 0.40)),
+          type: 'line',
+          borderColor: 'rgba(34,197,94,0.5)',
+          borderDash: [4, 4],
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 16 } } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true }
+      }
+    }
+  });
+
+  const ctx2 = document.getElementById('tierChart').getContext('2d');
+  tierChart = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: ['Course (\u00a3500)', 'Course+Finance (\u00a31,000)', 'Group (\u00a33,000)', 'One-to-One (\u00a35,000)'],
+      datasets: [{
+        data: [0, 0, 0, 0],
+        backgroundColor: ['#3ECFA0','#888888','#22c55e','#3ECFA0'],
+        borderWidth: 0,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } }
+      }
+    }
+  });
+
+  const ctx3 = document.getElementById('revenueChart').getContext('2d');
+  revenueChart = new Chart(ctx3, {
+    type: 'line',
+    data: {
+      labels: trendData.map(d => d.week),
+      datasets: [{
+        label: 'Revenue (\u00a3)',
+        data: trendData.map(d => d.revenue),
+        borderColor: '#3ECFA0',
+        backgroundColor: 'rgba(62,207,160,0.08)',
+        fill: true,
+        borderWidth: 2,
+        pointBackgroundColor: '#3ECFA0',
+        pointRadius: 4,
+        tension: 0.4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' }, beginAtZero: true,
+          ticks: { callback: v => '\u00a3' + v.toLocaleString() }
+        }
+      }
+    }
+  });
+}
+
+function updateCharts(d) {
+  const rev = [
+    (d.tiers['course'] || 0) * TIERS['course'],
+    (d.tiers['course_finance'] || 0) * TIERS['course_finance'],
+    (d.tiers['group'] || 0) * TIERS['group'],
+    (d.tiers['one_to_one'] || 0) * TIERS['one_to_one'],
+  ];
+  tierChart.data.datasets[0].data = rev;
+  tierChart.update();
+
+  const last = trendData.length ? trendData[trendData.length - 1] : null;
+  if (!last || last.week !== d.date) {
+    trendData.push({ week: d.date, regs: d.regs, attendees: d.attendees, revenue: d.revenue });
+  } else {
+    last.regs = d.regs; last.attendees = d.attendees; last.revenue = d.revenue;
+  }
+  trendChart.data.labels = trendData.map(x => x.week);
+  trendChart.data.datasets[0].data = trendData.map(x => x.regs);
+  trendChart.data.datasets[1].data = trendData.map(x => x.attendees);
+  trendChart.data.datasets[2].data = trendData.map(x => Math.round(x.regs * 0.40));
+  trendChart.update();
+
+  revenueChart.data.labels = trendData.map(x => x.week);
+  revenueChart.data.datasets[0].data = trendData.map(x => x.revenue);
+  revenueChart.update();
+}
+
+// ─── TRAFFIC SOURCE SPLIT (Top-level KPI card) ─────────────────────
+function renderTrafficSource(data) {
+  if (!data) return;
+  const sources = data.by_source || {};
+  const total = data.total_registrations || 0;
+
+  const paid = sources['paid'] || 0;
+  const organic = sources['organic'] || 0;
+  const direct = total - paid - organic;
+
+  const paidPct = total > 0 ? Math.round((paid / total) * 100) : 0;
+  const organicPct = total > 0 ? Math.round((organic / total) * 100) : 0;
+  const directPct = total > 0 ? (100 - paidPct - organicPct) : 0;
+
+  set('tsPaidCount', paid);
+  set('tsOrganicCount', organic);
+  set('tsDirectCount', direct > 0 ? direct : 0);
+  set('tsPaidPct', paidPct + '%');
+  set('tsOrganicPct', organicPct + '%');
+  set('tsDirectPct', directPct + '%');
+  set('tsTotal', total + ' registration' + (total !== 1 ? 's' : '') + ' tracked');
+
+  const barPaid = document.getElementById('tsBarPaid');
+  const barOrganic = document.getElementById('tsBarOrganic');
+  const barDirect = document.getElementById('tsBarDirect');
+  if (barPaid) barPaid.style.width = paidPct + '%';
+  if (barOrganic) barOrganic.style.width = organicPct + '%';
+  if (barDirect) barDirect.style.width = directPct + '%';
+
+  const directBlock = document.getElementById('tsDirectBlock');
+  const directDivider = directBlock ? directBlock.previousElementSibling : null;
+  if (directBlock) directBlock.style.display = direct > 0 ? 'flex' : 'none';
+  if (directDivider && directDivider.classList.contains('ts-divider')) directDivider.style.display = direct > 0 ? 'block' : 'none';
+}
+
+// ─── UTM ATTRIBUTION PANEL ───────────────────────────────────────────
+function initUTMChart() {
+  const ctx = document.getElementById('utmSourceChart').getContext('2d');
+  utmSourceChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['No data yet'],
+      datasets: [{
+        data: [1],
+        backgroundColor: ['#1e1e1e'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+function toggleUTMPanel() {
+  const body = document.getElementById('utmPanelBody');
+  const icon = document.getElementById('utmToggleIcon');
+  body.classList.toggle('open');
+  icon.classList.toggle('open');
+}
+
+function renderUTMPanel(data) {
+  if (!data) return;
+
+  renderTrafficSource(data);
+
+  const sourceColorMap = { paid: '#3ECFA0', organic: '#22c55e', direct: '#888' };
+  const sourceColors = ['#3ECFA0','#22c55e','#888888','#3ECFA0','#ef4444','#606060','#a0a0a0'];
+  const sources = data.by_source || {};
+  const campaigns = data.by_campaign || {};
+  const total = data.total_registrations || 0;
+
+  set('utmTotalBadge', total + ' registrations tracked');
+
+  const barsEl = document.getElementById('utmSourceBars');
+  const sortedSources = Object.entries(sources).sort((a,b) => b[1]-a[1]);
+  const maxCount = sortedSources.length > 0 ? sortedSources[0][1] : 1;
+
+  if (sortedSources.length > 0) {
+    barsEl.innerHTML = sortedSources.map(([src, count], i) => {
+      const color = sourceColorMap[src] || sourceColors[i % sourceColors.length];
+      return `
+      <div class="utm-source-bar">
+        <span class="utm-source-name">${src || 'direct'}</span>
+        <div class="utm-bar-track">
+          <div class="utm-bar-fill" style="width:${(count/maxCount*100).toFixed(0)}%;background:${color}"></div>
+        </div>
+        <span class="utm-source-count" style="color:${color}">${count}</span>
+      </div>`;
+    }).join('');
+  } else {
+    barsEl.innerHTML = '<div class="utm-no-data">No source data yet.</div>';
+  }
+
+  if (utmSourceChart && sortedSources.length > 0) {
+    utmSourceChart.data.labels = sortedSources.map(([src]) => src || 'direct');
+    utmSourceChart.data.datasets[0].data = sortedSources.map(([,count]) => count);
+    utmSourceChart.data.datasets[0].backgroundColor = sortedSources.map(([src], i) => sourceColorMap[src] || sourceColors[i % sourceColors.length]);
+    utmSourceChart.update();
+  }
+
+  const tbody = document.getElementById('utmCampaignTableBody');
+  const sortedCampaigns = Object.entries(campaigns).sort((a,b) => b[1].registrations - a[1].registrations);
+
+  if (sortedCampaigns.length > 0) {
+    tbody.innerHTML = sortedCampaigns.map(([name, c]) => `
+      <tr>
+        <td style="font-weight:600;color:var(--text);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${name}">${name}</td>
+        <td style="color:var(--accent);font-weight:700">${c.registrations}</td>
+        <td style="color:${c.cost_per_reg > 0 ? (c.cost_per_reg <= 15 ? 'var(--green)' : 'var(--yellow)') : 'var(--text3)'}">
+          ${c.cost_per_reg > 0 ? '\u00a3' + c.cost_per_reg.toFixed(2) : '\u2014'}
+        </td>
+        <td style="color:var(--text2);font-size:11px;">${c.spend > 0 ? '\u00a3'+c.spend.toFixed(0)+' spend' : 'No spend data'}</td>
+      </tr>
+    `).join('');
+  } else {
+    tbody.innerHTML = '<tr><td colspan="4" class="utm-no-data">No campaign data yet</td></tr>';
+  }
+}
+
+// ─── NEXT WEBINAR CARD ──────────────────────────────────────────────
+function updateNextWebinarCard() {
+  const nextDate = localStorage.getItem('pl_next_webinar') || '2026-04-13';
+  const nextName = localStorage.getItem('pl_next_webinar_name') || 'Airbnb Launch — April 2026';
+
+  // Update modal countdown if open
+  const countdownEl = document.getElementById('f-modal-countdown');
+  if (countdownEl) _updateModalCountdown(nextDate);
+}
+
+function loadCampaignWindow() {}
+function updateCampaignWindow() {}
+
+// ─── DATA SOURCES PANEL ──────────────────────────────────────────────────
+function toggleDataSources() {
+  const wrap = document.getElementById('dsGridWrap');
+  const btn = document.getElementById('dsCollapseBtn');
+  const isHidden = wrap.style.display === 'none';
+  wrap.style.display = isHidden ? '' : 'none';
+  btn.textContent = isHidden ? '\u25B2 Hide' : '\u25BC Show';
+}
+
+let _lastDataSource = null;
+let _connectionStatus = {};
+
+function toggleDSCard(id) {
+  const card = document.getElementById('ds-' + id + '-card');
+  if (!card) return;
+  const wasExpanded = card.classList.contains('expanded');
+  document.querySelectorAll('.ds-card.expanded').forEach(c => c.classList.remove('expanded'));
+  if (!wasExpanded) card.classList.add('expanded');
+}
+
+function copyEndpoint(id) {
+  const el = document.getElementById('ds-' + id + '-endpoint');
+  if (!el) return;
+  const text = el.textContent.replace(/^POST\s+/, '');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el.nextElementSibling;
+    if (btn) {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    }
+  });
+}
+
+async function testConnection(id) {
+  const resultEl = document.getElementById('ds-' + id + '-result');
+  if (!resultEl) return;
+  resultEl.className = 'ds-test-result';
+  resultEl.style.display = 'block';
+  resultEl.textContent = 'Testing...';
+
+  try {
+    if (id === 'utm') {
+      const utmStored = localStorage.getItem('pl_utm_breakdown');
+      if (utmStored && JSON.parse(utmStored)?.sources?.length > 0) {
+        resultEl.className = 'ds-test-result ok';
+        resultEl.textContent = '\u2713 UTM data found \u2014 ' + JSON.parse(utmStored).sources.length + ' sources tracked';
+      } else {
+        resultEl.className = 'ds-test-result ok';
+        resultEl.textContent = '\u2713 UTM tracking is deployed on funnel pages. Data will appear once ads are running with UTM parameters.';
+      }
+      return;
+    }
+
+    const url = SHEETS_CONFIG.API_BASE + '?action=test_connections';
+    const resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    const data = await resp.json();
+
+    const sourceMap = { meta: 'meta', wj: 'webinarjam', cal: 'calendly' };
+    const srcKey = sourceMap[id];
+    const info = data[srcKey];
+
+    if (info && info.connected) {
+      resultEl.className = 'ds-test-result ok';
+      resultEl.textContent = '\u2713 Connected' + (info.last_event ? ' \u2014 last event: ' + new Date(info.last_event).toLocaleString() : '');
+      _setDSRow(id, true, 'Connected');
+    } else {
+      resultEl.className = 'ds-test-result fail';
+      resultEl.textContent = '\u2717 Not connected \u2014 ' + (info?.note || 'No webhook events received yet. Follow the setup steps above.');
+      _setDSRow(id, false, info?.note || 'Not connected');
+    }
+  } catch (err) {
+    resultEl.className = 'ds-test-result fail';
+    resultEl.textContent = '\u2717 Could not reach API: ' + err.message;
+  }
+}
+
+function updateDataSourcesPanel() {
+  fetch(SHEETS_CONFIG.API_BASE + '?action=test_connections', { signal: AbortSignal.timeout(8000) })
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data) {
+        _setDSRow('meta', false, 'API unreachable');
+        _setDSRow('wj', false, 'API unreachable');
+        _setDSRow('cal', false, 'API unreachable');
+        _setDSRow('utm', false, 'API unreachable');
+        return;
+      }
+
+      _connectionStatus = data;
+      localStorage.setItem('pl_connection_status', JSON.stringify(data));
+
+      if (data.meta?.connected) {
+        const evtNote = data.meta.events_received > 0 ? data.meta.events_received + ' syncs' : '';
+        _setDSRow('meta', true, 'Connected \u2014 ' + ['Token valid', evtNote].filter(Boolean).join(', '));
+      } else if (data.meta?.access_token_set && !data.meta?.token_valid) {
+        _setDSRow('meta', 'warning', 'Token expired \u2014 needs renewal');
+      } else {
+        _setDSRow('meta', false, data.meta?.note || 'Not connected');
+      }
+
+      if (data.webinarjam?.connected) {
+        const apiNote = data.webinarjam.api_key_set ? 'API connected' : '';
+        const evtNote = data.webinarjam.events_received > 0 ? data.webinarjam.events_received + ' syncs' : '';
+        _setDSRow('wj', true, 'Connected' + (apiNote || evtNote ? ' \u2014 ' + [apiNote, evtNote].filter(Boolean).join(', ') : ''));
+      } else {
+        _setDSRow('wj', false, data.webinarjam?.note || 'Webhook not configured');
+      }
+
+      if (data.calendly?.connected) {
+        const whNote = data.calendly.webhook_active ? 'Webhook active' : '';
+        const evtNote = data.calendly.events_received > 0 ? data.calendly.events_received + ' events' : '';
+        _setDSRow('cal', true, 'Connected' + (whNote || evtNote ? ' \u2014 ' + [whNote, evtNote].filter(Boolean).join(', ') : ''));
+      } else {
+        _setDSRow('cal', false, data.calendly?.note || 'Webhook not configured');
+      }
+
+      const utmStored = localStorage.getItem('pl_utm_breakdown');
+      const hasUtmData = utmStored && JSON.parse(utmStored)?.sources?.length > 0;
+      _setDSRow('utm', true, hasUtmData
+        ? 'Active \u2014 ' + JSON.parse(utmStored).sources.length + ' sources'
+        : 'Deployed \u2014 awaiting ad traffic');
+    })
+    .catch((err) => {
+      console.warn('[Dashboard] Connection check failed:', err.message || err);
+      const cached = localStorage.getItem('pl_connection_status');
+      if (cached) {
+        try {
+          const data = JSON.parse(cached);
+          _connectionStatus = data;
+          if (data.meta?.connected) _setDSRow('meta', true, 'Connected (cached)');
+          else _setDSRow('meta', false, 'API unreachable');
+          if (data.webinarjam?.connected) _setDSRow('wj', true, 'Connected (cached)');
+          else _setDSRow('wj', false, 'API unreachable');
+          if (data.calendly?.connected) _setDSRow('cal', true, 'Connected (cached)');
+          else _setDSRow('cal', false, 'API unreachable');
+          _setDSRow('utm', true, 'Deployed on funnel pages');
+          return;
+        } catch(e) {}
+      }
+      _setDSRow('meta', false, 'API unreachable');
+      _setDSRow('wj', false, 'API unreachable');
+      _setDSRow('cal', false, 'API unreachable');
+      _setDSRow('utm', true, 'Deployed on funnel pages');
+    });
+}
+
+function _setDSRow(id, connected, text) {
+  const dot = document.getElementById('ds-' + id + '-dot');
+  const textEl = document.getElementById('ds-' + id + '-text');
+  const btn = document.getElementById('ds-' + id + '-btn');
+  const row = document.getElementById('ds-' + id);
+
+  const isWarning = connected === 'warning';
+  const isConnected = connected === true;
+
+  if (dot) {
+    dot.className = 'ds-status-dot' + (isConnected ? ' green' : isWarning ? ' warning' : '');
+  }
+  if (textEl) {
+    textEl.textContent = text;
+    textEl.style.color = isConnected ? 'var(--green)' : isWarning ? 'var(--yellow)' : 'var(--text3)';
+  }
+  if (btn) {
+    if (isConnected) {
+      btn.innerHTML = '<span style="color:var(--green);">&#x25CF;</span> Connected';
+      btn.className = 'btn-sm btn-sm-accent';
+      btn.style.color = 'var(--green)';
+      btn.style.borderColor = 'rgba(34,197,94,0.3)';
+      btn.style.background = 'rgba(34,197,94,0.1)';
+      btn.style.fontWeight = '600';
+    } else if (isWarning) {
+      btn.innerHTML = '<span style="color:var(--yellow);">&#x25CF;</span> Expired';
+      btn.className = 'btn-sm btn-sm-accent';
+      btn.style.color = 'var(--yellow)';
+      btn.style.borderColor = 'rgba(245,158,11,0.3)';
+      btn.style.background = 'rgba(245,158,11,0.1)';
+      btn.style.fontWeight = '600';
+    } else {
+      btn.textContent = 'Setup \u2192';
+      btn.className = 'btn-sm btn-sm-ghost';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+      btn.style.background = '';
+      btn.style.fontWeight = '';
+    }
+    btn.onclick = () => toggleDSCard(id);
+  }
+  if (row) row.className = 'ds-row' + (isConnected ? ' connected' : isWarning ? ' connected' : '');
+}
+
+// ─── LIVE DATA CONNECTION ─────────────────────────────────────────────
+async function fetchLiveData() {
+  try {
+    let data = null;
+
+    // Demo mode support
+    if (isDemoMode()) {
+      console.log('[Dashboard] Demo mode active');
+      data = getDemoData();
+    }
+
+    if (!data) {
+      console.log('[Dashboard] Starting live data fetch...');
+
+      // Try 1: GAS Web App (if configured)
+      if (SHEETS_CONFIG.ENABLED && SHEETS_CONFIG.GAS_WEBAPP_URL) {
+        try {
+          console.log('[Dashboard] Trying GAS Web App...');
+          const url = SHEETS_CONFIG.GAS_WEBAPP_URL + '?action=dashboard_data';
+          const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+          if (response.ok) {
+            data = await response.json();
+            data._source = 'gas_webapp';
+            console.log('[Dashboard] GAS Web App returned', data.sessions?.length || 0, 'sessions');
+          }
+        } catch (e) { console.log('[Dashboard] GAS Web App failed:', e.message); }
+      }
+
+      // Try 2: Vercel API then local proxy
+      if (!data || !Array.isArray(data.sessions)) {
+        console.log('[Dashboard] Trying API/proxy...');
+        data = await fetchFromProxy();
+      }
+
+      // Try 3: Direct Google Sheets read (fallback)
+      if (!data || !Array.isArray(data.sessions)) {
+        console.log('[Dashboard] Trying direct Google Sheets...');
+        data = await fetchFromGoogleSheets();
+        if (data) data._source = 'direct_sheets';
+      }
+    }
+
+    if (!data || !Array.isArray(data.sessions)) {
+      console.warn('[Dashboard] No live data found from any source');
+      return;
+    }
+
+    // Build campaign selector from API response
+    if (data.campaigns) {
+      buildCampaignSelect(data.campaigns, data.active_campaign);
+      if (data.active_campaign?.webinar_date) {
+        localStorage.setItem('pl_next_webinar', data.active_campaign.webinar_date);
+        updateNextWebinarCard();
+      }
+    }
+
+    // Merge live sessions
+    if (data.sessions.length) {
+      const liveSessionDates = new Set(data.sessions.map(s => s.date));
+      const localOnly = sessions.filter(s => !liveSessionDates.has(s.date));
+      sessions = [...data.sessions, ...localOnly].sort((a,b) => new Date(a.date) - new Date(b.date));
+      localStorage.setItem('pl_sessions', JSON.stringify(sessions));
+    } else {
+      sessions = [];
+      localStorage.removeItem('pl_sessions');
+    }
+
+    // Render dashboard
+    if (data.sessions.length) {
+      const agg = aggregateSessions(data.sessions);
+      if (agg) renderDashboard(agg);
+    } else {
+      renderEmptyState(data.active_campaign);
+    }
+
+    if (data.utmBreakdown) {
+      utmData = data.utmBreakdown;
+      localStorage.setItem('pl_utm_breakdown', JSON.stringify(utmData));
+      renderUTMPanel(utmData);
+    }
+
+    lastFetchTime = new Date();
+    _lastDataSource = data._source || 'unknown';
+    updateLiveBadge();
+    updateDataSourcesPanel();
+    document.getElementById('lastUpdated').textContent =
+      'Last updated: ' + lastFetchTime.toLocaleTimeString() +
+      ' (source: ' + _lastDataSource + ')';
+
+    console.log('[Dashboard] Live data loaded successfully from:', _lastDataSource, '\u2014 sessions:', sessions.length);
+
+    // Background sync (once per 30 min)
+    const lastSync = parseInt(localStorage.getItem('pl_last_sync') || '0');
+    if (Date.now() - lastSync > 30 * 60 * 1000) {
+      localStorage.setItem('pl_last_sync', String(Date.now()));
+      console.log('[Dashboard] Triggering background data sync...');
+      fetch(SHEETS_CONFIG.API_BASE + '?action=sync_webinarjam', { signal: AbortSignal.timeout(25000) })
+        .then(r => r.json())
+        .then(d => console.log('[Dashboard] WJ sync:', d.message || d.status))
+        .catch(e => console.log('[Dashboard] WJ sync skipped:', e.message));
+      fetch(SHEETS_CONFIG.API_BASE + '?action=sync_meta', { signal: AbortSignal.timeout(25000) })
+        .then(r => r.json())
+        .then(d => console.log('[Dashboard] Meta sync:', d.message || d.status))
+        .catch(e => console.log('[Dashboard] Meta sync skipped:', e.message));
+    }
+
+  } catch (err) {
+    console.warn('[Dashboard] fetchLiveData error:', err);
+  }
+}
+
+// ─── DIRECT GOOGLE SHEETS CONNECTION ─────────────────────────────────────
+async function fetchFromGoogleSheets() {
+  const id = SHEETS_CONFIG.SPREADSHEET_ID;
+  if (!id) return null;
+
+  try {
+    const sheetName = encodeURIComponent('\u{1F3AF} FUNNEL FLOW');
+    const range = encodeURIComponent('A5:AB54');
+    const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&range=${range}&sheet=${sheetName}`;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Sheets fetch HTTP ' + response.status);
+
+    const text = await response.text();
+    let jsonStr = text;
+    const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\);?\s*$/);
+    if (match) {
+      jsonStr = match[1];
+    } else {
+      jsonStr = text.replace(/^\/\*[\s\S]*?\*\/\s*/, '').replace(/^google\.visualization\.Query\.setResponse\(/, '').replace(/\);?\s*$/, '');
+    }
+    const gviz = JSON.parse(jsonStr);
+
+    if (!gviz.table || !gviz.table.rows) return null;
+
+    const parsedSessions = [];
+    for (const row of gviz.table.rows) {
+      const c = row.c || [];
+      const val = (i) => (c[i] && c[i].v != null) ? c[i].v : null;
+      const num = (i) => { const v = val(i); return v ? parseFloat(v) : 0; };
+
+      const dateVal = val(0);
+      if (!dateVal || String(dateVal).trim() === '') continue;
+
+      let dateStr = String(dateVal);
+      if (dateStr.startsWith('Date(')) {
+        const parts = dateStr.replace('Date(', '').replace(')', '').split(',');
+        const y = parseInt(parts[0]);
+        const m = parseInt(parts[1]) + 1;
+        const d = parseInt(parts[2]);
+        dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      }
+
+      parsedSessions.push({
+        date: dateStr,
+        name: val(1) || 'Webinar Session',
+        impressions: num(3),
+        clicks: num(4),
+        lpviews: num(5),
+        regs: num(8),
+        smsOptins: num(11),
+        attendees: num(15),
+        stayToPitch: num(18),
+        ctaClicks: num(20),
+        callsBooked: num(22),
+        callsShowed: num(23),
+        buyers: num(25),
+        spend: num(26),
+        revenue: num(27),
+        watchTime: 0,
+        tiers: { 'course': 0, 'course_finance': 0, 'group': 0, 'one_to_one': 0 }
+      });
+    }
+
+    if (!parsedSessions.length) return null;
+
+    console.log('[Dashboard] Loaded', parsedSessions.length, 'sessions from Google Sheets');
+    return { sessions: parsedSessions, utmBreakdown: null, source: 'direct_sheets' };
+
+  } catch (err) {
+    console.warn('[Dashboard] fetchFromGoogleSheets error:', err.message);
+    return null;
+  }
+}
+
+async function fetchFromProxy() {
+  const urls = [
+    SHEETS_CONFIG.API_BASE + '?action=dashboard_data',
+    SHEETS_CONFIG.PROXY_URL  + '/?action=dashboard_data',
+  ];
+  for (const url of urls) {
+    try {
+      console.log('[Dashboard] Trying:', url);
+      const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if (!response.ok) { console.log('[Dashboard] HTTP', response.status, 'from', url); continue; }
+      const data = await response.json();
+      if (data.status === 'ok' && Array.isArray(data.sessions)) {
+        const src = url.includes('vercel') ? 'vercel' : url.includes('localhost') ? 'local_proxy' : 'api';
+        console.log('[Dashboard] SUCCESS:', data.sessions.length, 'sessions from', src);
+        data._source = src;
+        return data;
+      }
+      console.log('[Dashboard] Invalid response from', url);
+    } catch (err) { console.log('[Dashboard] Failed:', url, '-', err.message); }
+  }
+  return null;
+}
+
+function forceFetchLiveData() {
+  fetchLiveData();
+}
+
+function startAutoRefresh() {
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+  autoRefreshTimer = setInterval(fetchLiveData, SHEETS_CONFIG.AUTO_REFRESH_INTERVAL);
+}
+
+function stopAutoRefresh() {
+  if (autoRefreshTimer) {
+    clearInterval(autoRefreshTimer);
+    autoRefreshTimer = null;
+  }
+}
+
+function updateLiveBadge() {
+  const badge = document.getElementById('liveBadge');
+  const text = document.getElementById('liveBadgeText');
+  if (!badge || !text) return;
+
+  if (!lastFetchTime) {
+    badge.className = 'live-badge stale';
+    text.textContent = 'CONNECTING...';
+    return;
+  }
+
+  const ageMs = Date.now() - lastFetchTime.getTime();
+  if (ageMs > 3600000) {
+    badge.className = 'live-badge stale';
+    text.textContent = 'STALE';
+  } else if (ageMs < 300000) {
+    badge.className = 'live-badge';
+    text.textContent = 'LIVE';
+  } else {
+    badge.className = 'live-badge';
+    text.textContent = 'SYNCED ' + Math.round(ageMs / 60000) + 'min ago';
+  }
+}
+
+async function testGASConnection() {
+  const url = document.getElementById('s-gas-url').value.trim();
+  const statusEl = document.getElementById('s-gas-status');
+  if (!url) {
+    statusEl.style.display = 'flex';
+    statusEl.className = 'settings-status-row error';
+    statusEl.textContent = 'Please enter a GAS Web App URL first.';
+    return;
+  }
+  statusEl.style.display = 'flex';
+  statusEl.className = 'settings-status-row';
+  statusEl.textContent = 'Testing connection...';
+
+  try {
+    const res = await fetch(url + '?action=ping');
+    if (res.ok) {
+      statusEl.className = 'settings-status-row success';
+      statusEl.textContent = 'Connection successful! GAS endpoint is responding.';
+    } else {
+      throw new Error('HTTP ' + res.status);
+    }
+  } catch (err) {
+    statusEl.className = 'settings-status-row error';
+    statusEl.textContent = 'Connection failed: ' + err.message + '. Check your GAS URL and deployment settings.';
+  }
+}
+
+// ─── SETTINGS MODAL ──────────────────────────────────────────────────
+function openSettingsModal() {
+  document.getElementById('s-gas-url').value = SHEETS_CONFIG.GAS_WEBAPP_URL || '';
+  document.getElementById('s-live-enabled').checked = SHEETS_CONFIG.ENABLED;
+  document.getElementById('s-gas-status').style.display = 'none';
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+
+function closeSettingsModal() {
+  document.getElementById('settingsOverlay').classList.remove('open');
+}
+
+function closeSettingsOutside(e) {
+  if (e.target === document.getElementById('settingsOverlay')) closeSettingsModal();
+}
+
+function onGASUrlChange() {
+  const url = document.getElementById('s-gas-url').value.trim();
+  document.getElementById('s-gas-status').style.display = 'none';
+  if (url.includes('script.google.com')) {
+    document.getElementById('s-live-enabled').checked = true;
+  }
+}
+
+function onLiveToggle() {}
+
+function saveSettings() {
+  const url = document.getElementById('s-gas-url').value.trim();
+  const enabled = document.getElementById('s-live-enabled').checked;
+
+  SHEETS_CONFIG.GAS_WEBAPP_URL = url;
+  SHEETS_CONFIG.ENABLED = enabled && !!url;
+
+  localStorage.setItem('pl_gas_url', url);
+  localStorage.setItem('pl_live_enabled', SHEETS_CONFIG.ENABLED ? 'true' : 'false');
+
+  updateDataSourcesPanel();
+
+  if (SHEETS_CONFIG.ENABLED) {
+    fetchLiveData();
+    startAutoRefresh();
+  } else {
+    stopAutoRefresh();
+    updateLiveBadge();
+  }
+
+  closeSettingsModal();
+}
+
+// ─── WEBINAR SETTINGS MODAL ────────────────────────────────────────────
+function openModal() {
+  const savedDate = localStorage.getItem('pl_next_webinar') || '2026-04-13';
+  const savedName = localStorage.getItem('pl_next_webinar_name') || 'Airbnb Launch — April 2026';
+  document.getElementById('f-next-webinar-date').value = savedDate;
+  document.getElementById('f-next-webinar-name').value = savedName;
+
+  _updateModalCountdown(savedDate);
+  _buildWebinarSchedule();
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function _updateModalCountdown(dateStr) {
+  const el = document.getElementById('f-modal-countdown');
+  if (!el || !dateStr) { el.textContent = '--'; return; }
+  const webDate = new Date(dateStr + 'T19:00:00');
+  const now = new Date();
+  const diff = webDate - now;
+  if (diff <= 0) {
+    el.textContent = 'Webinar has passed';
+    el.style.color = 'var(--text3)';
+  } else {
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    el.textContent = days + 'd ' + hours + 'h until webinar';
+    el.style.color = days <= 1 ? 'var(--red)' : days <= 3 ? 'var(--yellow)' : 'var(--green)';
+  }
+}
+
+function _buildWebinarSchedule() {
+  const el = document.getElementById('f-webinar-schedule');
+  if (!el) return;
+
+  const nextDate = localStorage.getItem('pl_next_webinar') || '2026-04-13';
+  const nextName = localStorage.getItem('pl_next_webinar_name') || 'Airbnb Launch — April 2026';
+  const now = new Date();
+  now.setHours(0,0,0,0);
+
+  let html = '';
+
+  const nextWebDate = new Date(nextDate + 'T00:00:00');
+  const isUpcoming = nextWebDate >= now;
+  html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;margin-bottom:6px;background:${isUpcoming ? 'rgba(62,207,160,0.07)' : 'rgba(255,255,255,0.03)'};border:1px solid ${isUpcoming ? 'rgba(62,207,160,0.2)' : 'rgba(255,255,255,0.06)'};">
+    <span style="font-size:14px;">${isUpcoming ? '\u{1F7E2}' : '\u26AA'}</span>
+    <div style="flex:1;">
+      <div style="font-size:12px;font-weight:600;color:var(--text);">${nextName}</div>
+      <div style="font-size:11px;color:var(--text3);">${new Date(nextDate + 'T00:00:00').toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short', year:'numeric'})} at 7:00 PM GMT</div>
+    </div>
+    <span style="font-size:10px;font-weight:700;color:${isUpcoming ? 'var(--accent)' : 'var(--text3)'};text-transform:uppercase;">${isUpcoming ? 'NEXT' : 'PAST'}</span>
+  </div>`;
+
+  const pastSessions = [...sessions].sort((a,b) => new Date(b.date) - new Date(a.date));
+  pastSessions.forEach(s => {
+    if (s.date === nextDate) return;
+    const sDate = new Date(s.date + 'T00:00:00');
+    const isPast = sDate < now;
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;margin-bottom:4px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);">
+      <span style="font-size:14px;">\u26AA</span>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);">${s.name}</div>
+        <div style="font-size:11px;color:var(--text3);">${sDate.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short', year:'numeric'})}</div>
+      </div>
+      <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;">${isPast ? 'DONE' : 'UPCOMING'}</span>
+    </div>`;
+  });
+
+  el.innerHTML = html || '<div style="font-size:12px;color:var(--text3);font-style:italic;">No sessions yet. This is your first webinar!</div>';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function saveWebinarSettings() {
+  const nextDate = document.getElementById('f-next-webinar-date').value;
+  const nextName = document.getElementById('f-next-webinar-name').value || 'Airbnb Launch — April 2026';
+
+  localStorage.setItem('pl_next_webinar', nextDate);
+  localStorage.setItem('pl_next_webinar_name', nextName);
+
+  updateNextWebinarCard();
+  closeModal();
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────
+function set(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function colorEl(id, cls) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = el.className.replace(/\b(green|yellow|red|blue|white|emerald)\b/g, '');
+  el.classList.add(cls);
+  if (el.classList.contains('kpi-value')) el.classList.add('kpi-value');
+}
+
+function delta(curr, prev) {
+  if (!prev) return '\u2014';
+  const d = ((curr - prev) / prev * 100).toFixed(1);
+  return (d >= 0 ? '+' : '') + d + '%';
+}
+
+function exportPDF() {
+  window.print();
+}
+
+// ─── PRINT STYLES ────────────────────────────────────────────────────
+const printStyle = document.createElement('style');
+printStyle.textContent = `@media print { .nav-right { display: none; } .campaign-selector { display: none; } .data-sources-panel { display: none; } body { background: white; color: black; } }`;
+document.head.appendChild(printStyle);
+</script>
+
+<footer style="text-align:center;padding:20px 0;border-top:1px solid var(--border);margin-top:40px;">
+  <a href="https://www.instagram.com/ollieknxght" target="_blank" rel="noopener noreferrer" style="color:var(--text3);font-size:13px;text-decoration:none;">designed by ollie knight</a>
+</footer>
+
+</body>
+</html>
