@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Property Labs — Webinar Dashboard v5</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+<style>
+  :root{
+    --bg:#08090b;
+    --panel:#0f1013;
+    --panel-2:#14161b;
+    --panel-3:#1a1d23;
+    --border:#1f232b;
+    --border-strong:#2a2f38;
+    --text:#f2f3f5;
+    --text-2:#a0a5af;
+    --text-3:#5f6672;
+    --green:#22c55e;
+    --green-soft:rgba(34,197,94,0.12);
+    --amber:#f59e0b;
+    --amber-soft:rgba(245,158,11,0.14);
+    --red:#ef4444;
+    --red-soft:rgba(239,68,68,0.14);
+    --blue:#3b82f6;
+    --blue-soft:rgba(59,130,246,0.14);
+    --purple:#a855f7;
+    --cyan:#06b6d4;
+    --pre-accent:#3b82f6;
+    --post-accent:#a855f7;
+    --radius-sm:8px;
+    --radius-md:12px;
+    --radius-lg:16px;
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md:0 4px 12px rgba(0,0,0,0.4);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:120px}
+  html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  body{min-height:100vh;background:radial-gradient(ellipse at top,#0e1015 0%,#08090b 55%) fixed}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+  /* ══ NAV ══ */
+  .nav{position:sticky;top:0;z-index:50;display:flex;flex-direction:column;background:rgba(8,9,11,0.82);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border)}
+  .nav-top{display:flex;align-items:center;justify-content:space-between;padding:13px 28px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1a1d24,#0e1014);border:1px solid var(--border-strong);display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff}
+  .brand-text{line-height:1.2}
+  .brand-title{font-size:14px;font-weight:600;letter-spacing:-0.01em}
+  .brand-sub{font-size:11px;color:var(--text-3);margin-top:1px}
+  .nav-right{display:flex;align-items:center;gap:10px}
+  .live-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:600;background:var(--green-soft);color:var(--green);border:1px solid rgba(34,197,94,0.25)}
+  .live-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+  .live-pill.stale{background:var(--amber-soft);color:var(--amber);border-color:rgba(245,158,11,0.3)}
+  .live-pill.stale .dot{background:var(--amber);animation:none}
+  .live-pill.error{background:var(--red-soft);color:var(--red);border-color:rgba(239,68,68,0.3)}
+  .live-pill.error .dot{background:var(--red);animation:none}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.45;transform:scale(0.9)}}
+  .updated{font-size:11px;color:var(--text-3)}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;font-size:12px;font-weight:500;color:var(--text);background:var(--panel-2);border:1px solid var(--border-strong);transition:all 0.15s}
+  .btn:hover{background:var(--panel-3);border-color:#3a4150}
+  .btn svg{width:13px;height:13px}
+  .btn.subtle{font-size:11px;padding:6px 10px}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn.primary:hover{background:#2563eb;border-color:#2563eb}
+
+  /* ══ FILTER BAR (session + date range) ══ */
+  .filter-bar{display:flex;align-items:center;gap:10px;padding:10px 28px;border-top:1px solid var(--border);background:rgba(15,16,19,0.5);flex-wrap:wrap}
+  .filter-bar label{font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;font-weight:600}
+  .filter-bar .session-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;background:var(--panel-2);border:1px solid var(--border-strong);border-radius:8px;font-size:12px;color:var(--text)}
+  .filter-bar select,.filter-bar input[type="date"]{background:var(--panel-2);border:1px solid var(--border-strong);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text);font-family:inherit;outline:none;min-height:30px}
+  .filter-bar select:focus,.filter-bar input[type="date"]:focus{border-color:var(--blue)}
+  .filter-bar .preset-group{display:inline-flex;gap:2px;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:3px}
+  .filter-bar .preset{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;color:var(--text-2);cursor:pointer;transition:all 0.15s;border:none;background:none}
+  .filter-bar .preset:hover{color:var(--text)}
+  .filter-bar .preset.active{background:var(--panel-3);color:var(--text);box-shadow:0 1px 0 rgba(255,255,255,0.04) inset}
+  .filter-bar .range-arrow{color:var(--text-3);font-size:11px}
+  .filter-bar .filter-meta{margin-left:auto;font-size:11px;color:var(--text-3)}
+
+  /* ══ SECTION TABS (PRE / POST jumper) ══ */
+  .nav-tabs{display:flex;align-items:center;justify-content:space-between;padding:0 28px 10px;gap:16px;flex-wrap:wrap}
+  .tabs{display:flex;gap:6px;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:4px}
+  .tab{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;color:var(--text-2);transition:all 0.15s;cursor:pointer}
+  .tab:hover{color:var(--text)}
+  .tab.active{background:var(--panel-3);color:var(--text);box-shadow:0 1px 0 rgba(255,255,255,0.03) inset}
+  .tab .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .tab[data-target="overview"] .dot{background:#94a3b8}
+  .tab[data-target="pre"] .dot{background:var(--pre-accent)}
+  .tab[data-target="post"] .dot{background:var(--post-accent)}
+
+  /* Compact data-source pills in header */
+  .ds-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .ds-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:10.5px;background:var(--panel-2);border:1px solid var(--border);color:var(--text-2)}
+  .ds-pill .dot{width:5px;height:5px;border-radius:50%;background:var(--text-3)}
+  .ds-pill.ok{border-color:rgba(34,197,94,0.3);color:var(--green)}
+  .ds-pill.ok .dot{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,0.6)}
+  .ds-pill.warn{border-color:rgba(245,158,11,0.3);color:var(--amber)}
+  .ds-pill.warn .dot{background:var(--amber)}
+  .ds-pill.err{border-color:rgba(239,68,68,0.3);color:var(--red)}
+  .ds-pill.err .dot{background:var(--red)}
+
+  /* ══ MAIN ══ */
+  .main{padding:22px 28px 48px;max-width:1440px;margin:0 auto}
+
+  /* ══ COLLAPSIBLE SECTION WRAPPER (universal) ══ */
+  .c-section{margin-bottom:20px}
+  .c-section .c-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 14px;border-radius:var(--radius-md);background:var(--panel-2);border:1px solid var(--border);cursor:pointer;transition:all 0.15s;user-select:none;flex-wrap:wrap}
+  .c-section .c-head:hover{background:var(--panel-3);border-color:var(--border-strong)}
+  .c-section .c-head .c-title{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:0.06em;min-width:0;flex:1}
+  .c-section .c-head .c-title .idx{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:5px;background:var(--panel-3);font-size:10px;color:var(--text-2);font-weight:700;flex-shrink:0}
+  .c-section .c-head .c-title .c-meta{color:var(--text-3);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px;font-size:11px}
+  .c-section .c-head .c-right{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text-2);flex-wrap:wrap}
+  .c-section .c-head .c-right b{color:var(--text);font-weight:600}
+  .c-section .c-head .c-caret{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;background:var(--panel-3);color:var(--text-2);font-size:10px;transition:transform 0.2s;flex-shrink:0}
+  .c-section.open > .c-head .c-caret{transform:rotate(90deg)}
+  .c-section.open > .c-head{border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:1px solid transparent}
+  .c-section > .c-body{display:none;padding:14px;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-md) var(--radius-md);background:var(--panel)}
+  .c-section.open > .c-body{display:block}
+  /* Big section variant (Pre / Post master headers) */
+  .c-section.big > .c-head{padding:16px 20px;background:linear-gradient(135deg,var(--panel) 0%,var(--panel-2) 100%);border:1px solid var(--border-strong);position:relative;overflow:hidden;border-radius:var(--radius-lg)}
+  .c-section.big.open > .c-head{border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:1px solid transparent}
+  .c-section.big > .c-head::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--accent)}
+  .c-section.big > .c-head .c-title{font-size:15px;text-transform:none;letter-spacing:-0.01em}
+  .c-section.big > .c-head .c-title .tag{display:inline-flex;align-items:center;padding:3px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;border-radius:6px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);flex-shrink:0}
+  .c-section.big > .c-body{padding:18px;border-radius:0 0 var(--radius-lg) var(--radius-lg)}
+  #pre-section{--accent:var(--pre-accent);--accent-soft:var(--blue-soft);--accent-border:rgba(59,130,246,0.3)}
+  #post-section{--accent:var(--post-accent);--accent-soft:rgba(168,85,247,0.14);--accent-border:rgba(168,85,247,0.3)}
+
+  /* ══ KPI TILES (top 4) ══ */
+  .stat-card{position:relative;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 18px;transition:border-color 0.2s}
+  .stat-card:hover{border-color:var(--border-strong)}
+  .stat-card .stat-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+  .stat-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em}
+  .stat-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:600;line-height:1;white-space:nowrap}
+  .stat-badge.green{background:var(--green-soft);color:var(--green)}
+  .stat-badge.amber{background:var(--amber-soft);color:var(--amber)}
+  .stat-badge.red{background:var(--red-soft);color:var(--red)}
+  .stat-badge.grey{background:rgba(160,165,175,0.12);color:var(--text-2)}
+  .stat-value{font-size:28px;font-weight:700;letter-spacing:-0.02em;line-height:1;color:var(--text)}
+  .stat-sub{font-size:11px;color:var(--text-2);margin-top:8px;display:flex;align-items:center;gap:6px}
+  .stat-sub .tick{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text-3);flex-shrink:0}
+  .stat-sub .tick.green{background:var(--green)}
+  .stat-sub .tick.amber{background:var(--amber)}
+  .stat-sub .tick.red{background:var(--red)}
+
+  .hero-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media (max-width:900px){.hero-grid-4{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:500px){.hero-grid-4{grid-template-columns:1fr}}
+
+  /* ══ PIPELINE FLOW — HORIZONTAL SCORECARD + ARROW ══ */
+  .flow-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 10px;padding:0 2px}
+  .flow-title .t{font-size:11.5px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.08em;display:flex;align-items:center;gap:8px}
+  .flow-title .t .tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border)}
+  .flow-title .t.pre{--accent:var(--pre-accent);--accent-soft:var(--blue-soft);--accent-border:rgba(59,130,246,0.3)}
+  .flow-title .t.post{--accent:var(--post-accent);--accent-soft:rgba(168,85,247,0.14);--accent-border:rgba(168,85,247,0.3)}
+  .flow-title .m{font-size:11px;color:var(--text-3)}
+
+  .flow{display:flex;flex-wrap:nowrap;align-items:stretch;gap:0;overflow-x:auto;overflow-y:visible;padding:4px 2px 10px;scrollbar-width:thin;scrollbar-color:var(--border-strong) transparent}
+  .flow::-webkit-scrollbar{height:8px}
+  .flow::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:4px}
+  .flow::-webkit-scrollbar-track{background:transparent}
+
+  .sc{flex:0 0 auto;width:150px;min-width:140px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 13px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;gap:4px;position:relative}
+  .sc:hover{border-color:var(--border-strong);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+  .sc.open{border-color:var(--border-strong);background:var(--panel-2)}
+  .sc.biggest{border-color:rgba(239,68,68,0.45);background:rgba(239,68,68,0.04);animation:wfPulse 2.4s infinite}
+  @keyframes wfPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.35)}50%{box-shadow:0 0 0 4px rgba(239,68,68,0)}}
+  .sc .sc-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px}
+  .sc .sc-label{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;line-height:1.2}
+  .sc .sc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .sc .sc-dot.green{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,0.6)}
+  .sc .sc-dot.amber{background:var(--amber);box-shadow:0 0 6px rgba(245,158,11,0.5)}
+  .sc .sc-dot.red{background:var(--red);box-shadow:0 0 6px rgba(239,68,68,0.6)}
+  .sc .sc-dot.na{background:var(--text-3)}
+  .sc .sc-value{font-size:22px;font-weight:700;letter-spacing:-0.02em;line-height:1.1;color:var(--text);font-variant-numeric:tabular-nums;margin-top:2px}
+  .sc .sc-sub{font-size:10px;color:var(--text-2);margin-top:4px;display:flex;align-items:center;gap:4px;min-height:14px}
+  .sc .sc-sub .v{font-weight:600}
+  .sc .sc-sub .v.green{color:var(--green)}
+  .sc .sc-sub .v.amber{color:var(--amber)}
+  .sc .sc-sub .v.red{color:var(--red)}
+
+  .arr{flex:0 0 auto;width:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0 4px;position:relative}
+  .arr .arr-line{display:flex;align-items:center;width:100%;height:18px}
+  .arr .arr-line .l{flex:1;height:2px;background:linear-gradient(90deg,transparent,var(--border-strong) 30%)}
+  .arr .arr-line .chev{color:var(--text-2);font-size:14px;line-height:1}
+  .arr .arr-pct{font-size:15px;font-weight:700;letter-spacing:-0.01em;color:var(--text);font-variant-numeric:tabular-nums}
+  .arr .arr-pct.good{color:var(--green)}
+  .arr .arr-pct.amber{color:var(--amber)}
+  .arr .arr-pct.red{color:var(--red)}
+  .arr .arr-bench{font-size:9.5px;color:var(--text-3);display:flex;align-items:center;gap:4px}
+  .arr .arr-bench .cdot{width:6px;height:6px;border-radius:50%;background:var(--text-3)}
+  .arr .arr-bench .cdot.green{background:var(--green)}
+  .arr .arr-bench .cdot.amber{background:var(--amber)}
+  .arr .arr-bench .cdot.red{background:var(--red)}
+  .arr .arr-na{font-size:10px;color:var(--text-3);font-style:italic}
+
+  /* Inline drawer beneath scorecard row */
+  .sc-drawer{display:none;grid-template-columns:repeat(3,1fr);gap:14px;padding:12px 14px;margin-top:10px;border:1px solid var(--border-strong);border-radius:var(--radius-md);background:var(--panel-2)}
+  .sc-drawer.open{display:grid}
+  .sc-drawer .cell{display:flex;flex-direction:column;gap:2px}
+  .sc-drawer .k{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em}
+  .sc-drawer .v{font-size:13px;color:var(--text);font-weight:500}
+  .sc-drawer .v.uplift{color:var(--green);font-weight:600}
+  .sc-drawer .v.hint{font-size:12px;color:var(--text-2);grid-column:1/-1;line-height:1.5;padding-top:8px;border-top:1px dashed var(--border);margin-top:4px}
+  @media (max-width:900px){.sc-drawer{grid-template-columns:1fr}}
+
+  /* Mobile: stack the flow vertically with down arrows */
+  @media (max-width:900px){
+    .flow{flex-direction:column;overflow-x:visible}
+    .sc{width:100%;min-width:0}
+    .arr{width:100%;height:48px;flex-direction:row;justify-content:center;gap:10px}
+    .arr .arr-line{width:auto;height:auto;flex-direction:column}
+    .arr .arr-line .l{display:none}
+    .arr .arr-line .chev{transform:rotate(90deg);font-size:18px}
+  }
+
+  /* ══ LEGACY SECTION CONTENT STYLES (kept for inner content) ══ */
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px;flex-wrap:wrap}
+  .section-title{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:0.08em;display:flex;align-items:center;gap:8px}
+  .section-meta{font-size:11px;color:var(--text-3)}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px}
+
+  /* ══ FUNNEL BARS (used inside Pre 1.1 + Post 2.1 / 2.4) ══ */
+  .funnel-wrap{display:grid;grid-template-columns:1fr;gap:10px}
+  .funnel-row{display:grid;grid-template-columns:170px 1fr 160px;align-items:center;gap:14px;padding:9px 0;border-top:1px solid var(--border)}
+  .funnel-row:first-child{border-top:none;padding-top:0}
+  .flabel{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px}
+  .flabel .stage-icon{width:22px;height:22px;border-radius:6px;background:var(--panel-3);display:grid;place-items:center;font-size:10px;color:var(--text-2);flex-shrink:0;font-weight:700}
+  .fbar-wrap{position:relative;height:28px;background:var(--panel-2);border-radius:8px;border:1px solid var(--border);overflow:hidden}
+  .fbar{position:absolute;inset:0;width:0;background:linear-gradient(90deg,#1c3a28,#22c55e);border-radius:7px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1);display:flex;align-items:center;padding-left:12px;color:#fff;font-size:12px;font-weight:600}
+  .fbar.amber{background:linear-gradient(90deg,#3a2e10,#f59e0b)}
+  .fbar.red{background:linear-gradient(90deg,#3a1515,#ef4444)}
+  .fbar.neutral{background:linear-gradient(90deg,#1a2030,#3b4757)}
+  .fbar.pre{background:linear-gradient(90deg,#0f2247,#3b82f6)}
+  .fbar.post{background:linear-gradient(90deg,#2a1147,#a855f7)}
+  .fmeta{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+  .fmeta .fcount{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.01em}
+  .fmeta .fconv{font-size:11px;color:var(--text-2);display:flex;align-items:center;gap:4px}
+  .fmeta .fconv.drop{color:var(--red);font-weight:600}
+  .fmeta .fconv.good{color:var(--green);font-weight:600}
+  .fmeta .fconv.warn{color:var(--amber)}
+
+  /* ══ GRID ══ */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media (max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}.grid-4{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:560px){.grid-4{grid-template-columns:1fr}}
+
+  /* ══ TABLES ══ */
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  thead th{text-align:left;font-size:10.5px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.07em;padding:9px 12px;border-bottom:1px solid var(--border);background:var(--panel-2)}
+  thead th.num{text-align:right}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+  tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--panel-2)}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;background:var(--panel)}
+  .rate-chip{display:inline-flex;align-items:center;justify-content:flex-end;min-width:44px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums}
+  .rate-chip.good{background:var(--green-soft);color:var(--green)}
+  .rate-chip.ok{background:rgba(160,165,175,0.12);color:var(--text-2)}
+  .rate-chip.warn{background:var(--amber-soft);color:var(--amber)}
+  .rate-chip.bad{background:var(--red-soft);color:var(--red)}
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:600}
+  .pill.awaiting{background:rgba(160,165,175,0.1);color:var(--text-3);border:1px dashed var(--border-strong)}
+  .pill.live{background:var(--green-soft);color:var(--green)}
+  .slot-label{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:var(--text-3)}
+  .subj{color:var(--text-2);font-size:12.5px;max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* ══ SOURCE CARDS ══ */
+  .source-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px}
+  .source-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .source-val{font-size:22px;font-weight:700;letter-spacing:-0.02em;margin-bottom:8px}
+  .source-bar-bg{height:6px;background:var(--panel-3);border-radius:999px;overflow:hidden;margin-bottom:8px}
+  .source-bar{height:100%;border-radius:999px;transition:width 0.5s ease}
+  .source-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-2)}
+
+  /* ══ SEQUENCE GROUPS (used in Pre 1.5/1.6 and Post 2.7/2.8) ══ */
+  .seq-group{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:10px}
+  .seq-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--panel-2);border-bottom:1px solid transparent;cursor:pointer;gap:12px;flex-wrap:wrap}
+  .seq-head:hover{background:var(--panel-3)}
+  .seq-title{font-size:13px;font-weight:600;color:var(--text)}
+  .seq-summary{display:flex;gap:14px;font-size:11px;color:var(--text-2);flex-wrap:wrap;align-items:center}
+  .seq-summary b{color:var(--text);font-weight:600}
+  .seq-caret{font-size:10px;color:var(--text-3);transition:transform 0.2s;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;background:var(--panel-3)}
+  .seq-group.open .seq-head{border-bottom-color:var(--border)}
+  .seq-group.open .seq-caret{transform:rotate(90deg)}
+  .seq-body{display:none;padding:0}
+  .seq-group.open .seq-body{display:block}
+
+  /* ══ CHARTS ══ */
+  .chart-frame{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px;height:100%}
+  .chart-frame h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px}
+  .chart-canvas-wrap{position:relative;height:220px}
+
+  /* ══ RETENTION BUCKETS ══ */
+  .ret-row{display:grid;grid-template-columns:180px 1fr 100px;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--border)}
+  .ret-row:first-child{border-top:none;padding-top:0}
+  .ret-row .label{font-size:12.5px;color:var(--text)}
+  .ret-row .bar-bg{height:14px;background:var(--panel-3);border-radius:6px;overflow:hidden;position:relative}
+  .ret-row .bar{position:absolute;inset:0;width:0;border-radius:6px;background:linear-gradient(90deg,#2a1147,#a855f7);transition:width 0.5s}
+  .ret-row.pitch .bar{background:linear-gradient(90deg,#133b20,#22c55e)}
+  .ret-row.end .bar{background:linear-gradient(90deg,#1a3a14,#84cc16)}
+  .ret-row.bounce .bar{background:linear-gradient(90deg,#3a1818,#ef4444)}
+  .ret-row .val{font-size:12px;font-weight:600;color:var(--text);text-align:right;font-variant-numeric:tabular-nums}
+  .ret-row .val .sub{color:var(--text-3);font-weight:400;font-size:10.5px;display:block;margin-top:1px}
+
+  /* ══ TIMING BARS ══ */
+  .time-row{display:grid;grid-template-columns:170px 1fr 80px;align-items:center;gap:12px;padding:8px 0;border-top:1px solid var(--border)}
+  .time-row:first-child{border-top:none;padding-top:0}
+  .time-row .label{font-size:12px;color:var(--text)}
+  .time-row .bar-bg{height:12px;background:var(--panel-3);border-radius:4px;overflow:hidden;position:relative}
+  .time-row .bar{position:absolute;inset:0;width:0;border-radius:4px;background:var(--pre-accent);transition:width 0.5s}
+  .time-row .val{font-size:12px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+
+  /* ══ UTIL ══ */
+  .hidden{display:none!important}
+  .skeleton{background:linear-gradient(90deg,var(--panel-2) 0%,var(--panel-3) 50%,var(--panel-2) 100%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px;min-height:14px;color:transparent}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  .muted{color:var(--text-3)}
+  .nowrap{white-space:nowrap}
+  .text-sm{font-size:12px}
+  .info-banner{padding:10px 14px;border-radius:8px;background:var(--panel-2);border:1px dashed var(--border-strong);color:var(--text-3);font-size:12px;margin-bottom:10px}
+
+  footer{margin:48px auto 24px;text-align:center;font-size:11px;color:var(--text-3);max-width:1440px;padding:0 28px}
+  footer a{color:var(--text-2);border-bottom:1px solid var(--border-strong);transition:color 0.2s}
+  footer a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<header class="nav">
+  <div class="nav-top">
+    <div class="brand">
+      <div class="brand-logo">PL</div>
+      <div class="brand-text">
+        <div class="brand-title">Property Labs — Webinar Dashboard</div>
+        <div class="brand-sub">v5 · Scorecard-flow pipeline · collapsible sections</div>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button class="btn subtle" id="collapseAllBtn" type="button" title="Collapse all sections">Collapse all</button>
+      <button class="btn subtle" id="expandAllBtn" type="button" title="Expand all sections">Expand all</button>
+      <span class="updated" id="lastUpdated">Loading…</span>
+      <span class="live-pill" id="livePill"><span class="dot"></span> <span id="livePillText">Live</span></span>
+      <button class="btn" id="refreshBtn" type="button" title="Refresh all data now">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10a7 7 0 0 1 12-4.95L17 7"/><path d="M17 3v4h-4"/><path d="M17 10a7 7 0 0 1-12 4.95L3 13"/><path d="M3 17v-4h4"/></svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+  <div class="filter-bar" id="filterBar">
+    <label for="fSession">Webinar</label>
+    <select id="fSession" title="Pick a webinar session — loads its window into the date range">
+      <option value="all">All Time — All Sessions</option>
+    </select>
+
+    <div class="preset-group" role="group" aria-label="Date range presets">
+      <button class="preset" data-preset="today" type="button">Today</button>
+      <button class="preset" data-preset="yesterday" type="button">Yesterday</button>
+      <button class="preset" data-preset="7d" type="button">Last 7d</button>
+      <button class="preset" data-preset="30d" type="button">Last 30d</button>
+      <button class="preset" data-preset="session" type="button">Session</button>
+      <button class="preset" data-preset="all" type="button">All time</button>
+    </div>
+
+    <label for="fFrom">From</label>
+    <input type="date" id="fFrom" />
+    <span class="range-arrow">→</span>
+    <label for="fTo">To</label>
+    <input type="date" id="fTo" />
+    <button class="btn primary" id="fApply" type="button" title="Apply filter and refresh data">Apply</button>
+
+    <span class="filter-meta" id="filterMeta">—</span>
+  </div>
+
+  <div class="nav-tabs">
+    <div class="tabs" role="tablist">
+      <a href="#overview" class="tab active" data-target="overview"><span class="dot"></span> Overview</a>
+      <a href="#pre-section" class="tab" data-target="pre"><span class="dot"></span> Pre-Webinar</a>
+      <a href="#post-section" class="tab" data-target="post"><span class="dot"></span> Post-Webinar</a>
+    </div>
+    <div class="ds-row" id="dsRow">
+      <span class="ds-pill" id="ds-sheets"><span class="dot"></span> Sheets</span>
+      <span class="ds-pill" id="ds-ghl"><span class="dot"></span> GHL</span>
+      <span class="ds-pill" id="ds-wj"><span class="dot"></span> WebinarJam</span>
+      <span class="ds-pill" id="ds-cal"><span class="dot"></span> Calendly</span>
+      <span class="ds-pill" id="ds-stripe"><span class="dot"></span> Stripe</span>
+      <span class="ds-pill" id="ds-meta"><span class="dot"></span> Meta Ads</span>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="overview">
+
+  <!-- ══ OVERVIEW SECTION ══ -->
+
+  <!-- Hero KPIs (collapsible, default open) -->
+  <div class="c-section" data-key="sec-kpis" data-default="open">
+    <div class="c-head">
+      <div class="c-title"><span class="idx">KPI</span> Key performance <span class="c-meta">· this month</span></div>
+      <div class="c-right">
+        <span>Regs <b id="kpiPeekRegs">—</b></span>
+        <span>Show <b id="kpiPeekShow">—</b></span>
+        <span>Rev <b id="kpiPeekRev">—</b></span>
+        <span class="c-caret">›</span>
+      </div>
+    </div>
+    <div class="c-body">
+      <div class="hero-grid-4" id="heroGrid">
+        <div class="stat-card" id="heroRegs">
+          <div class="stat-head"><span class="stat-label">Registrations</span><span class="stat-badge grey" id="heroRegsBadge">—</span></div>
+          <div class="stat-value" id="heroRegsVal">—</div>
+          <div class="stat-sub"><span class="tick"></span> <span id="heroRegsSub">Target 104+</span></div>
+        </div>
+        <div class="stat-card" id="heroShow">
+          <div class="stat-head"><span class="stat-label">Show Rate</span><span class="stat-badge grey" id="heroShowBadge">—</span></div>
+          <div class="stat-value" id="heroShowVal">—</div>
+          <div class="stat-sub"><span class="tick"></span> <span id="heroShowSub">Target 35–45%</span></div>
+        </div>
+        <div class="stat-card" id="heroBooked">
+          <div class="stat-head"><span class="stat-label">Calls Booked</span><span class="stat-badge grey" id="heroBookedBadge">—</span></div>
+          <div class="stat-value" id="heroBookedVal">—</div>
+          <div class="stat-sub"><span class="tick"></span> <span id="heroBookedSub">Target 20%+ of attendees</span></div>
+        </div>
+        <div class="stat-card" id="heroRev">
+          <div class="stat-head"><span class="stat-label">Revenue</span><span class="stat-badge grey" id="heroRevBadge">—</span></div>
+          <div class="stat-value" id="heroRevVal">—</div>
+          <div class="stat-sub"><span class="tick"></span> <span id="heroRevSub">ROAS —</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pipeline Flow (scorecard + arrow horizontal) — collapsible, default open -->
+  <div class="c-section" data-key="sec-pipeline" data-default="open">
+    <div class="c-head">
+      <div class="c-title"><span class="idx">FLOW</span> Pipeline flow <span class="c-meta">· impressions → closed won · click any stage for detail</span></div>
+      <div class="c-right">
+        <span id="flowMeta">—</span>
+        <span class="c-caret">›</span>
+      </div>
+    </div>
+    <div class="c-body">
+      <div class="flow-title">
+        <div class="t pre"><span class="tag">Pre</span> Pre-Webinar Flow</div>
+        <div class="m">Impressions → Attended Live</div>
+      </div>
+      <div class="flow" id="flowPre">
+        <div class="muted" style="padding:12px">Loading…</div>
+      </div>
+      <div class="sc-drawer" id="drawerPre"></div>
+
+      <div class="flow-title" style="margin-top:18px">
+        <div class="t post"><span class="tag">Post</span> Post-Webinar Flow</div>
+        <div class="m">Attended Live → Closed Won</div>
+      </div>
+      <div class="flow" id="flowPost">
+        <div class="muted" style="padding:12px">Loading…</div>
+      </div>
+      <div class="sc-drawer" id="drawerPost"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ══                PRE-WEBINAR  — SECTION 1                       ══ -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div class="c-section big" data-key="sec-pre" data-default="closed" id="pre-section" style="scroll-margin-top:120px">
+    <div class="c-head">
+      <div class="c-title">
+        <span class="tag">Section 1</span> Pre-Webinar
+        <span class="c-meta">· From ad impression through to webinar doors opening</span>
+      </div>
+      <div class="c-right">
+        <span>Regs <b id="preSumRegs">—</b></span>
+        <span>Predicted show <b id="preSumShow">—</b></span>
+        <span>Spend <b id="preSumSpend">—</b></span>
+        <span>CPR <b id="preSumCPR">—</b></span>
+        <span class="c-caret">›</span>
+      </div>
+    </div>
+    <div class="c-body">
+
+      <!-- 1.1 TRAFFIC FUNNEL -->
+      <div class="c-section" data-key="sec-1-1" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">1.1</span> Traffic funnel <span class="c-meta">· impressions → registration</span></div>
+          <div class="c-right"><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="panel">
+            <div class="funnel-wrap" id="preTrafficFunnel">
+              <div class="funnel-row"><div class="flabel">Loading…</div><div class="fbar-wrap"><div class="fbar" style="width:0"></div></div><div class="fmeta"><span class="fcount">—</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.2 SOURCE ATTRIBUTION -->
+      <div class="c-section" data-key="sec-1-2" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">1.2</span> Source attribution <span class="c-meta">· spend · cost per reg</span></div>
+          <div class="c-right"><span id="preSourcesMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="grid-4" id="preSourcesGrid">
+            <div class="source-card"><div class="source-label">Loading…</div><div class="source-val skeleton">&nbsp;</div></div>
+            <div class="source-card"><div class="source-label">Loading…</div><div class="source-val skeleton">&nbsp;</div></div>
+            <div class="source-card"><div class="source-label">Loading…</div><div class="source-val skeleton">&nbsp;</div></div>
+            <div class="source-card"><div class="source-label">Loading…</div><div class="source-val skeleton">&nbsp;</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.3 TIMING + 1.4 SHOW-UP PREDICTION -->
+      <div class="c-section" data-key="sec-1-3" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">1.3</span> Registration timing &amp; show-up prediction</div>
+          <div class="c-right"><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="grid-2">
+            <div>
+              <div class="section-head"><div class="section-title">Registration timing distribution</div></div>
+              <div class="panel"><div id="preTiming"><div class="muted" style="padding:6px 0">Loading…</div></div></div>
+            </div>
+            <div>
+              <div class="section-head"><div class="section-title">Show-up prediction + WhatsApp group</div></div>
+              <div class="panel">
+                <div style="display:flex;flex-direction:column;gap:14px">
+                  <div>
+                    <div class="stat-label" style="margin-bottom:4px">Predicted live attendees</div>
+                    <div class="stat-value" style="font-size:28px" id="prePredictedShow">—</div>
+                    <div class="muted text-sm" id="prePredictedSub">Model based on timing buckets × industry show-probability</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+                    <div><div class="stat-label">WA members</div><div class="stat-value" style="font-size:18px" id="waMembers">—</div></div>
+                    <div><div class="stat-label">WA sent</div><div class="stat-value" style="font-size:18px" id="waSent">—</div></div>
+                    <div><div class="stat-label">WA status</div><div class="stat-value" style="font-size:14px" id="waStatus">—</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.5 PRE-WEBINAR EMAILS -->
+      <div class="c-section" data-key="sec-1-5" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">1.5</span> Pre-webinar email sequence <span class="c-meta">· 9 emails</span></div>
+          <div class="c-right"><span id="preEmailMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Slot</th>
+                  <th>Subject line</th>
+                  <th class="num">Opens</th>
+                  <th class="num">Clicks</th>
+                  <th class="num">Open %</th>
+                  <th class="num">Click %</th>
+                </tr>
+              </thead>
+              <tbody id="preEmailBody">
+                <tr><td colspan="7" class="muted" style="text-align:center;padding:20px">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.6 PRE-WEBINAR SMS -->
+      <div class="c-section" data-key="sec-1-6" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">1.6</span> Pre-webinar SMS <span class="c-meta">· 6 messages</span></div>
+          <div class="c-right"><span id="preSmsMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Slot</th>
+                  <th>Message</th>
+                  <th class="num">Sent</th>
+                  <th class="num">Delivered</th>
+                  <th class="num">Clicks</th>
+                  <th class="num">Status</th>
+                </tr>
+              </thead>
+              <tbody id="preSmsBody">
+                <tr><td colspan="7" class="muted" style="text-align:center;padding:20px">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.7 META AD PERFORMANCE -->
+      <div class="c-section" data-key="sec-1-7" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">1.7</span> Ad performance <span class="c-meta">· Meta ads · per-campaign + Masterclass vs VSL</span></div>
+          <div class="c-right"><span id="metaMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="grid-2" style="margin-bottom:12px">
+            <div class="source-card" id="metaMcCard"><div class="source-label">Masterclass / Webinar</div><div class="source-val">—</div><div class="source-meta"><span>—</span></div></div>
+            <div class="source-card" id="metaVslCard"><div class="source-label">VSL</div><div class="source-val">—</div><div class="source-meta"><span>—</span></div></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Campaign</th><th class="num">Spend</th><th class="num">Impressions</th><th class="num">Clicks</th><th class="num">CTR</th><th class="num">CPC</th><th class="num">Leads</th><th class="num">CPR</th></tr></thead>
+              <tbody id="metaCampaignBody"><tr><td colspan="8" class="muted" style="text-align:center;padding:20px">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.8 LEAD MAGNET FUNNEL -->
+      <div class="c-section" data-key="sec-1-8" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">1.8</span> Lead-magnet funnel <span class="c-meta">· opt-ins → calls booked</span></div>
+          <div class="c-right"><span id="lmMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Magnet</th><th class="num">Opt-ins</th><th class="num">Calls booked</th><th class="num">Opt-in → Call %</th></tr></thead>
+              <tbody id="lmBody"><tr><td colspan="4" class="muted" style="text-align:center;padding:20px">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.9 IG PROFILE FUNNEL -->
+      <div class="c-section" data-key="sec-1-9" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">1.9</span> IG profile funnel <span class="c-meta">· profiles → DMs → replies → calls (from Setter EOD)</span></div>
+          <div class="c-right"><span id="igMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="funnel-wrap" id="igFunnel">
+            <div class="funnel-row"><div class="flabel">Loading…</div><div class="fbar-wrap"><div class="fbar" style="width:0"></div></div><div class="fmeta"><span class="fcount">—</span></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- ══                POST-WEBINAR — SECTION 2                       ══ -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div class="c-section big" data-key="sec-post" data-default="closed" id="post-section" style="scroll-margin-top:120px">
+    <div class="c-head">
+      <div class="c-title">
+        <span class="tag">Section 2</span> Post-Webinar
+        <span class="c-meta">· From doors-open to closed revenue</span>
+      </div>
+      <div class="c-right">
+        <span>Attended <b id="postSumAtt">—</b></span>
+        <span>Stayed <b id="postSumPitch">—</b></span>
+        <span>Booked <b id="postSumBooked">—</b></span>
+        <span>Revenue <b id="postSumRev">—</b></span>
+        <span class="c-caret">›</span>
+      </div>
+    </div>
+    <div class="c-body">
+
+      <!-- 2.1 ATTENDANCE FUNNEL -->
+      <div class="c-section" data-key="sec-2-1" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">2.1</span> Attendance funnel <span class="c-meta">· registered → stayed to end</span></div>
+          <div class="c-right"><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="panel">
+            <div class="funnel-wrap" id="postAttendanceFunnel">
+              <div class="funnel-row"><div class="flabel">Loading…</div><div class="fbar-wrap"><div class="fbar" style="width:0"></div></div><div class="fmeta"><span class="fcount">—</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.2 RETENTION + 2.3 REPLAY -->
+      <div class="c-section" data-key="sec-2-2" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">2.2</span> Retention curve &amp; replay engagement</div>
+          <div class="c-right"><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="grid-2">
+            <div>
+              <div class="section-head"><div class="section-title">Retention curve · watch time</div></div>
+              <div class="panel"><div id="postRetention"><div class="muted" style="padding:6px 0">Loading…</div></div></div>
+            </div>
+            <div>
+              <div class="section-head"><div class="section-title">Replay engagement</div></div>
+              <div class="panel">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                  <div><div class="stat-label">Replay-only viewers</div><div class="stat-value" style="font-size:22px" id="replayViews">—</div></div>
+                  <div><div class="stat-label">Total watch minutes</div><div class="stat-value" style="font-size:22px" id="replayMinutes">—</div></div>
+                  <div><div class="stat-label">Click-to-Calendly</div><div class="stat-value" style="font-size:22px" id="replayClicks">—</div></div>
+                  <div><div class="stat-label">Replay closes in</div><div class="stat-value" style="font-size:22px" id="replayExpiry">—</div></div>
+                </div>
+                <div class="info-banner" id="replayNote" style="margin-top:14px">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.4 CALL FUNNEL + 2.5 CLOSERS -->
+      <div class="c-section" data-key="sec-2-4" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">2.4</span> Call funnel &amp; closer activity</div>
+          <div class="c-right"><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="grid-2">
+            <div>
+              <div class="section-head"><div class="section-title">Call funnel · Calendly → close</div></div>
+              <div class="panel">
+                <div class="funnel-wrap" id="postCallFunnel">
+                  <div class="funnel-row"><div class="flabel">Loading…</div><div class="fbar-wrap"><div class="fbar" style="width:0"></div></div><div class="fmeta"><span class="fcount">—</span></div></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="section-head"><div class="section-title">Closer leaderboard</div></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Closer</th><th class="num">Calls</th><th class="num">Closed</th><th class="num">Close %</th><th class="num">Revenue</th></tr></thead>
+                  <tbody id="postCloserBody"><tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Loading…</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.5 CALENDLY BY EVENT TYPE -->
+      <div class="c-section" data-key="sec-2-5" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">2.5</span> Calendly bookings by event type <span class="c-meta">· Normal / W / LM / V</span></div>
+          <div class="c-right"><span id="postCalEvtMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="grid-4" id="postCalEvtGrid">
+            <div class="source-card skeleton" style="min-height:90px">&nbsp;</div>
+            <div class="source-card skeleton" style="min-height:90px">&nbsp;</div>
+            <div class="source-card skeleton" style="min-height:90px">&nbsp;</div>
+            <div class="source-card skeleton" style="min-height:90px">&nbsp;</div>
+          </div>
+          <div id="postCalEvtUnmatched" class="muted" style="margin-top:10px;font-size:11px"></div>
+        </div>
+      </div>
+
+      <!-- 2.6 REVENUE -->
+      <div class="c-section" data-key="sec-2-6" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">2.6</span> Revenue by offer tier</div>
+          <div class="c-right"><span id="postRevMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="grid-4" id="postTiersGrid">
+            <div class="source-card skeleton" style="min-height:90px">&nbsp;</div>
+            <div class="source-card skeleton" style="min-height:90px">&nbsp;</div>
+            <div class="source-card skeleton" style="min-height:90px">&nbsp;</div>
+            <div class="source-card skeleton" style="min-height:90px">&nbsp;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.6b STRIPE PAYMENTS BY TIER (PIF + deposits) -->
+      <div class="c-section" data-key="sec-2-6b" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">2.6b</span> Stripe payments by tier <span class="c-meta">· paid-in-full + deposits, per tier</span></div>
+          <div class="c-right"><span id="payTierMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="grid-4" id="payTierGrid">
+            <div class="source-card skeleton" style="min-height:120px">&nbsp;</div>
+            <div class="source-card skeleton" style="min-height:120px">&nbsp;</div>
+            <div class="source-card skeleton" style="min-height:120px">&nbsp;</div>
+            <div class="source-card skeleton" style="min-height:120px">&nbsp;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.7 POST-WEBINAR EMAILS -->
+      <div class="c-section" data-key="sec-2-7" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">2.7</span> Post-webinar email sequences <span class="c-meta">· per path, per email</span></div>
+          <div class="c-right"><span id="postEmailMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div id="postEmailList">
+            <div class="seq-group"><div class="seq-head"><div class="seq-title">Loading…</div><span class="seq-caret">›</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.8 POST-WEBINAR SMS -->
+      <div class="c-section" data-key="sec-2-8" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">2.8</span> Post-webinar SMS <span class="c-meta">· per path, per message</span></div>
+          <div class="c-right"><span id="postSmsMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div id="postSmsList">
+            <div class="seq-group"><div class="seq-head"><div class="seq-title">Loading…</div><span class="seq-caret">›</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.9 TREND -->
+      <div class="c-section" data-key="sec-2-9" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">2.9</span> Performance trends <span class="c-meta">· last 10 sessions</span></div>
+          <div class="c-right"><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="grid-2">
+            <div class="chart-frame"><h3>Registrations &amp; Attendees</h3><div class="chart-canvas-wrap"><canvas id="trendChart"></canvas></div></div>
+            <div class="chart-frame"><h3>Revenue by tier</h3><div class="chart-canvas-wrap"><canvas id="tierChart"></canvas></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.10 EOD: CLOSERS + SETTERS -->
+      <div class="c-section" data-key="sec-2-10" data-default="closed">
+        <div class="c-head">
+          <div class="c-title"><span class="idx">2.10</span> EOD: closers + setters <span class="c-meta">· same data feed as /eod</span></div>
+          <div class="c-right"><span id="eodMeta">—</span><span class="c-caret">›</span></div>
+        </div>
+        <div class="c-body">
+          <div class="grid-2">
+            <div>
+              <div class="section-head"><div class="section-title">Closer leaderboard</div></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Closer</th><th class="num">Showed</th><th class="num">Closed</th><th class="num">Close %</th><th class="num">Revenue</th></tr></thead>
+                  <tbody id="eodCloserBody"><tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Loading…</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+            <div>
+              <div class="section-head"><div class="section-title">Setter leaderboard</div></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Setter</th><th class="num">Booked</th><th class="num">Showed</th><th class="num">Closed</th><th class="num">Revenue</th></tr></thead>
+                  <tbody id="eodSetterBody"><tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Loading…</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px"><a href="/eod" style="color:var(--blue);font-size:11px">Open full EOD dashboard →</a></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Designed by <a href="https://www.instagram.com/ollieknight__" target="_blank" rel="noopener">Ollie Knight</a>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  const API_BASE = '/api';
+  const REFRESH_MS = 5 * 60 * 1000;
+  const TARGETS = {
+    regs: 104,
+    showRate: 35,
+    stayRate: 50,
+    bookRate: 20,
+    closeRate: 30,
+  };
+  const LS_PREFIX = 'plwd-v5:';
+
+  const state = {
+    lastUpdated: null,
+    pre: null,
+    post: null,
+    dashboard: null,
+    connections: null,
+    adSpend: null,
+    waterfall: null,
+    campaigns: [],
+    activeCampaign: null,
+    filter: loadFilterFromStorage(),
+    calendly: null,
+    metaInsights: null,
+    payments: null,
+    ig: null,
+    lm: null,
+    eod: null,
+  };
+
+  // ─── FILTER STATE (session + custom date range) ────────────────────
+  function loadFilterFromStorage() {
+    try {
+      const raw = localStorage.getItem(LS_PREFIX + 'filter');
+      if (raw) {
+        const f = JSON.parse(raw);
+        if (f && typeof f === 'object') return f;
+      }
+    } catch (_) { /* ignore */ }
+    return { session_id: 'active', preset: 'session', from: '', to: '' };
+  }
+  function saveFilterToStorage() {
+    try { localStorage.setItem(LS_PREFIX + 'filter', JSON.stringify(state.filter)); } catch (_) {}
+  }
+  function buildFilterQuery() {
+    const f = state.filter || {};
+    const params = [];
+    if (f.from) params.push('from=' + encodeURIComponent(f.from));
+    if (f.to) params.push('to=' + encodeURIComponent(f.to));
+    if (f.session_id && f.session_id !== 'all' && f.session_id !== 'active') {
+      params.push('session_id=' + encodeURIComponent(f.session_id));
+    } else if (f.session_id === 'all') {
+      params.push('session_id=all');
+    }
+    return params.length ? '&' + params.join('&') : '';
+  }
+  function fmtDateShort(s) {
+    if (!s) return '—';
+    try { return new Date(s + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); }
+    catch(_) { return s; }
+  }
+  function isoToday() { return new Date().toISOString().slice(0,10); }
+  function isoDaysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0,10); }
+  function findActiveCampaign() {
+    if (!Array.isArray(state.campaigns)) return null;
+    return state.campaigns.find(c => c.active) || state.campaigns[state.campaigns.length - 1] || null;
+  }
+  function applyPreset(preset, opts = { reload: true }) {
+    const f = state.filter;
+    f.preset = preset;
+    const today = isoToday();
+    if (preset === 'today') { f.from = today; f.to = today; f.session_id = 'all'; }
+    else if (preset === 'yesterday') { const y = isoDaysAgo(1); f.from = y; f.to = y; f.session_id = 'all'; }
+    else if (preset === '7d') { f.from = isoDaysAgo(6); f.to = today; f.session_id = 'all'; }
+    else if (preset === '30d') { f.from = isoDaysAgo(29); f.to = today; f.session_id = 'all'; }
+    else if (preset === 'all') { f.from = ''; f.to = ''; f.session_id = 'all'; }
+    else if (preset === 'session') {
+      const active = state.activeCampaign || findActiveCampaign();
+      if (active) {
+        f.from = active.start || '';
+        f.to = active.end || '';
+        // index of campaign in list (if exposed) — fallback to name
+        const idx = state.campaigns.findIndex(c => c.name === active.name);
+        f.session_id = idx >= 0 ? String(idx) : 'active';
+      }
+    }
+    saveFilterToStorage();
+    renderFilterUI();
+    if (opts.reload) loadAll();
+  }
+  async function loadCampaignsForPicker() {
+    const data = await fetchJSON('?action=dashboard_data', 25000);
+    state.campaigns = (data && data.campaigns) || [];
+    state.activeCampaign = (data && data.active_campaign) || findActiveCampaign();
+    const sel = $('fSession');
+    if (!sel) return;
+    let html = '<option value="all">All Time — All Sessions</option>';
+    state.campaigns.forEach((c, i) => {
+      const range = fmtDateShort(c.start) + ' → ' + fmtDateShort(c.end);
+      html += '<option value="' + i + '"' + (c.active ? ' selected' : '') + '>' + (c.name || ('Campaign ' + (i+1))) + ' | ' + range + '</option>';
+    });
+    sel.innerHTML = html;
+    // restore previous selection
+    const f = state.filter;
+    if (f.session_id === 'active' && state.activeCampaign) {
+      const idx = state.campaigns.findIndex(c => c.name === state.activeCampaign.name);
+      if (idx >= 0) { sel.value = String(idx); f.session_id = String(idx); }
+    } else if (f.session_id && sel.querySelector('option[value="' + f.session_id + '"]')) {
+      sel.value = f.session_id;
+    }
+    // if no from/to set yet, default to active session window
+    if (!f.from && !f.to && state.activeCampaign) {
+      f.from = state.activeCampaign.start || '';
+      f.to = state.activeCampaign.end || '';
+      f.preset = 'session';
+    }
+    renderFilterUI();
+  }
+  function renderFilterUI() {
+    const f = state.filter || {};
+    if ($('fFrom')) $('fFrom').value = f.from || '';
+    if ($('fTo')) $('fTo').value = f.to || '';
+    document.querySelectorAll('.filter-bar .preset').forEach(b => {
+      b.classList.toggle('active', b.dataset.preset === f.preset);
+    });
+    const meta = $('filterMeta');
+    if (meta) {
+      if (f.from && f.to) meta.textContent = fmtDateShort(f.from) + ' → ' + fmtDateShort(f.to);
+      else if (f.session_id === 'all') meta.textContent = 'All time';
+      else meta.textContent = '—';
+    }
+  }
+  function initFilterBar() {
+    document.querySelectorAll('.filter-bar .preset').forEach(b => {
+      b.addEventListener('click', () => applyPreset(b.dataset.preset));
+    });
+    $('fSession')?.addEventListener('change', (e) => {
+      const v = e.target.value;
+      state.filter.session_id = v;
+      if (v === 'all') {
+        state.filter.preset = 'all';
+        state.filter.from = '';
+        state.filter.to = '';
+      } else {
+        const c = state.campaigns[parseInt(v, 10)];
+        if (c) { state.filter.from = c.start || ''; state.filter.to = c.end || ''; state.filter.preset = 'session'; state.activeCampaign = c; }
+      }
+      saveFilterToStorage();
+      renderFilterUI();
+      loadAll();
+    });
+    $('fFrom')?.addEventListener('change', (e) => { state.filter.from = e.target.value; state.filter.preset = 'custom'; saveFilterToStorage(); renderFilterUI(); });
+    $('fTo')?.addEventListener('change', (e) => { state.filter.to = e.target.value; state.filter.preset = 'custom'; saveFilterToStorage(); renderFilterUI(); });
+    $('fApply')?.addEventListener('click', () => loadAll());
+  }
+
+  // ─── utilities ──────────────────────────────────────────────────────
+  const $ = (id) => document.getElementById(id);
+  const fmtInt = (n) => (Number(n) || 0).toLocaleString('en-GB');
+  const fmtGBP = (n) => {
+    const v = Number(n) || 0;
+    if (v > 0 && v < 10) return '£' + v.toFixed(2);
+    return '£' + Math.round(v).toLocaleString('en-GB');
+  };
+  const fmtGBPShort = (n) => {
+    const v = Number(n) || 0;
+    if (v >= 1_000_000) return '£' + (v/1_000_000).toFixed(1) + 'M';
+    if (v >= 10_000)    return '£' + Math.round(v/1_000) + 'k';
+    if (v >= 1_000)     return '£' + (v/1_000).toFixed(1) + 'k';
+    return '£' + Math.round(v).toLocaleString('en-GB');
+  };
+  const fmtPct = (n, dp = 1) => (Number.isFinite(Number(n)) ? Number(n).toFixed(dp) + '%' : '—');
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  async function fetchJSON(path, ms = 25000) {
+    try {
+      const r = await fetch(API_BASE + path, { signal: AbortSignal.timeout(ms) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return await r.json();
+    } catch (e) {
+      console.warn('[API]', path, e.message);
+      return null;
+    }
+  }
+
+  function setLivePill(status, text) {
+    const pill = $('livePill');
+    const t = $('livePillText');
+    pill.classList.remove('stale','error');
+    if (status === 'stale') pill.classList.add('stale');
+    if (status === 'error') pill.classList.add('error');
+    t.textContent = text || 'Live';
+  }
+  function setLastUpdated() {
+    state.lastUpdated = new Date();
+    $('lastUpdated').textContent = 'Updated ' + state.lastUpdated.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+  function statusForPct(value, target, inverse = false) {
+    if (!Number.isFinite(value) || value === 0) return 'red';
+    if (inverse) {
+      if (value <= target) return 'green';
+      if (value <= target * 1.5) return 'amber';
+      return 'red';
+    }
+    if (value >= target) return 'green';
+    if (value >= target * 0.6) return 'amber';
+    return 'red';
+  }
+  function statusForCount(value, target) {
+    if (!Number.isFinite(value) || value === 0) return 'red';
+    if (value >= target) return 'green';
+    if (value >= target * 0.6) return 'amber';
+    return 'red';
+  }
+  function setTick(rootId, status) {
+    const tick = document.querySelector('#' + rootId + ' .tick');
+    if (!tick) return;
+    tick.classList.remove('green','amber','red');
+    if (status) tick.classList.add(status);
+  }
+  function setBadge(id, text, status) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = text;
+    el.classList.remove('green','amber','red','grey');
+    el.classList.add(status || 'grey');
+  }
+  function rateClass(pct, good, ok) {
+    if (!Number.isFinite(pct) || pct === 0) return 'bad';
+    if (pct >= good) return 'good';
+    if (pct >= ok) return 'ok';
+    return 'warn';
+  }
+
+  // ─── COLLAPSIBLE SECTIONS (universal) ──────────────────────────────
+  function initCollapsibles() {
+    const sections = document.querySelectorAll('.c-section');
+    sections.forEach(sec => {
+      const key = sec.dataset.key;
+      const def = sec.dataset.default || 'closed';
+      const saved = key ? localStorage.getItem(LS_PREFIX + key) : null;
+      const open = saved === 'open' || (saved == null && def === 'open');
+      sec.classList.toggle('open', open);
+
+      const head = sec.querySelector(':scope > .c-head');
+      if (head) {
+        head.addEventListener('click', (e) => {
+          // avoid toggling when user clicks a tab/link inside header
+          if (e.target.closest('a')) return;
+          sec.classList.toggle('open');
+          if (key) localStorage.setItem(LS_PREFIX + key, sec.classList.contains('open') ? 'open' : 'closed');
+        });
+      }
+    });
+
+    $('collapseAllBtn')?.addEventListener('click', () => setAllSections(false));
+    $('expandAllBtn')?.addEventListener('click', () => setAllSections(true));
+  }
+  function setAllSections(open) {
+    document.querySelectorAll('.c-section').forEach(sec => {
+      sec.classList.toggle('open', open);
+      if (sec.dataset.key) localStorage.setItem(LS_PREFIX + sec.dataset.key, open ? 'open' : 'closed');
+    });
+  }
+
+  // ─── LOADERS ───────────────────────────────────────────────────────
+  async function loadAll() {
+    setLivePill('stale', 'Refreshing…');
+    const q = buildFilterQuery(); // '&from=...&to=...&session_id=...'
+
+    // eod_dashboard_data uses start/end (not from/to) — build a separate query string
+    const f = state.filter || {};
+    const eodQ = (f.from ? '&start=' + encodeURIComponent(f.from) : '') + (f.to ? '&end=' + encodeURIComponent(f.to) : '');
+
+    const results = await Promise.allSettled([
+      fetchJSON('?action=pre_webinar_stats' + q, 45000),
+      fetchJSON('?action=post_webinar_stats' + q, 60000),
+      fetchJSON('?action=dashboard_data' + q, 20000),
+      fetchJSON('?action=test_connections', 10000),
+      fetchJSON('?action=ad_spend_totals' + q, 15000),
+      fetchJSON('?action=waterfall_with_benchmarks' + q, 30000),
+      fetchJSON('?action=calendly_by_event_type' + q, 15000),
+      fetchJSON('?action=meta_insights&level=campaign' + q, 25000),
+      fetchJSON('?action=payments_by_tier' + q, 20000),
+      fetchJSON('?action=ig_profile_funnel' + q, 15000),
+      fetchJSON('?action=lead_magnet_funnel' + q, 20000),
+      fetchJSON('?action=eod_dashboard_data' + eodQ, 25000),
+    ]);
+    const [pre, post, dashboard, connections, adSpend, waterfall, calendly, metaInsights, payments, ig, lm, eod] = results.map(r => r.status === 'fulfilled' ? r.value : null);
+    state.pre = pre;
+    state.post = post;
+    state.dashboard = dashboard;
+    state.connections = connections;
+    state.adSpend = adSpend;
+    state.waterfall = waterfall;
+    state.calendly = calendly;
+    state.metaInsights = metaInsights;
+    state.payments = payments;
+    state.ig = ig;
+    state.lm = lm;
+    state.eod = eod;
+
+    renderAll();
+    setLastUpdated();
+    setLivePill('live', 'Live');
+  }
+
+  function renderAll() {
+    safeRun(renderConnections);
+    safeRun(renderHero);
+    safeRun(renderPipelineFlow);
+    safeRun(renderPreSection);
+    safeRun(renderPostSection);
+    safeRun(renderCalendlyEventTypes);
+    safeRun(renderMetaInsights);
+    safeRun(renderPaymentsByTier);
+    safeRun(renderIgFunnel);
+    safeRun(renderLeadMagnetFunnel);
+    safeRun(renderEodSection);
+    safeRun(renderTrends);
+  }
+  function safeRun(fn){ try { fn(); } catch(e){ console.warn('[render]', fn.name, e); } }
+
+  // ─── CONNECTIONS STRIP ─────────────────────────────────────────────
+  function renderConnections() {
+    const c = state.connections || {};
+    const mapping = [
+      { id: 'ds-sheets', key: 'google_sheets', test: (x) => (x && x.connected !== false) },
+      { id: 'ds-ghl',    key: 'ghl',           test: (x) => (x && x.connected) },
+      { id: 'ds-wj',     key: 'webinarjam',    test: (x) => (x && x.connected) },
+      { id: 'ds-cal',    key: 'calendly',      test: (x) => (x && (x.connected || x.webhook_active)) },
+      { id: 'ds-stripe', key: 'stripe',        test: (x) => (x && x.connected) },
+      { id: 'ds-meta',   key: 'meta',          test: (x) => (x && x.connected) },
+    ];
+    mapping.forEach(m => {
+      const el = $(m.id);
+      if (!el) return;
+      el.classList.remove('ok','warn','err');
+      const sub = c[m.key];
+      if (m.test(sub)) { el.classList.add('ok'); return; }
+      if (sub && sub.access_token_set === false) { el.classList.add('err'); return; }
+      el.classList.add('warn');
+    });
+  }
+
+  // ─── HERO (4 primary KPIs) ─────────────────────────────────────────
+  function renderHero() {
+    const pre = state.pre || {};
+    const post = state.post || {};
+    const regs = pre.total_registrants || post.total_registrants || 0;
+    const attended = post.total_attended || 0;
+    const callFunnel = post.call_funnel || [];
+    const booked = (callFunnel.find(s=>s.key==='booked_completed')||{}).count || 0;
+    const closed = (callFunnel.find(s=>s.key==='call_closed')||{}).count || 0;
+    const revenue = (post.revenue || {}).total_cash || 0;
+    const spend = (state.adSpend && state.adSpend.total_spend) || 0;
+    const roas = (revenue > 0 && spend > 0) ? (revenue / spend) : null;
+
+    // Registrations
+    $('heroRegsVal').textContent = fmtInt(regs);
+    const regsSt = statusForCount(regs, TARGETS.regs);
+    setBadge('heroRegsBadge', regs >= TARGETS.regs ? 'On target' : `${Math.round(regs/TARGETS.regs*100)}%`, regsSt);
+    $('heroRegsSub').textContent = `Target ${TARGETS.regs}+ registrants`;
+    setTick('heroRegs', regsSt);
+
+    // Show rate
+    const showRate = regs > 0 ? (attended / regs) * 100 : 0;
+    $('heroShowVal').textContent = regs > 0 ? fmtPct(showRate) : '—';
+    const showSt = statusForPct(showRate, TARGETS.showRate);
+    setBadge('heroShowBadge', `${fmtInt(attended)} attended`, showSt);
+    $('heroShowSub').textContent = `Target ${TARGETS.showRate}–45%`;
+    setTick('heroShow', showSt);
+
+    // Calls booked
+    $('heroBookedVal').textContent = fmtInt(booked);
+    const bookPct = attended > 0 ? (booked / attended) * 100 : 0;
+    const bookSt = booked === 0 ? 'amber' : statusForPct(bookPct, TARGETS.bookRate);
+    setBadge('heroBookedBadge', attended > 0 ? fmtPct(bookPct) + ' of attend.' : '—', bookSt);
+    $('heroBookedSub').textContent = `Target ${TARGETS.bookRate}%+`;
+    setTick('heroBooked', bookSt);
+
+    // Revenue
+    $('heroRevVal').textContent = fmtGBP(revenue);
+    const revSt = revenue > 0 ? 'green' : 'amber';
+    setBadge('heroRevBadge', revenue > 0 ? `${fmtInt(closed)} won` : 'No revenue', revSt);
+    $('heroRevSub').textContent = roas != null ? `ROAS ${roas.toFixed(2)}×` : 'ROAS pending';
+    setTick('heroRev', revSt);
+
+    // Peek summary on collapsed KPI header
+    $('kpiPeekRegs').textContent = fmtInt(regs);
+    $('kpiPeekShow').textContent = regs > 0 ? fmtPct(showRate, 0) : '—';
+    $('kpiPeekRev').textContent = revenue > 0 ? fmtGBPShort(revenue) : '—';
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // PIPELINE FLOW — horizontal scorecard + arrow
+  // ═══════════════════════════════════════════════════════════════════
+  function renderPipelineFlow() {
+    const flowPre = $('flowPre');
+    const flowPost = $('flowPost');
+    const meta = $('flowMeta');
+    const drawerPre = $('drawerPre');
+    const drawerPost = $('drawerPost');
+    const w = state.waterfall;
+    if (!w || w.status !== 'ok' || !w.stages) {
+      flowPre.innerHTML = '<div class="muted" style="padding:12px">Pipeline data unavailable.</div>';
+      flowPost.innerHTML = '';
+      meta.textContent = '—';
+      return;
+    }
+    const biggest = w.biggest_bottleneck_key;
+    const stages = w.stages;
+    const byKey = Object.fromEntries(stages.map(s => [s.key, s]));
+    const totalUplift = (w.opportunities || []).reduce((a, o) => a + (o.revenue_uplift || 0), 0);
+    meta.textContent = `${stages.length} stages · uplift opp ${fmtGBPShort(totalUplift)}`;
+
+    // Split the pipeline — 'attended' bridges pre and post
+    const preKeys  = ['impressions','clicks','lp_views','regs','attended'];
+    const postKeys = ['attended','pitch','calendly','booked','showed','won'];
+
+    flowPre.innerHTML  = buildFlowHTML(preKeys.map(k => byKey[k]).filter(Boolean), biggest, 'pre');
+    flowPost.innerHTML = buildFlowHTML(postKeys.map(k => byKey[k]).filter(Boolean), biggest, 'post');
+
+    // Close any prior drawer state, re-wire
+    drawerPre.className = 'sc-drawer';
+    drawerPre.innerHTML = '';
+    drawerPost.className = 'sc-drawer';
+    drawerPost.innerHTML = '';
+
+    wireFlowCards($('flowPre'), drawerPre);
+    wireFlowCards($('flowPost'), drawerPost);
+  }
+
+  function buildFlowHTML(stages, biggest, kind) {
+    if (!stages.length) return '<div class="muted" style="padding:12px">No data.</div>';
+    return stages.map((s, i) => {
+      const scHtml = scorecardHTML(s, biggest);
+      if (i === stages.length - 1) return scHtml;
+      // arrow between stages uses the NEXT stage's rate_pct (conversion INTO next)
+      const next = stages[i + 1];
+      return scHtml + arrowHTML(next);
+    }).join('');
+  }
+
+  function scorecardHTML(s, biggest) {
+    const st = s.status || 'na';
+    const isBig = s.key === biggest;
+    const count = s.count || 0;
+    const subBits = [];
+    if (s.benchmark_pct != null && s.rate_pct != null) {
+      const vari = s.variance_pct;
+      if (vari != null) {
+        const cls = vari >= 0 ? 'green' : (vari >= -5 ? 'amber' : 'red');
+        subBits.push(`<span class="v ${cls}">${vari >= 0 ? '+' : ''}${vari.toFixed(1)}pt</span> <span class="muted">vs bench</span>`);
+      }
+    } else if (s.key === 'impressions') {
+      subBits.push('<span class="muted">top of funnel</span>');
+    } else {
+      subBits.push('<span class="muted">—</span>');
+    }
+    return `<div class="sc ${isBig ? 'biggest' : ''}" data-key="${esc(s.key)}">
+      <div class="sc-head">
+        <span class="sc-label">${esc(s.label)}</span>
+        <span class="sc-dot ${st}" title="${st === 'green' ? 'On / above benchmark' : (st === 'amber' ? 'Within 15% of benchmark' : (st === 'red' ? '15%+ below benchmark' : 'No benchmark'))}"></span>
+      </div>
+      <div class="sc-value">${fmtInt(count)}</div>
+      <div class="sc-sub">${subBits.join(' ')}</div>
+    </div>`;
+  }
+
+  function arrowHTML(nextStage) {
+    const rate = nextStage.rate_pct;
+    const bench = nextStage.benchmark_pct;
+    const st = nextStage.status || 'na';
+    const pctCls = st === 'green' ? 'good' : (st === 'amber' ? 'amber' : (st === 'red' ? 'red' : ''));
+    const dotCls = st === 'green' || st === 'amber' || st === 'red' ? st : '';
+    const pctTxt = rate != null ? fmtPct(rate, 1) : '—';
+    const benchTxt = bench != null ? `vs ${fmtPct(bench, 0)}` : '';
+    const title = (rate != null)
+      ? `${fmtInt(nextStage.count || 0)} of prev (${pctTxt}), benchmark ${bench != null ? fmtPct(bench, 0) : '—'}`
+      : 'No conversion data';
+    return `<div class="arr" title="${esc(title)}">
+      <div class="arr-pct ${pctCls}">${pctTxt}</div>
+      <div class="arr-line"><div class="l"></div><span class="chev">›</span></div>
+      <div class="arr-bench">${benchTxt ? `<span class="cdot ${dotCls}"></span> ${benchTxt}` : '&nbsp;'}</div>
+    </div>`;
+  }
+
+  function wireFlowCards(flowEl, drawerEl) {
+    flowEl.querySelectorAll('.sc').forEach(card => {
+      card.addEventListener('click', () => {
+        const key = card.dataset.key;
+        // toggle card state within this flow
+        const wasOpen = card.classList.contains('open');
+        flowEl.querySelectorAll('.sc.open').forEach(c => c.classList.remove('open'));
+        if (wasOpen) { drawerEl.classList.remove('open'); drawerEl.innerHTML=''; return; }
+        card.classList.add('open');
+        const stage = (state.waterfall?.stages || []).find(s => s.key === key);
+        if (!stage) { drawerEl.classList.remove('open'); drawerEl.innerHTML=''; return; }
+        drawerEl.classList.add('open');
+        const variance = stage.variance_pct;
+        const drop = stage.drop_count;
+        const dropPct = stage.drop_pct;
+        const uplift = stage.revenue_uplift || 0;
+        const opp = (state.waterfall.opportunities || []).find(o => o.stage_key === stage.key);
+        const rank = opp ? (state.waterfall.opportunities.indexOf(opp) + 1) : null;
+        drawerEl.innerHTML = `
+          <div class="cell"><span class="k">Stage</span><span class="v">${esc(stage.label)}</span></div>
+          <div class="cell"><span class="k">Current conversion</span><span class="v">${stage.rate_pct != null ? fmtPct(stage.rate_pct) : '—'}${stage.benchmark_pct != null ? ` <span class="muted">vs bench ${fmtPct(stage.benchmark_pct, 0)}</span>` : ''}</span></div>
+          <div class="cell"><span class="k">Benchmark variance</span><span class="v">${variance == null ? '—' : (variance >= 0 ? '+' : '') + variance.toFixed(1) + ' pts'}</span></div>
+          <div class="cell"><span class="k">Drop from previous</span><span class="v">${drop != null && drop > 0 ? '−' + fmtInt(drop) + ' (' + fmtPct(dropPct || 0, 0) + ')' : '—'}</span></div>
+          <div class="cell"><span class="k">£ uplift if benchmark hit</span><span class="v uplift">${uplift > 0 ? '+' + fmtGBP(uplift) : '—'}</span></div>
+          <div class="cell"><span class="k">Priority</span><span class="v">${rank ? '#' + rank + ' opportunity' : (stage.status === 'green' ? 'On target' : '—')}</span></div>
+          <div class="v hint">💡 ${esc(stage.hint || 'On target — hold the line and monitor weekly.')}</div>
+        `;
+      });
+    });
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // PRE-WEBINAR SECTION
+  // ══════════════════════════════════════════════════════════════════
+  function renderPreSection() {
+    const p = state.pre;
+    if (!p || p.status !== 'ok') {
+      $('preTrafficFunnel').innerHTML = '<div class="muted" style="padding:16px;text-align:center">No pre-webinar data.</div>';
+      return;
+    }
+    // summary strip
+    const regs = p.total_registrants || 0;
+    const pred = p.show_up_prediction?.predicted_attendees || 0;
+    const spend = (state.adSpend?.total_spend) || 0;
+    const cpr = regs > 0 && spend > 0 ? spend / regs : null;
+    $('preSumRegs').textContent = fmtInt(regs);
+    $('preSumShow').textContent = fmtInt(pred) + ' (' + fmtPct(p.show_up_prediction?.predicted_show_rate_pct || 0, 0) + ')';
+    $('preSumSpend').textContent = fmtGBP(spend);
+    $('preSumCPR').textContent = cpr ? fmtGBP(cpr) : '—';
+
+    renderFunnelBars('preTrafficFunnel', p.traffic_funnel || [], 'pre');
+    renderSourceCards('preSourcesGrid', 'preSourcesMeta', p.sources || []);
+    renderTimingBars('preTiming', p.registration_timing || [], regs);
+
+    $('prePredictedShow').textContent = fmtInt(pred) + ' (' + fmtPct(p.show_up_prediction?.predicted_show_rate_pct || 0, 0) + ')';
+    $('prePredictedSub').textContent = p.show_up_prediction?.note || '';
+    const wa = p.whatsapp_group || {};
+    $('waMembers').textContent = fmtInt(wa.members || 0);
+    $('waSent').textContent = fmtInt(wa.messages_sent || 0);
+    $('waStatus').textContent = wa.status === 'live' ? 'Live' : 'Awaiting';
+
+    const emailData = p.pre_webinar_emails || { emails: [] };
+    $('preEmailMeta').textContent = `${emailData.emails.length} emails · ${fmtInt(emailData.total || 0)} opens`;
+    $('preEmailBody').innerHTML = emailData.emails.map(e => `
+      <tr>
+        <td class="slot-label">${esc(e.when)}</td>
+        <td><span class="pill live">${esc(e.code)}</span></td>
+        <td class="subj">${esc(e.subject)}</td>
+        <td class="num">${fmtInt(e.opened)}</td>
+        <td class="num">${fmtInt(e.clicked)}</td>
+        <td class="num"><span class="rate-chip ${rateClass(e.open_rate_pct, 30, 20)}">${fmtPct(e.open_rate_pct)}</span></td>
+        <td class="num"><span class="rate-chip ${rateClass(e.click_rate_pct, 5, 3)}">${fmtPct(e.click_rate_pct)}</span></td>
+      </tr>
+    `).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">No emails.</td></tr>';
+
+    const smsData = p.pre_webinar_sms || { messages: [], totals: {} };
+    const smsTot = smsData.totals || {};
+    $('preSmsMeta').textContent = `${smsData.messages.length} msgs · ${fmtInt(smsTot.sent || 0)} sent`;
+    $('preSmsBody').innerHTML = smsData.messages.map(m => `
+      <tr>
+        <td class="slot-label">${esc(m.when)}</td>
+        <td><span class="pill live">${esc(m.code)}</span></td>
+        <td class="subj">${esc(m.label)}</td>
+        <td class="num">${fmtInt(m.sent)}</td>
+        <td class="num">${fmtInt(m.delivered)}</td>
+        <td class="num">${fmtInt(m.clicked)}</td>
+        <td class="num">${m.status === 'live'
+          ? '<span class="pill live">Live</span>'
+          : '<span class="pill awaiting">Awaiting</span>'}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">No messages.</td></tr>';
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // POST-WEBINAR SECTION
+  // ══════════════════════════════════════════════════════════════════
+  function renderPostSection() {
+    const p = state.post;
+    if (!p || p.status !== 'ok') {
+      $('postAttendanceFunnel').innerHTML = '<div class="muted" style="padding:16px;text-align:center">No post-webinar data.</div>';
+      return;
+    }
+    const attended = p.total_attended || 0;
+    const stayedPitch = (p.attendance_funnel || []).find(s => s.key === 'stayed_pitch')?.count || 0;
+    const booked = (p.call_funnel || []).find(s => s.key === 'booked_completed')?.count || 0;
+    const revenue = (p.revenue || {}).total_cash || 0;
+    $('postSumAtt').textContent = fmtInt(attended);
+    $('postSumPitch').textContent = fmtInt(stayedPitch) + ' (' + fmtPct(p.stay_to_pitch_rate_pct || 0, 0) + ')';
+    $('postSumBooked').textContent = fmtInt(booked);
+    $('postSumRev').textContent = fmtGBP(revenue);
+
+    renderFunnelBars('postAttendanceFunnel', p.attendance_funnel || [], 'post');
+    renderRetention('postRetention', p.retention_curve || [], p.stay_to_pitch_target_pct || 50);
+
+    const r = p.replay || {};
+    $('replayViews').textContent = fmtInt(r.unique_views || 0);
+    $('replayMinutes').textContent = fmtInt(r.total_watch_minutes || 0) + ' m';
+    $('replayClicks').textContent = fmtInt(r.click_to_calendly || 0);
+    $('replayExpiry').textContent = r.expiry_in_hours != null ? (r.expiry_in_hours + 'h') : '—';
+    $('replayNote').textContent = r.note || '';
+
+    renderFunnelBars('postCallFunnel', p.call_funnel || [], 'post');
+
+    const lb = (p.closers || {}).leaderboard || [];
+    $('postCloserBody').innerHTML = lb.length ? lb.map(c => {
+      const rc = rateClass(c.close_rate_pct, 30, 15);
+      return `<tr>
+        <td><strong>${esc(c.name)}</strong></td>
+        <td class="num">${fmtInt(c.calls_taken)}</td>
+        <td class="num" style="color:var(--green);font-weight:600">${fmtInt(c.deals_closed)}</td>
+        <td class="num"><span class="rate-chip ${rc}">${fmtPct(c.close_rate_pct)}</span></td>
+        <td class="num" style="font-weight:600">${fmtGBP(c.revenue)}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">No closer activity.</td></tr>';
+
+    const tiers = (p.revenue || {}).tiers || [];
+    const totalClosed = (p.revenue || {}).deals_closed || 0;
+    $('postRevMeta').textContent = `${fmtInt(totalClosed)} deals · AOV ${fmtGBP((p.revenue||{}).aov || 0)}`;
+    const colours = { course:'#3b82f6', course_finance:'#06b6d4', group:'#a855f7', one_to_one:'#22c55e' };
+    $('postTiersGrid').innerHTML = tiers.map(t => {
+      const pct = totalClosed > 0 ? (t.count / totalClosed) * 100 : 0;
+      const col = colours[t.key] || '#3b82f6';
+      return `
+        <div class="source-card">
+          <div class="source-label">${esc(t.label)}</div>
+          <div class="source-val">${fmtInt(t.count)}</div>
+          <div class="source-bar-bg"><div class="source-bar" style="width:${pct.toFixed(1)}%;background:${col}"></div></div>
+          <div class="source-meta"><span>${fmtGBP(t.price)} each</span><span>${fmtGBP(t.revenue)}</span></div>
+        </div>`;
+    }).join('') || '<div class="muted" style="padding:16px;grid-column:1/-1;text-align:center">No tier data.</div>';
+
+    renderPostEmailList(p.post_webinar_emails || {});
+    renderPostSmsList(p.post_webinar_sms || {});
+  }
+
+  // ─── CALENDLY BY EVENT TYPE ─────────────────────────────────────────
+  function renderCalendlyEventTypes() {
+    const c = state.calendly;
+    const grid = $('postCalEvtGrid');
+    const meta = $('postCalEvtMeta');
+    const unmatched = $('postCalEvtUnmatched');
+    if (!grid) return;
+    if (!c || !Array.isArray(c.buckets)) {
+      grid.innerHTML = '<div class="muted" style="padding:16px;grid-column:1/-1;text-align:center">No Calendly data yet.</div>';
+      if (meta) meta.textContent = '—';
+      if (unmatched) unmatched.textContent = '';
+      return;
+    }
+    const total = c.total || 0;
+    if (meta) meta.textContent = total + ' booking' + (total === 1 ? '' : 's');
+    const colours = { normal: '#94a3b8', w: '#3b82f6', lm: '#22c55e', v: '#a855f7', coaching: '#06b6d4', other: '#64748b', unknown: '#475569' };
+    grid.innerHTML = c.buckets.map(b => {
+      const pct = total > 0 ? Math.round((b.count / total) * 1000) / 10 : 0;
+      const col = colours[b.key] || '#3b82f6';
+      const placeholder = b.count === 0 ? ' style="opacity:0.55"' : '';
+      return '<div class="source-card"' + placeholder + '>' +
+        '<div class="source-label">' + esc(b.label) + '</div>' +
+        '<div class="source-val">' + fmtInt(b.count) + '</div>' +
+        '<div class="source-bar-bg"><div class="source-bar" style="width:' + pct.toFixed(1) + '%;background:' + col + '"></div></div>' +
+        '<div class="source-meta"><span>' + pct.toFixed(1) + '% of total</span><span>' + (b.count === 0 ? 'no bookings yet' : '') + '</span></div>' +
+        '</div>';
+    }).join('');
+    if (unmatched) {
+      const ex = c.unmatched_examples || [];
+      unmatched.textContent = ex.length
+        ? 'Unbucketed event names (first 5): ' + ex.map(s => '"' + s + '"').join(', ')
+        : '';
+    }
+  }
+
+  // ─── META INSIGHTS (per-campaign + Masterclass vs VSL split) ─────────
+  function classifyCampaignFunnel(name) {
+    const s = String(name || '').toLowerCase();
+    if (/^(vsl|v-)|vsl\b|video[\s-]?sales[\s-]?letter/.test(s)) return 'vsl';
+    if (/^(mc|masterclass|webinar|wbnr|may\d*-webinar)/.test(s) || /webinar/.test(s) || /masterclass/.test(s)) return 'mc';
+    return 'other';
+  }
+  function renderMetaInsights() {
+    const m = state.metaInsights;
+    const body = $('metaCampaignBody');
+    const meta = $('metaMeta');
+    const mcCard = $('metaMcCard');
+    const vslCard = $('metaVslCard');
+    if (!body) return;
+    if (!m || !Array.isArray(m.by_campaign)) {
+      body.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">No Meta data.</td></tr>';
+      if (meta) meta.textContent = '—';
+      return;
+    }
+    const totals = m.totals || {};
+    if (meta) meta.textContent = fmtGBP(totals.spend || 0) + ' spend · ' + fmtInt(totals.impressions || 0) + ' impressions';
+    // Bucket campaigns into MC / VSL / Other
+    const bucket = { mc: { spend: 0, impressions: 0, clicks: 0, leads: 0, campaigns: 0 }, vsl: { spend: 0, impressions: 0, clicks: 0, leads: 0, campaigns: 0 }, other: { spend: 0, impressions: 0, clicks: 0, leads: 0, campaigns: 0 } };
+    for (const c of m.by_campaign) {
+      const cls = classifyCampaignFunnel(c.name);
+      bucket[cls].spend += Number(c.spend || 0);
+      bucket[cls].impressions += Number(c.impressions || 0);
+      bucket[cls].clicks += Number(c.clicks || 0);
+      bucket[cls].leads += Number(c.leads || 0);
+      bucket[cls].campaigns += 1;
+    }
+    const setCard = (el, b, label) => {
+      if (!el) return;
+      const cpr = b.leads > 0 ? b.spend / b.leads : 0;
+      const ctr = b.impressions > 0 ? (b.clicks / b.impressions) * 100 : 0;
+      el.innerHTML = '<div class="source-label">' + label + '</div>' +
+        '<div class="source-val">' + fmtGBP(b.spend) + '</div>' +
+        '<div class="source-meta"><span>' + fmtInt(b.leads) + ' leads · CPR ' + fmtGBP(cpr) + '</span><span>' + ctr.toFixed(2) + '% CTR · ' + b.campaigns + ' campaigns</span></div>';
+    };
+    setCard(mcCard, bucket.mc, 'Masterclass / Webinar');
+    setCard(vslCard, bucket.vsl, 'VSL');
+    // Sorted table of top 20 campaigns by spend
+    const rows = m.by_campaign.slice().sort((a, b) => (b.spend || 0) - (a.spend || 0)).slice(0, 20);
+    body.innerHTML = rows.map(c => {
+      const cpr = c.leads > 0 ? c.spend / c.leads : null;
+      return '<tr>' +
+        '<td>' + esc(c.name || '—') + '</td>' +
+        '<td class="num">' + fmtGBP(c.spend || 0) + '</td>' +
+        '<td class="num">' + fmtInt(c.impressions || 0) + '</td>' +
+        '<td class="num">' + fmtInt(c.clicks || 0) + '</td>' +
+        '<td class="num">' + (Number(c.ctr_pct || c.ctr || 0)).toFixed(2) + '%</td>' +
+        '<td class="num">' + fmtGBP(c.cpc || 0) + '</td>' +
+        '<td class="num">' + fmtInt(c.leads || 0) + '</td>' +
+        '<td class="num">' + (cpr != null ? fmtGBP(cpr) : '—') + '</td>' +
+        '</tr>';
+    }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">No campaigns in window.</td></tr>';
+  }
+
+  // ─── STRIPE PAYMENTS BY TIER ────────────────────────────────────────
+  function renderPaymentsByTier() {
+    const p = state.payments;
+    const grid = $('payTierGrid');
+    const meta = $('payTierMeta');
+    if (!grid) return;
+    if (!p || !Array.isArray(p.tiers)) {
+      grid.innerHTML = '<div class="muted" style="padding:16px;grid-column:1/-1;text-align:center">No payment data.</div>';
+      if (meta) meta.textContent = '—';
+      return;
+    }
+    const t = p.totals || {};
+    if (meta) meta.textContent = fmtGBP(t.cash_collected || 0) + ' collected · ' + fmtInt(t.pif_count || 0) + ' PIF · ' + fmtInt(t.deposit_count || 0) + ' deposits';
+    const colours = { foundation: '#94a3b8', scale: '#3b82f6', empire: '#a855f7', inner_circle: '#22c55e', unknown: '#475569' };
+    const tiersOrdered = ['foundation','scale','empire','inner_circle','unknown'];
+    const lookup = {}; for (const x of p.tiers) lookup[x.key] = x;
+    grid.innerHTML = tiersOrdered.map(k => {
+      const tier = lookup[k] || { key: k, label: k, pif_count: 0, deposit_count: 0, cash_collected: 0, total_committed: 0 };
+      const total = (tier.pif_count || 0) + (tier.deposit_count || 0);
+      const col = colours[k] || '#3b82f6';
+      const fade = total === 0 && k !== 'unknown' ? ' style="opacity:0.55"' : (k === 'unknown' && total === 0 ? ' style="display:none"' : '');
+      return '<div class="source-card"' + fade + '>' +
+        '<div class="source-label">' + esc(tier.label) + '</div>' +
+        '<div class="source-val">' + fmtGBP(tier.cash_collected || 0) + '</div>' +
+        '<div class="source-bar-bg"><div class="source-bar" style="width:' + (total > 0 ? '100%' : '0') + ';background:' + col + '"></div></div>' +
+        '<div class="source-meta"><span>' + fmtInt(tier.pif_count || 0) + ' PIF · ' + fmtInt(tier.deposit_count || 0) + ' dep</span><span>Committed ' + fmtGBP(tier.total_committed || 0) + '</span></div>' +
+        '</div>';
+    }).join('');
+  }
+
+  // ─── IG PROFILE FUNNEL ──────────────────────────────────────────────
+  function renderIgFunnel() {
+    const ig = state.ig;
+    const wrap = $('igFunnel');
+    const meta = $('igMeta');
+    if (!wrap) return;
+    if (!ig || !Array.isArray(ig.funnel)) {
+      wrap.innerHTML = '<div class="muted" style="padding:16px">No IG funnel data yet.</div>';
+      if (meta) meta.textContent = '—';
+      return;
+    }
+    const stages = ig.funnel;
+    const max = Math.max(1, ...stages.map(s => s.count || 0));
+    if (meta) meta.textContent = fmtInt(stages[stages.length - 1]?.count || 0) + ' calls booked · ' + (ig.rows_included || 0) + ' EOD rows';
+    wrap.innerHTML = stages.map(s => {
+      const width = max > 0 ? (s.count / max) * 100 : 0;
+      const rate = s.rate_pct != null ? '<span class="fpct">' + s.rate_pct.toFixed(1) + '%</span>' : '';
+      return '<div class="funnel-row">' +
+        '<div class="flabel">' + esc(s.label) + '</div>' +
+        '<div class="fbar-wrap"><div class="fbar" style="width:' + width.toFixed(1) + '%;background:#06b6d4"></div></div>' +
+        '<div class="fmeta"><span class="fcount">' + fmtInt(s.count) + '</span>' + rate + '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  // ─── LEAD MAGNET FUNNEL ─────────────────────────────────────────────
+  function renderLeadMagnetFunnel() {
+    const lm = state.lm;
+    const body = $('lmBody');
+    const meta = $('lmMeta');
+    if (!body) return;
+    if (!lm || !Array.isArray(lm.magnets)) {
+      body.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;padding:20px">No data.</td></tr>';
+      if (meta) meta.textContent = '—';
+      return;
+    }
+    const t = lm.totals || {};
+    if (meta) meta.textContent = fmtInt(t.optins || 0) + ' opt-ins · ' + fmtInt(t.calls_booked || 0) + ' calls';
+    body.innerHTML = lm.magnets.map(m => {
+      return '<tr>' +
+        '<td>' + esc(m.label) + '</td>' +
+        '<td class="num">' + fmtInt(m.optins) + '</td>' +
+        '<td class="num">' + fmtInt(m.calls_booked) + '</td>' +
+        '<td class="num">' + (m.optin_to_call_pct || 0).toFixed(1) + '%</td>' +
+        '</tr>';
+    }).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:20px">No opt-ins in window.</td></tr>';
+  }
+
+  // ─── EOD: CLOSERS + SETTERS ─────────────────────────────────────────
+  function renderEodSection() {
+    const e = state.eod;
+    const closerBody = $('eodCloserBody');
+    const setterBody = $('eodSetterBody');
+    const meta = $('eodMeta');
+    if (!closerBody || !setterBody) return;
+    if (!e || e.status !== 'ok') {
+      closerBody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">No EOD data.</td></tr>';
+      setterBody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">No EOD data.</td></tr>';
+      if (meta) meta.textContent = '—';
+      return;
+    }
+    const totals = e.totals || {};
+    if (meta) {
+      const dr = e.date_range || {};
+      meta.textContent = (dr.start || '') + ' → ' + (dr.end || '') + ' · ' + fmtInt(totals.booked || 0) + ' booked · ' + fmtGBP(totals.revenue || 0) + ' rev';
+    }
+    const closersList = Object.entries(e.by_closer || {}).map(([name, c]) => ({ name, ...c })).sort((a, b) => (b.closed || 0) - (a.closed || 0));
+    closerBody.innerHTML = closersList.map(c => {
+      const closePct = c.showed > 0 ? Math.round((c.closed / c.showed) * 1000) / 10 : 0;
+      return '<tr>' +
+        '<td>' + esc(c.name) + '</td>' +
+        '<td class="num">' + fmtInt(c.showed || 0) + '</td>' +
+        '<td class="num">' + fmtInt(c.closed || 0) + '</td>' +
+        '<td class="num">' + closePct.toFixed(1) + '%</td>' +
+        '<td class="num">' + fmtGBP(c.revenue || 0) + '</td>' +
+        '</tr>';
+    }).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">No closer activity in window.</td></tr>';
+    const settersList = Object.entries(e.by_setter || {}).map(([name, s]) => ({ name, ...s })).sort((a, b) => (b.booked || 0) - (a.booked || 0));
+    setterBody.innerHTML = settersList.map(s => {
+      return '<tr>' +
+        '<td>' + esc(s.name) + '</td>' +
+        '<td class="num">' + fmtInt(s.booked || 0) + '</td>' +
+        '<td class="num">' + fmtInt(s.showed || 0) + '</td>' +
+        '<td class="num">' + fmtInt(s.closed || 0) + '</td>' +
+        '<td class="num">' + fmtGBP(s.revenue || 0) + '</td>' +
+        '</tr>';
+    }).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">No setter activity in window.</td></tr>';
+  }
+
+  // ═══ RENDER HELPERS ═══
+  function renderFunnelBars(targetId, stages, kind) {
+    const wrap = $(targetId);
+    if (!stages.length) { wrap.innerHTML = '<div class="muted" style="padding:12px">No data.</div>'; return; }
+    const maxCount = Math.max(1, ...stages.map(s => s.count || 0));
+    wrap.innerHTML = stages.map((s, i) => {
+      const count = s.count || 0;
+      const widthPct = Math.max(2, (count / maxCount) * 100);
+      let barClass = 'fbar ' + (kind || 'neutral');
+      if (s.rate_pct != null && s.benchmark_pct != null) {
+        if (s.rate_pct >= s.benchmark_pct) { barClass = 'fbar'; }
+        else if (s.rate_pct >= s.benchmark_pct * 0.6) { barClass = 'fbar amber'; }
+        else if (s.rate_pct > 0) { barClass = 'fbar red'; }
+      }
+      let convDisplay = '';
+      if (s.rate_pct != null && Number.isFinite(s.rate_pct)) {
+        let cls = '';
+        if (s.benchmark_pct != null) {
+          if (s.rate_pct >= s.benchmark_pct) cls = 'good';
+          else if (s.rate_pct >= s.benchmark_pct * 0.6) cls = 'warn';
+          else cls = 'drop';
+        }
+        convDisplay = `<span class="fconv ${cls}">${fmtPct(s.rate_pct)} from prior</span>`;
+      } else if (s.benchmark_pct) {
+        convDisplay = `<span class="fconv">target ${fmtPct(s.benchmark_pct, 0)}</span>`;
+      }
+      return `<div class="funnel-row">
+        <div class="flabel"><span class="stage-icon">${i + 1}</span> ${esc(s.label)}</div>
+        <div class="fbar-wrap"><div class="${barClass}" style="width:${widthPct.toFixed(1)}%"></div></div>
+        <div class="fmeta">
+          <span class="fcount">${fmtInt(count)}</span>
+          ${convDisplay}
+          ${s.note ? `<span class="fconv" style="color:var(--text-3);font-size:10px">${esc(s.note)}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderSourceCards(gridId, metaId, sources) {
+    const grid = $(gridId);
+    const meta = $(metaId);
+    if (!sources.length) {
+      grid.innerHTML = '<div class="source-card"><div class="source-label">No data</div></div>';
+      meta.textContent = '—';
+      return;
+    }
+    const total = sources.reduce((a, s) => a + s.count, 0);
+    meta.textContent = `${fmtInt(total)} regs · ${sources.length} sources`;
+    const colours = ['#22c55e','#3b82f6','#a855f7','#f59e0b','#ec4899','#06b6d4','#84cc16'];
+    grid.innerHTML = sources.slice(0, 8).map((s, i) => {
+      const pct = total > 0 ? (s.count / total) * 100 : 0;
+      const col = colours[i % colours.length];
+      let costLine = '';
+      if (s.type === 'paid' && s.spend > 0) {
+        costLine = `${fmtGBP(s.spend)} · ${s.cost_per_reg != null ? fmtGBP(s.cost_per_reg) + '/reg' : 'no spend'}`;
+      } else if (s.type === 'paid') {
+        costLine = 'Paid · spend pending';
+      } else {
+        costLine = 'Organic · £0';
+      }
+      return `<div class="source-card">
+        <div class="source-label">${esc(s.label)}<span class="pill ${s.type === 'paid' ? 'live' : 'awaiting'}">${s.type}</span></div>
+        <div class="source-val">${fmtInt(s.count)}</div>
+        <div class="source-bar-bg"><div class="source-bar" style="width:${pct.toFixed(1)}%;background:${col}"></div></div>
+        <div class="source-meta"><span>${fmtPct(pct, 0)} of total</span><span>${costLine}</span></div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderTimingBars(targetId, buckets, totalRegs) {
+    const wrap = $(targetId);
+    if (!buckets.length) { wrap.innerHTML = '<div class="muted">No timing data.</div>'; return; }
+    const max = Math.max(1, ...buckets.map(b => b.count));
+    wrap.innerHTML = buckets.map(b => {
+      const pct = totalRegs > 0 ? (b.count / totalRegs) * 100 : 0;
+      const width = Math.max(1, (b.count / max) * 100);
+      return `<div class="time-row">
+        <div class="label">${esc(b.label)}</div>
+        <div class="bar-bg"><div class="bar" style="width:${width.toFixed(1)}%"></div></div>
+        <div class="val">${fmtInt(b.count)} <span class="muted" style="font-size:10.5px">(${fmtPct(pct, 0)})</span></div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderRetention(targetId, buckets, pitchTarget) {
+    const wrap = $(targetId);
+    if (!buckets.length) { wrap.innerHTML = '<div class="muted">No retention data.</div>'; return; }
+    const shown = buckets.filter(b => b.key !== 'no_watch');
+    const max = Math.max(1, ...shown.map(b => b.count));
+    wrap.innerHTML = shown.map(b => {
+      const width = Math.max(1, (b.count / max) * 100);
+      const cls = b.key === '60_85' ? 'pitch' : (b.key === '85_plus' ? 'end' : (b.key === '0_5' ? 'bounce' : ''));
+      return `<div class="ret-row ${cls}">
+        <div class="label">${esc(b.label)}</div>
+        <div class="bar-bg"><div class="bar" style="width:${width.toFixed(1)}%"></div></div>
+        <div class="val">${fmtInt(b.count)}<span class="sub">${fmtPct(b.pct_of_attended, 0)} of att.</span></div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderPostEmailList(paths) {
+    const list = $('postEmailList');
+    const meta = $('postEmailMeta');
+    const labels = {
+      postattendee: 'Post-attendee (attended-no-buy)',
+      noshow:       'No-show recovery',
+      abandoned:    'Application / booking abandonment',
+      reengagement: 'Re-engagement',
+      prebook:      'Post-booking (pre-call)',
+    };
+    const ordered = ['postattendee','noshow','abandoned','reengagement','prebook'];
+    const seqs = ordered.map(k => ({ k, ...paths[k] })).filter(s => s.emails && s.emails.length);
+    if (!seqs.length) {
+      list.innerHTML = '<div class="seq-group"><div class="seq-head"><div class="seq-title">No post-webinar email data</div><span class="seq-caret">›</span></div></div>';
+      meta.textContent = '—';
+      return;
+    }
+    meta.textContent = `${seqs.length} paths · ${fmtInt(seqs.reduce((a,s)=>a+s.emails.length,0))} emails`;
+    list.innerHTML = seqs.map((s, idx) => {
+      const rows = s.emails.map(e => `
+        <tr>
+          <td class="slot-label">${esc(e.when)}</td>
+          <td><span class="pill live">${esc(e.code)}</span></td>
+          <td class="subj">${esc(e.subject)}</td>
+          <td class="num">${fmtInt(e.opened)}</td>
+          <td class="num">${fmtInt(e.clicked)}</td>
+          <td class="num"><span class="rate-chip ${rateClass(e.open_rate_pct, 30, 20)}">${fmtPct(e.open_rate_pct)}</span></td>
+          <td class="num"><span class="rate-chip ${rateClass(e.click_rate_pct, 5, 3)}">${fmtPct(e.click_rate_pct)}</span></td>
+        </tr>`).join('');
+      return `<div class="seq-group ${idx === 0 ? 'open' : ''}" data-seq="${esc(s.k)}">
+        <div class="seq-head" onclick="window.__toggleSeq(this)">
+          <div><div class="seq-title">${esc(labels[s.k] || s.k)} <span class="muted text-sm">· ${s.emails.length} emails</span></div></div>
+          <div class="seq-summary">
+            <span><b>${fmtInt(s.total_opened || 0)}</b> opens</span>
+            <span><b>${fmtInt(s.total_clicked || 0)}</b> clicks</span>
+            <span>avg open <b>${fmtPct(s.avg_open_rate_pct || 0)}</b></span>
+            <span>avg click <b>${fmtPct(s.avg_click_rate_pct || 0)}</b></span>
+            <span class="seq-caret">›</span>
+          </div>
+        </div>
+        <div class="seq-body">
+          <table>
+            <thead><tr><th>When</th><th>Slot</th><th>Subject line</th><th class="num">Opens</th><th class="num">Clicks</th><th class="num">Open %</th><th class="num">Click %</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderPostSmsList(paths) {
+    const list = $('postSmsList');
+    const meta = $('postSmsMeta');
+    const labels = {
+      postattendee: 'Post-attendee SMS',
+      noshow:       'No-show recovery SMS',
+      abandoned:    'Booking abandonment SMS',
+      prebook:      'Post-booking pre-call SMS',
+    };
+    const ordered = ['postattendee','noshow','abandoned','prebook'];
+    const seqs = ordered.map(k => ({ k, msgs: paths[k] || [] })).filter(s => s.msgs.length);
+    if (!seqs.length) {
+      list.innerHTML = '<div class="seq-group"><div class="seq-head"><div class="seq-title">No post-webinar SMS data</div><span class="seq-caret">›</span></div></div>';
+      meta.textContent = '—';
+      return;
+    }
+    const totalMsgs = seqs.reduce((a, s) => a + s.msgs.length, 0);
+    const totalSent = seqs.reduce((a, s) => a + s.msgs.reduce((b, m) => b + (m.sent || 0), 0), 0);
+    meta.textContent = `${seqs.length} paths · ${totalMsgs} msgs · ${fmtInt(totalSent)} sent`;
+    list.innerHTML = seqs.map((s, idx) => {
+      const rows = s.msgs.map(m => `
+        <tr>
+          <td class="slot-label">${esc(m.when)}</td>
+          <td><span class="pill live">${esc(m.code)}</span></td>
+          <td class="subj">${esc(m.label)}</td>
+          <td class="num">${fmtInt(m.sent)}</td>
+          <td class="num">${fmtInt(m.delivered)}</td>
+          <td class="num">${fmtInt(m.clicked)}</td>
+          <td class="num">${m.status === 'live' ? '<span class="pill live">Live</span>' : '<span class="pill awaiting">Awaiting</span>'}</td>
+        </tr>`).join('');
+      const pathSent = s.msgs.reduce((a, m) => a + (m.sent || 0), 0);
+      const pathDel  = s.msgs.reduce((a, m) => a + (m.delivered || 0), 0);
+      return `<div class="seq-group ${idx === 0 ? 'open' : ''}">
+        <div class="seq-head" onclick="window.__toggleSeq(this)">
+          <div><div class="seq-title">${esc(labels[s.k] || s.k)} <span class="muted text-sm">· ${s.msgs.length} messages</span></div></div>
+          <div class="seq-summary">
+            <span><b>${fmtInt(pathSent)}</b> sent</span>
+            <span><b>${fmtInt(pathDel)}</b> delivered</span>
+            <span class="seq-caret">›</span>
+          </div>
+        </div>
+        <div class="seq-body">
+          <table>
+            <thead><tr><th>When</th><th>Slot</th><th>Message</th><th class="num">Sent</th><th class="num">Deliv.</th><th class="num">Clicks</th><th class="num">Status</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.__toggleSeq = function(el){
+    // Prevent this click from bubbling up to the enclosing .c-section header
+    // (which would collapse the entire parent panel)
+    try { event && event.stopPropagation && event.stopPropagation(); } catch(_){}
+    const g = el.closest('.seq-group');
+    if (g) g.classList.toggle('open');
+  };
+
+  // ─── TRENDS ────────────────────────────────────────────────────────
+  let trendChartInst = null, tierChartInst = null;
+  function renderTrends() {
+    if (typeof Chart === 'undefined') return;
+    const sessions = (state.dashboard?.sessions || []).slice(-10);
+    const labels = sessions.map(s => {
+      const d = new Date(s.date + 'T00:00:00');
+      return d.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+    });
+    const regsData = sessions.map(s => s.regs || 0);
+    const attData = sessions.map(s => s.attendees || 0);
+
+    const ctx = $('trendChart')?.getContext('2d');
+    if (ctx) {
+      if (trendChartInst) trendChartInst.destroy();
+      trendChartInst = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels.length ? labels : ['No sessions'],
+          datasets: [
+            { label:'Registrations', data: regsData, backgroundColor:'rgba(59,130,246,0.55)', borderColor:'#3b82f6', borderWidth:1, borderRadius:4 },
+            { label:'Attendees',     data: attData,  backgroundColor:'rgba(34,197,94,0.55)',  borderColor:'#22c55e', borderWidth:1, borderRadius:4 },
+          ],
+        },
+        options: {
+          responsive:true, maintainAspectRatio:false,
+          plugins: { legend: { labels: { color:'#a0a5af', font:{ size:11 } } }, tooltip: { backgroundColor:'#0f1013', borderColor:'#2a2f38', borderWidth:1 } },
+          scales: { x: { grid:{ color:'#1f232b' }, ticks:{ color:'#5f6672', font:{ size:10 } } }, y: { grid:{ color:'#1f232b' }, ticks:{ color:'#5f6672', font:{ size:10 } }, beginAtZero:true } },
+        },
+      });
+    }
+
+    const tiers = (state.post?.revenue?.tiers) || [];
+    const ctx2 = $('tierChart')?.getContext('2d');
+    if (ctx2 && tiers.some(t => t.count > 0)) {
+      if (tierChartInst) tierChartInst.destroy();
+      tierChartInst = new Chart(ctx2, {
+        type: 'doughnut',
+        data: { labels: tiers.map(t => t.label), datasets: [{ data: tiers.map(t => t.revenue || 0), backgroundColor: ['#3b82f6','#06b6d4','#a855f7','#22c55e'], borderColor: '#0f1013', borderWidth: 2 }] },
+        options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins: { legend: { position:'right', labels:{ color:'#a0a5af', font:{ size:11 }, boxWidth:10 } }, tooltip: { backgroundColor:'#0f1013', borderColor:'#2a2f38', borderWidth:1, callbacks:{ label: (ctx) => ctx.label + ': £' + Math.round(ctx.parsed).toLocaleString('en-GB') } } } },
+      });
+    } else if (ctx2) {
+      if (tierChartInst) tierChartInst.destroy();
+      ctx2.canvas.parentElement.innerHTML = '<div class="muted" style="display:flex;align-items:center;justify-content:center;height:100%;font-size:13px">No closed deals yet.</div>';
+    }
+  }
+
+  // ─── TAB NAV ───────────────────────────────────────────────────────
+  function wireTabs() {
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(t => t.addEventListener('click', (e) => {
+      tabs.forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      // Auto-open the target section if it's collapsed
+      const target = t.dataset.target;
+      if (target === 'pre' || target === 'post') {
+        const sec = target === 'pre' ? document.getElementById('pre-section') : document.getElementById('post-section');
+        if (sec && !sec.classList.contains('open')) {
+          sec.classList.add('open');
+          if (sec.dataset.key) localStorage.setItem(LS_PREFIX + sec.dataset.key, 'open');
+        }
+      }
+    }));
+    const sections = [
+      { id: 'overview', tab: 'overview' },
+      { id: 'pre-section', tab: 'pre' },
+      { id: 'post-section', tab: 'post' },
+    ];
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY + 160;
+      let active = 'overview';
+      for (const s of sections) {
+        const el = document.getElementById(s.id);
+        if (el && el.offsetTop <= y) active = s.tab;
+      }
+      tabs.forEach(t => t.classList.toggle('active', t.dataset.target === active));
+    }, { passive: true });
+  }
+
+  // ─── INIT ───────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    initCollapsibles();
+    wireTabs();
+    initFilterBar();
+    $('refreshBtn')?.addEventListener('click', () => loadAll());
+    loadCampaignsForPicker().then(() => loadAll());
+    setInterval(loadAll, REFRESH_MS);
+    setInterval(() => {
+      if (state.lastUpdated) {
+        const s = Math.round((Date.now() - state.lastUpdated.getTime())/1000);
+        const txt = s < 60 ? 'just now' : s < 3600 ? Math.round(s/60)+'m ago' : Math.round(s/3600)+'h ago';
+        $('lastUpdated').textContent = 'Updated ' + txt;
+      }
+    }, 60000);
+  });
+
+})();
+</script>
+</body>
+</html>
