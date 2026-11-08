@@ -1,0 +1,28 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.567
+This video covers the three other connections. Your Instagram inbox, the AI that writes replies, and your CRM. All three are on the Get connected screen, under Connect the rest.
+
+00:00:12.717 --> 00:00:21.615
+First, your Instagram inbox. This is what lets the app read your messages and answer them. It uses Instagram's official connection.
+
+00:00:21.765 --> 00:00:31.218
+Follow the numbered links in order. Each link opens the exact page you need, so there is nothing to search for. Link one creates your Meta app.
+
+00:00:31.368 --> 00:00:40.885
+Paste the app's ID here. It is the long number at the top of your new app. Once it is in, the next link takes you straight to the right page inside your app.
+
+00:00:41.035 --> 00:00:51.810
+On that page, press Add account, sign in to Instagram, and press Generate token. Paste the token here and press Connect. Your inbox starts to fill within a minute.
+
+00:00:51.960 --> 00:01:05.061
+A note for later. When the app is hosted on a public address, with a registered Meta app, these steps are replaced by one button. Continue with Instagram. It works the same way as Continue with Google.
+
+00:01:05.211 --> 00:01:17.074
+Second, the AI. It needs a key from Anthropic, and some credit on that account. The links open the keys page and the billing page. Paste the key, press Save, and the app checks it for you.
+
+00:01:17.224 --> 00:01:32.095
+Third, your CRM. This one is optional. If you use Go High Level, create a private integration in the sub account that should receive your leads, then paste the token and location ID into Settings, under CRM.
+
+00:01:32.245 --> 00:01:41.442
+Each connection shows a green tick as soon as it is working. If something stops working later, this screen tells you what is wrong, in plain words.

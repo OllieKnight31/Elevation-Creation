@@ -1,0 +1,40 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:08.450
+Welcome. This video gets you connected. There are three steps, and each one ticks itself when it is done, so you always know where you are.
+
+00:00:08.600 --> 00:00:13.615
+Open Get connected in the menu. This one screen is where everything is set up.
+
+00:00:13.765 --> 00:00:24.583
+Step one is the helper. It is a small add on for Chrome. It is the part that types and sends messages in your own Instagram, from your own browser. You add it once.
+
+00:00:24.733 --> 00:00:40.522
+Press Download the helper. It saves a zip file to your Downloads folder. Open Downloads and double click the zip, and a folder called Ainable Setter Helper appears. Leave that folder where it is, because Chrome runs the helper from it.
+
+00:00:40.672 --> 00:00:50.466
+Next, copy this address, open a new tab, paste it, and press Enter. Chrome doesn't let websites link to this page, which is why it gets pasted.
+
+00:00:50.616 --> 00:01:12.591
+On that page, switch on Developer mode in the top right corner, then click Load unpacked in the top left. On a Mac, press Command Shift G, paste the folder address from step five, press Enter, and click Select. On Windows, open Downloads, then the helper folder with the file called manifest dot json inside, and click Select Folder.
+
+00:01:12.741 --> 00:01:21.341
+Come back to the app. The helper links itself within a few seconds. There is no address or key to copy. Step one now shows a tick.
+
+00:01:21.491 --> 00:01:32.842
+Step two. Press the button to open Instagram's own sign in page, and sign in the way you normally do. Your password is only ever typed on Instagram, never in this app.
+
+00:01:32.992 --> 00:01:39.415
+When you come back, the app shows which account you are signed in to. Messages will be sent from that account.
+
+00:01:39.565 --> 00:01:52.431
+Step three is a test. Type the username of someone who is expecting it, such as your own second account. Choose whether you press send yourself, or the helper sends it. Then press Send test message.
+
+00:01:52.581 --> 00:02:05.895
+Chrome opens a pinned Instagram tab, goes to their profile, and types the message the way a person would, with small slips and corrections. It takes about a minute. Leave that tab alone while it works.
+
+00:02:06.045 --> 00:02:14.581
+Last, this switch. When it is off, nothing is sent from this browser, whatever your campaigns say. Turn it on when you are ready to send.
+
+00:02:14.731 --> 00:02:22.306
+That is it. You are connected. In the next video, we connect your Instagram inbox, the AI, and your CRM.

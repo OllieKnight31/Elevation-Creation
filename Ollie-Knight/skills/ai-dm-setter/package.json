@@ -1,0 +1,17 @@
+{
+  "name": "ainable-setter",
+  "version": "0.2.0",
+  "private": true,
+  "description": "AI appointment setter for Instagram and Messenger DMs",
+  "scripts": {
+    "postinstall": "npm --prefix web install",
+    "setup": "npm --prefix web run setup",
+    "serve": "npm --prefix web run serve",
+    "start": "npm --prefix web run serve",
+    "outreach:chrome": "node scripts/outreach-chrome.mjs",
+    "scan:updates": "node scripts/update-scan.mjs",
+    "scan:updates:dry": "node scripts/update-scan.mjs --dry-run",
+    "videos": "node scripts/build-videos.mjs",
+    "videos:shots": "node scripts/build-videos.mjs --shots"
+  }
+}

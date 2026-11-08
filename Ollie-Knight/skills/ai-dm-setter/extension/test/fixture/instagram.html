@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>fixture: guessed Instagram direct layout</title>
+    <style>
+      body { font: 14px sans-serif; margin: 0; display: flex; }
+      #list { width: 240px; height: 300px; overflow-y: auto; border-right: 1px solid #ccc; }
+      #list [role="button"] { padding: 10px; cursor: pointer; }
+      [role="main"] { width: 500px; }
+      #scroller { height: 300px; overflow-y: auto; }
+      [role="row"] { display: flex; padding: 3px 8px; }
+      .out { margin-left: auto; }
+      .bubble { max-width: 60%; padding: 6px 10px; border-radius: 12px; background: #eee; }
+      .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+      .dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: blue; }
+      #composer { min-height: 30px; border: 1px solid #999; margin: 6px; padding: 4px; }
+    </style>
+  </head>
+  <body>
+    <div role="navigation">
+      <div id="list" role="list" aria-label="Thread list"></div>
+    </div>
+    <div role="main">
+      <header><a id="profile" role="link" href="/jane.doe/"><h2 id="hdr"></h2></a></header>
+      <div id="scroller"><div id="grid" role="grid"></div></div>
+      <div id="composer" role="textbox" contenteditable="true" aria-label="Message..."></div>
+      <div id="send" role="button" aria-label="Send">Send</div>
+    </div>
+
+    <script>
+      window.__SITE = 'instagram';
+    </script>
+    <script src="harness.js"></script>
+    <script>
+      // ---- fake inbox data ----
+      function makeThread(id, name, handle, count, useMarker, unread) {
+        var messages = [];
+        for (var i = 1; i <= count; i++) {
+          var text = i % 7 === 0 ? 'ok' : name.split(' ')[0] + ' message ' + i; // "ok" repeats on purpose
+          if (i === 4) text = 'thanks for the link you sent'; // contains the marker words inside a message
+          messages.push({ dir: i % 3 === 0 ? 'out' : 'in', text: text, n: i });
+        }
+        return { id: id, name: name, handle: handle, messages: messages, useMarker: useMarker, unread: !!unread, shown: 0 };
+      }
+      var THREADS = [
+        makeThread('jane', 'Jane Doe', 'jane.doe', 70, true),
+        makeThread('bob', 'Bob Stone', 'bob_stone', 25, false),
+        makeThread('una', 'Una Read', 'una.read', 12, true, true),
+        makeThread('cy', 'Cy Short', 'cy.short', 3, false)
+      ];
+      var current = null;
+      var grid = document.getElementById('grid');
+      var scroller = document.getElementById('scroller');
+      window.__opened = [];
+
+      function rowFor(m, t) {
+        var row = document.createElement('div');
+        row.setAttribute('role', 'row');
+        var bubble = document.createElement('div');
+        bubble.className = 'bubble ' + m.dir;
+        if (t.useMarker && m.dir === 'out') {
+          var sr = document.createElement('span');
+          sr.className = 'sr';
+          sr.textContent = 'You sent';
+          bubble.appendChild(sr);
+        }
+        var txt = document.createElement('div');
+        txt.setAttribute('dir', 'auto');
+        txt.textContent = m.text;
+        bubble.appendChild(txt);
+        row.appendChild(bubble);
+        return row;
+      }
+      function separator(n) {
+        var row = document.createElement('div');
+        row.setAttribute('role', 'row');
+        var time = document.createElement('time');
+        var day = String(1 + Math.floor(n / 10)).padStart(2, '0');
+        time.setAttribute('datetime', '2026-09-' + day + 'T10:00:00.000Z');
+        time.textContent = 'Sep ' + Number(day);
+        row.appendChild(time);
+        return row;
+      }
+      function renderBatch(t, howMany) {
+        var end = t.messages.length - t.shown;
+        var start = Math.max(0, end - howMany);
+        var frag = document.createDocumentFragment();
+        for (var i = start; i < end; i++) {
+          if (t.messages[i].n % 10 === 1) frag.appendChild(separator(t.messages[i].n));
+          frag.appendChild(rowFor(t.messages[i], t));
+        }
+        t.shown += end - start;
+        var before = scroller.scrollHeight;
+        grid.insertBefore(frag, grid.firstChild);
+        scroller.scrollTop += scroller.scrollHeight - before;
+      }
+      function openThread(t) {
+        current = t;
+        window.__opened.push(t.id);
+        t.shown = 0;
+        grid.textContent = '';
+        grid.setAttribute('aria-label', 'Messages in conversation with ' + t.name);
+        document.getElementById('hdr').textContent = t.name;
+        document.getElementById('profile').setAttribute('href', '/' + t.handle + '/');
+        renderBatch(t, 10);
+        scroller.scrollTop = scroller.scrollHeight;
+      }
+      // Older messages load 700 ms after the list is scrolled to the top.
+      // Polled instead of using a scroll event, because headless Chrome under
+      // virtual time does not reliably deliver scroll events.
+      var loading = false;
+      setInterval(function () {
+        if (scroller.scrollTop > 0 || loading || !current || current.shown >= current.messages.length) return;
+        loading = true;
+        var t = current;
+        setTimeout(function () {
+          loading = false;
+          if (t === current) renderBatch(t, 20);
+        }, 700);
+      }, 200);
+
+      var list = document.getElementById('list');
+      THREADS.forEach(function (t) {
+        var item = document.createElement('div');
+        item.setAttribute('role', 'listitem');
+        var btn = document.createElement('div');
+        btn.setAttribute('role', 'button');
+        btn.setAttribute('tabindex', '0');
+        var name = document.createElement('span');
+        name.setAttribute('dir', 'auto');
+        name.textContent = t.name;
+        btn.appendChild(name);
+        if (t.unread) {
+          var dot = document.createElement('span');
+          dot.className = 'dot';
+          dot.setAttribute('aria-label', 'Unread');
+          btn.appendChild(dot);
+        }
+        btn.addEventListener('click', function () {
+          openThread(t);
+        });
+        item.appendChild(btn);
+        list.appendChild(item);
+      });
+      document.getElementById('send').addEventListener('click', function () {
+        window.__T.sendClicks++;
+      });
+      openThread(THREADS[0]);
+    </script>
+
+    <script src="../../src/selectors.js"></script>
+    <script src="../../src/lib/core.js"></script>
+    <script src="../../src/content/dom.js"></script>
+    <script src="../../src/content/panel.js"></script>
+    <script src="../../src/content/capture.js"></script>
+    <script src="../../src/content/labels.js"></script>
+    <script src="../../src/content/main.js"></script>
+
+    <script>
+      (async function () {
+        var T = window.__T;
+        var R = { errors: [] };
+        T.wrapPauses();
+        try {
+          var composer = document.getElementById('composer');
+
+          // 1. panel shows the app's data for the open thread
+          R.panelLoaded = await T.until(function () {
+            return T.panelText().indexOf('Qualified') >= 0;
+          });
+          R.panelText = T.panelText();
+
+          // 2. selector health check
+          var health = await T.cmd('health-check');
+          R.healthMissingRequired = health.report.results
+            .filter(function (r) {
+              return !r.optional && !r.found && !r.expectAbsent;
+            })
+            .map(function (r) {
+              return r.key;
+            });
+          R.healthLoginFormFound = health.report.results.filter(function (r) {
+            return r.expectAbsent && r.found;
+          }).length;
+          R.healthHalt = health.report.halt;
+
+          // 3. the click guard refuses the send control
+          try {
+            AIDM.dom.safeClick('instagram', document.getElementById('send'), 'send button');
+            R.sendGuard = 'CLICKED';
+          } catch (e) {
+            R.sendGuard = e.name;
+          }
+
+          // 4. Insert fills the composer and stops
+          T.panelButton('Insert').click();
+          await T.until(function () {
+            return T.panelText().indexOf('Inserted.') >= 0;
+          }, 5000);
+          R.afterInsert = composer.innerText.trim();
+          T.panelButton('Insert all').click();
+          await T.until(function () {
+            return T.panelText().indexOf('already has text') >= 0;
+          }, 5000);
+          R.insertRefusedWhenFull = T.panelText().indexOf('already has text') >= 0;
+          R.afterRefusedInsert = composer.innerText.trim();
+          composer.textContent = '';
+          T.panelButton('Insert all').click();
+          await T.sleep(2500);
+          R.afterInsertAll = composer.innerText.trim();
+          composer.textContent = '';
+
+          // 5. New suggestion
+          T.panelButton('New suggestion').click();
+          R.newSuggestion = await T.until(function () {
+            return T.panelText().indexOf('Fresh suggestion') >= 0 && T.panelText().indexOf('Booked') >= 0;
+          }, 5000);
+
+          // 6. capture this thread (Jane: 70 messages, lazy loaded, owner marker)
+          var started = await T.cmd('capture-thread');
+          R.captureStarted = started;
+          R.progressShown = await T.until(function () {
+            return !!T.panelButton('Stop');
+          }, 3000);
+          R.secondRunRefused = (await T.cmd('capture-recent')).ok === false;
+          R.captureRun = await T.nextRun();
+          R.captureIngests = T.ingests.slice();
+          T.ingests.length = 0;
+
+          // 7. capture recent threads (cap 3: Jane, Bob, then Una is unread and skipped, Cy)
+          T.cap = 3;
+          window.__opened.length = 0;
+          await T.cmd('capture-recent');
+          R.recentRun = await T.nextRun();
+          R.recentIngests = T.ingests.slice();
+          R.recentOpened = window.__opened.slice();
+          T.ingests.length = 0;
+
+          // 8. halt: rate-limit text appears mid run
+          await T.sleep(2500);
+          await T.cmd('capture-thread');
+          setTimeout(function () {
+            var alert = document.createElement('div');
+            alert.setAttribute('role', 'alert');
+            alert.id = 'ratelimit';
+            alert.textContent = 'Try Again Later. We restrict certain activity to protect our community.';
+            document.body.appendChild(alert);
+          }, 1500);
+          var t0 = Date.now();
+          R.haltRun = await T.nextRun();
+          R.haltMs = Date.now() - t0;
+          R.haltIngests = T.ingests.length;
+          R.runRefusedWhileHalted = await (async function () {
+            await T.cmd('capture-thread');
+            var run = await T.nextRun();
+            return run.outcome;
+          })();
+          document.getElementById('ratelimit').remove();
+
+          // 9. Stop button
+          await T.cmd('capture-thread');
+          await T.until(function () {
+            return !!T.panelButton('Stop');
+          }, 3000);
+          await T.sleep(1200);
+          T.panelButton('Stop').click();
+          var t1 = Date.now();
+          R.stopRun = await T.nextRun();
+          R.stopMs = Date.now() - t1;
+          R.stopIngests = T.ingests.length;
+
+          // 10. a prospect message containing halt words does not halt
+          R.haltIgnoresMessages = AIDM.dom.haltMarker('instagram');
+          var row = document.createElement('div');
+          row.setAttribute('role', 'row');
+          row.innerHTML = '<div class="bubble in"><div dir="auto">sorry, try again later please</div></div>';
+          document.getElementById('grid').appendChild(row);
+          R.haltIgnoresMessages = AIDM.dom.haltMarker('instagram');
+          row.remove();
+
+          // 11. selector miss is loud and clickless
+          document.getElementById('grid').removeAttribute('role');
+          document.getElementById('grid').removeAttribute('aria-label');
+          var clicksBefore = window.__opened.length;
+          await T.cmd('capture-thread');
+          R.missRun = await T.nextRun();
+          R.missOpened = window.__opened.length - clicksBefore;
+
+          R.pauses = T.pauses.slice();
+          R.sendClicks = T.sendClicks;
+        } catch (e) {
+          R.errors.push(String(e && e.stack ? e.stack : e));
+        }
+        T.finish(R);
+      })();
+    </script>
+  </body>
+</html>

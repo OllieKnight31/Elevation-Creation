@@ -1,0 +1,77 @@
+{
+  "manifest_version": 3,
+  "name": "Ainable Setter Helper",
+  "version": "0.3.12",
+  "description": "Reads your own Instagram and Business Suite inbox threads for the Ainable Setter app, applies its labels, and shows its suggested reply. Optional outreach sender, off by default, types and sends first messages in its own tab.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "minimum_chrome_version": "111",
+  "permissions": [
+    "activeTab",
+    "alarms",
+    "declarativeNetRequestWithHostAccess",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.instagram.com/*",
+    "https://business.facebook.com/*",
+    "http://localhost:3000/*",
+    "https://ainable-setter.vercel.app/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_title": "Ainable Setter",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.instagram.com/*",
+        "https://business.facebook.com/*"
+      ],
+      "js": [
+        "src/selectors.js",
+        "src/lib/core.js",
+        "src/content/dom.js",
+        "src/content/account.js",
+        "src/content/panel.js",
+        "src/content/capture.js",
+        "src/content/labels.js",
+        "src/content/main.js",
+        "src/content/sync.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "http://localhost:3000/*",
+        "https://ainable-setter.vercel.app/*"
+      ],
+      "js": [
+        "src/pair-content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

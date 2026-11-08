@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>fixture: guessed Instagram direct layout for live sync</title>
+    <style>
+      body { font: 14px sans-serif; margin: 0; display: flex; }
+      #list { width: 260px; height: 400px; overflow-y: auto; border-right: 1px solid #ccc; }
+      #list [role="button"] { padding: 10px; display: block; }
+      [role="main"] { width: 500px; }
+      #scroller { height: 300px; overflow-y: auto; }
+      [role="row"] { display: flex; padding: 3px 8px; }
+      .out { margin-left: auto; }
+      .bubble { max-width: 60%; padding: 6px 10px; border-radius: 12px; background: #eee; }
+      .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    </style>
+  </head>
+  <body>
+    <div role="navigation">
+      <div id="list" role="list" aria-label="Thread list"></div>
+    </div>
+    <div role="main">
+      <header><a id="profile" role="link" href="/jane.doe/" aria-label="Open the profile page of jane.doe"><img id="pic" alt="" width="32" height="32" src="https://scontent-lhr8-1.cdninstagram.com/v/t51/jane.jpg" /><h2 id="hdr">Jane Doe</h2></a></header>
+      <div id="scroller"><div id="grid" role="grid" aria-label="Messages in conversation with Jane Doe"></div></div>
+    </div>
+
+    <script>
+      window.__SITE = 'instagram';
+    </script>
+    <script src="harness.js"></script>
+    <script>
+      // ---- the page ----
+      var grid = document.getElementById('grid');
+      var scroller = document.getElementById('scroller');
+      function addMessage(dir, text) {
+        var row = document.createElement('div');
+        row.setAttribute('role', 'row');
+        var bubble = document.createElement('div');
+        bubble.className = 'bubble ' + dir;
+        if (dir === 'out') {
+          var sr = document.createElement('span');
+          sr.className = 'sr';
+          sr.textContent = 'You sent';
+          bubble.appendChild(sr);
+        }
+        var txt = document.createElement('div');
+        txt.setAttribute('dir', 'auto');
+        txt.textContent = text;
+        bubble.appendChild(txt);
+        row.appendChild(bubble);
+        grid.appendChild(row);
+        scroller.scrollTop = scroller.scrollHeight;
+      }
+      for (var i = 1; i <= 30; i++) addMessage(i % 2 ? 'in' : 'out', 'old message ' + i);
+
+      // A chat list entry: name, then the latest message and how long ago.
+      var list = document.getElementById('list');
+      function setRow(name, preview, age, pic) {
+        var btn = document.querySelector('[data-name="' + name + '"]');
+        if (!btn) {
+          btn = document.createElement('div');
+          btn.setAttribute('role', 'button');
+          btn.setAttribute('tabindex', '0');
+          btn.setAttribute('data-name', name);
+          list.insertBefore(btn, list.firstChild);
+        }
+        btn.innerHTML = '';
+        if (pic) {
+          var img = document.createElement('img');
+          img.setAttribute('alt', name + "'s profile picture");
+          img.setAttribute('src', pic);
+          img.width = 24;
+          img.height = 24;
+          btn.appendChild(img);
+        }
+        var n = document.createElement('span');
+        n.setAttribute('dir', 'auto');
+        var t = document.createElement('span');
+        t.setAttribute('title', name);
+        t.textContent = name;
+        n.appendChild(t);
+        btn.appendChild(n);
+        var line = document.createElement('div');
+        var p = document.createElement('span');
+        p.setAttribute('dir', 'auto');
+        p.textContent = preview;
+        line.appendChild(p);
+        var dot = document.createElement('span');
+        dot.textContent = ' · ';
+        line.appendChild(dot);
+        var a = document.createElement('span');
+        a.textContent = age;
+        line.appendChild(a);
+        btn.appendChild(line);
+      }
+      setRow('Jane Doe', 'You: old message 30', '2m');
+      setRow('Bob Stone', 'see you then', '3h', 'https://scontent-lhr8-1.cdninstagram.com/v/t51/bob.jpg');
+      setRow('Old Friend', 'long time ago', '2w');
+      setRow('Pic Sender', 'Sent a photo', '1m', 'https://scontent-lhr8-1.cdninstagram.com/v/t51/pic.jpg');
+    </script>
+    <script src="../../src/selectors.js"></script>
+    <script src="../../src/lib/core.js"></script>
+    <script src="../../src/content/dom.js"></script>
+    <script src="../../src/content/panel.js"></script>
+    <script src="../../src/content/capture.js"></script>
+    <script src="../../src/content/labels.js"></script>
+    <script src="../../src/content/main.js"></script>
+    <script src="../../src/content/sync.js"></script>
+    <script>
+      (async function () {
+        var T = window.__T;
+        var R = { errors: [] };
+        try {
+          // 1. First look: the open chat and every list entry newer than a day, nothing older, no photo preview.
+          await T.until(function () { return T.lives.length >= 1; }, 20000);
+          R.first = T.lives[0];
+          // 2. Nothing changes: nothing more is sent.
+          await T.sleep(5000);
+          R.quietCount = T.lives.length;
+          // 3. A message arrives in the open chat.
+          addMessage('in', 'can we talk tomorrow?');
+          await T.until(function () { return T.lives.length > R.quietCount; }, 8000);
+          R.afterIncoming = T.lives[T.lives.length - 1];
+          // 4. Another chat gets a new message: only its list entry changes.
+          var before = T.lives.length;
+          setRow('Bob Stone', 'actually can we move it to 4pm?', 'now', 'https://scontent-lhr8-1.cdninstagram.com/v/t51/bob.jpg');
+          await T.until(function () { return T.lives.length > before; }, 8000);
+          R.afterRow = T.lives[T.lives.length - 1];
+          // 5. Scrolled up to read old messages: the open chat is not sent.
+          before = T.lives.length;
+          scroller.scrollTop = 0;
+          addMessage('out', 'sent while scrolled');
+          scroller.scrollTop = 0;
+          await T.sleep(5000);
+          R.whileScrolled = T.lives.slice(before);
+          // 6. The app is unreachable: it backs off instead of hammering.
+          T.liveFails = true;
+          before = T.lives.length;
+          setRow('Bob Stone', 'one more thing', 'now');
+          await T.sleep(9000);
+          R.failedTries = T.liveTries - T.lives.length;
+        } catch (e) {
+          R.errors.push(String(e && e.stack ? e.stack : e));
+        }
+        T.finish(R);
+      })();
+    </script>
+  </body>
+</html>

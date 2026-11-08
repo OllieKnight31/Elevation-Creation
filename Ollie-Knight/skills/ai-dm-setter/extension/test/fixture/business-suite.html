@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>fixture: guessed Business Suite inbox layout</title>
+    <style>
+      body { font: 14px sans-serif; margin: 0; display: flex; }
+      #list { width: 240px; height: 300px; overflow-y: auto; }
+      #list [role="button"] { padding: 10px; cursor: pointer; }
+      [role="main"] { width: 440px; }
+      #scroller { height: 200px; overflow-y: auto; }
+      [role="row"] { display: flex; padding: 3px 8px; }
+      .out { margin-left: auto; }
+      .bubble { max-width: 60%; padding: 6px 10px; background: #eee; }
+      .badge { display: inline-block; width: 12px; height: 12px; background: purple; }
+      [role="complementary"] { width: 260px; padding: 8px; }
+      .chip { display: inline-block; padding: 2px 8px; margin: 2px; background: #ddd; border-radius: 10px; }
+      [role="dialog"] { border: 1px solid #333; padding: 8px; }
+    </style>
+  </head>
+  <body>
+    <div role="navigation">
+      <input id="search" placeholder="Search" />
+      <div id="list" role="list" aria-label="Conversation list"></div>
+    </div>
+    <div role="main">
+      <h2 id="hdr"></h2>
+      <span id="badge" class="badge" aria-label="Instagram"></span>
+      <div id="scroller"><div id="grid" role="grid"></div></div>
+      <textarea id="composer" placeholder="Reply in Instagram..."></textarea>
+      <button id="send" type="submit">Send</button>
+    </div>
+    <div role="complementary">
+      <div id="labelsBlock">
+        <div><h3>Labels</h3></div>
+        <div id="chips"></div>
+        <div id="add" role="button" aria-label="Add label">Add label</div>
+      </div>
+      <div id="pickerSlot"></div>
+    </div>
+
+    <script>
+      window.__SITE = 'businessSuite';
+    </script>
+    <script src="harness.js"></script>
+    <script>
+      var CONVS = [
+        { name: 'Jane Doe', labels: ['Hot lead'], platform: 'Instagram' },
+        { name: 'Bob Stone', labels: [], platform: 'Messenger' },
+        { name: 'Sam Lee', labels: [], platform: 'Instagram' },
+        { name: 'Sam Lee', labels: [], platform: 'Instagram' },
+        { name: 'Dee Late', labels: [], platform: 'Instagram', hiddenUntilSearch: true }
+      ];
+      var ALL_LABELS = ['Hot lead', 'VIP', 'Creators'];
+      var current = null;
+      window.__opened = [];
+      window.__created = [];
+
+      function renderChips() {
+        var chips = document.getElementById('chips');
+        chips.textContent = '';
+        current.labels.forEach(function (l) {
+          var c = document.createElement('span');
+          c.className = 'chip';
+          c.setAttribute('dir', 'auto');
+          c.textContent = l;
+          chips.appendChild(c);
+        });
+      }
+      function openConv(c) {
+        current = c;
+        window.__opened.push(c.name);
+        document.getElementById('hdr').textContent = c.name;
+        document.getElementById('badge').setAttribute('aria-label', c.platform);
+        var grid = document.getElementById('grid');
+        grid.textContent = '';
+        grid.setAttribute('aria-label', 'Messages in conversation with ' + c.name);
+        ['in:hi, how much is the programme', 'out:hey, happy to help', 'in:great'].forEach(function (s) {
+          var row = document.createElement('div');
+          row.setAttribute('role', 'row');
+          var b = document.createElement('div');
+          b.className = 'bubble ' + s.split(':')[0];
+          var t = document.createElement('div');
+          t.setAttribute('dir', 'auto');
+          t.textContent = s.split(':')[1];
+          b.appendChild(t);
+          row.appendChild(b);
+          grid.appendChild(row);
+        });
+        renderChips();
+        closePicker();
+      }
+      function renderList(filter) {
+        var list = document.getElementById('list');
+        list.textContent = '';
+        CONVS.forEach(function (c) {
+          var f = (filter || '').toLowerCase();
+          if (c.hiddenUntilSearch && !f) return;
+          if (f && c.name.toLowerCase().indexOf(f) < 0) return;
+          var item = document.createElement('div');
+          item.setAttribute('role', 'listitem');
+          var btn = document.createElement('div');
+          btn.setAttribute('role', 'button');
+          btn.setAttribute('tabindex', '0');
+          var name = document.createElement('span');
+          name.setAttribute('dir', 'auto');
+          name.textContent = c.name;
+          btn.appendChild(name);
+          btn.addEventListener('click', function () {
+            openConv(c);
+          });
+          item.appendChild(btn);
+          list.appendChild(item);
+        });
+      }
+      document.getElementById('search').addEventListener('input', function (e) {
+        renderList(e.target.value);
+      });
+
+      function closePicker() {
+        document.getElementById('pickerSlot').textContent = '';
+      }
+      function openPicker() {
+        var slot = document.getElementById('pickerSlot');
+        slot.textContent = '';
+        var dlg = document.createElement('div');
+        dlg.setAttribute('role', 'dialog');
+        var input = document.createElement('input');
+        input.setAttribute('placeholder', 'Search labels');
+        var box = document.createElement('div');
+        box.setAttribute('role', 'listbox');
+        function options() {
+          box.textContent = '';
+          var v = input.value.trim().toLowerCase();
+          var exact = false;
+          ALL_LABELS.forEach(function (l) {
+            if (v && l.toLowerCase().indexOf(v) < 0) return;
+            if (l.toLowerCase() === v) exact = true;
+            var o = document.createElement('div');
+            o.setAttribute('role', 'option');
+            o.textContent = l;
+            o.addEventListener('click', function () {
+              if (current.labels.indexOf(l) < 0) current.labels.push(l);
+              renderChips();
+              closePicker();
+            });
+            box.appendChild(o);
+          });
+          if (v && !exact) {
+            var c = document.createElement('div');
+            c.setAttribute('role', 'option');
+            c.textContent = 'Create "' + input.value.trim() + '"';
+            c.addEventListener('click', function () {
+              var l = input.value.trim();
+              ALL_LABELS.push(l);
+              window.__created.push(l);
+              current.labels.push(l);
+              renderChips();
+              closePicker();
+            });
+            box.appendChild(c);
+          }
+        }
+        input.addEventListener('input', options);
+        dlg.appendChild(input);
+        dlg.appendChild(box);
+        slot.appendChild(dlg);
+        options();
+      }
+      document.getElementById('add').addEventListener('click', openPicker);
+      document.getElementById('send').addEventListener('click', function () {
+        window.__T.sendClicks++;
+      });
+
+      renderList('');
+      openConv(CONVS[1]);
+    </script>
+
+    <script src="../../src/selectors.js"></script>
+    <script src="../../src/lib/core.js"></script>
+    <script src="../../src/content/dom.js"></script>
+    <script src="../../src/content/panel.js"></script>
+    <script src="../../src/content/capture.js"></script>
+    <script src="../../src/content/labels.js"></script>
+    <script src="../../src/content/main.js"></script>
+
+    <script>
+      (async function () {
+        var T = window.__T;
+        var R = { errors: [] };
+        T.wrapPauses();
+        try {
+          R.panelLoaded = await T.until(function () {
+            return T.panelText().indexOf('Qualified') >= 0;
+          });
+
+          var health = await T.cmd('health-check');
+          R.healthMissingRequired = health.report.results
+            .filter(function (r) {
+              return !r.optional && !r.found && !r.expectAbsent && r.scopeFound;
+            })
+            .map(function (r) {
+              return r.key;
+            });
+
+          try {
+            AIDM.dom.safeClick('businessSuite', document.getElementById('send'), 'send button');
+            R.sendGuard = 'CLICKED';
+          } catch (e) {
+            R.sendGuard = e.name;
+          }
+
+          // Insert into a <textarea> composer
+          T.panelButton('Insert').click();
+          await T.until(function () {
+            return T.panelText().indexOf('Inserted.') >= 0;
+          }, 5000);
+          R.afterInsert = document.getElementById('composer').value;
+          document.getElementById('composer').value = '';
+
+          // Capture the open thread (Bob, Messenger badge)
+          await T.cmd('capture-thread');
+          R.captureRun = await T.nextRun();
+          R.captureIngests = T.ingests.slice();
+
+          // Label sync
+          T.queue = [
+            { id: 'q1', platform: 'instagram', name: 'Jane Doe', handle: null, externalId: 'x1', labels: ['Hot lead', 'VIP', 'Webinar', 'Create'] },
+            { id: 'q2', platform: 'instagram', name: 'Nobody Here', handle: null, externalId: 'x2', labels: ['VIP'] },
+            { id: 'q3', platform: 'instagram', name: 'Sam Lee', handle: null, externalId: 'x3', labels: ['VIP'] },
+            { id: 'q4', platform: 'messenger', name: 'Bob Stone', handle: null, externalId: 'x4', labels: ['vip'] },
+            { id: 'q5', platform: 'instagram', name: 'Dee Late', handle: null, externalId: 'x5', labels: ['VIP'] },
+            { id: 'q6', platform: 'instagram', name: 'Jane Doe', handle: null, externalId: 'x1', labels: [] }
+          ];
+          window.__opened.length = 0;
+          await T.cmd('sync-labels');
+          R.syncRun = await T.nextRun();
+          R.acks = T.acks.slice();
+          R.opened = window.__opened.slice();
+          R.created = window.__created.slice();
+          R.labels = {};
+          CONVS.forEach(function (c, i) {
+            R.labels[c.name + '#' + i] = c.labels.slice();
+          });
+          R.searchLeftEmpty = document.getElementById('search').value === '';
+
+          // Broken selector: the Labels block disappears
+          document.getElementById('labelsBlock').remove();
+          T.acks.length = 0;
+          T.queue = [{ id: 'q7', platform: 'instagram', name: 'Jane Doe', handle: null, externalId: 'x1', labels: ['Brand new'] }];
+          await T.cmd('sync-labels');
+          R.brokenRun = await T.nextRun();
+          R.brokenAcks = T.acks.slice();
+
+          R.pauses = T.pauses.slice();
+          R.sendClicks = T.sendClicks;
+        } catch (e) {
+          R.errors.push(String(e && e.stack ? e.stack : e));
+        }
+        T.finish(R);
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "_note": "Tunable outreach defaults. The weekly update scan may edit this file. Code reads it at build time. New workspaces start from these values; saved workspace settings win.",
+  "updated": "2026-10-11",
+  "pacing": {
+    "dailyMin": 35,
+    "dailyMax": 45,
+    "hardMax": 50,
+    "hourStart": 8,
+    "hourEnd": 22,
+    "minGapSeconds": 240,
+    "rampStart": 10,
+    "rampStep": 5,
+    "errorsBeforePause": 2,
+    "leaseMinutes": 12
+  },
+  "variants": {
+    "minPerCampaign": 5,
+    "maxPerCampaign": 15
+  },
+  "typing": {
+    "wpmMin": 34,
+    "wpmMax": 58,
+    "typoRate": 0.035,
+    "rewriteRate": 0.12,
+    "pauseRate": 0.06,
+    "readMsMin": 2500,
+    "readMsMax": 9000
+  },
+  "detect": {
+    "phrases": [
+      "suspect automated behavior",
+      "try again later",
+      "we restrict certain activity",
+      "action blocked",
+      "your account has been temporarily",
+      "confirm it's you",
+      "help us confirm",
+      "we limit how often",
+      "this message couldn't be sent"
+    ],
+    "urlParts": ["/challenge/", "/accounts/suspended", "/accounts/login", "/accounts/onetap", "/checkpoint/"]
+  },
+  "privateReply": {
+    "perHour": 750,
+    "windowDays": 7
+  }
+}

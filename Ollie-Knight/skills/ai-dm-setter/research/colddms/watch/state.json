@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "createdAt": "2026-10-11T15:48:14.210Z",
+  "lastRun": "2026-11-02T00:12:17.406Z",
+  "lastChange": "2026-11-02T00:12:17.406Z",
+  "lastResult": "Update failed and restored: claude exited with code 1",
+  "extension": {
+    "id": "ffcepcgicipeaajceijngacfelhpgofe",
+    "version": "6.14.8",
+    "snapshotDir": "research/colddms/source/extension-6.14.8",
+    "crxSha256": "7383f614ac57304965e8394bd4a9e5a80085f141645d9152cd64f8b817d50120",
+    "checkedAt": "2026-11-01T23:55:50.914Z",
+    "changedAt": null
+  },
+  "webapp": {
+    "entry": "https://app.colddms.com/sign-in",
+    "mainBundle": "index.132db58e.js",
+    "snapshotDir": "research/colddms/source/webapp",
+    "checkedAt": "2026-10-25T23:32:32.220Z",
+    "changedAt": null
+  },
+  "meta": {
+    "latestGraphVersion": "v26.0",
+    "projectGraphVersion": "v25.0",
+    "sources": {
+      "graph-changelog": {
+        "url": "https://developers.facebook.com/docs/graph-api/changelog",
+        "title": "Changelog - Graph API - Documentation - Meta for Developers",
+        "hash": "8a4a04a543554fdab4dde5a7492dd8f1c97ad26318d7d6659b9a92fdff91815b",
+        "length": 1951,
+        "checkedAt": "2026-11-02T00:06:24.743Z",
+        "changedAt": null,
+        "firstSeenAt": "2026-10-11T15:48:58.540Z"
+      },
+      "instagram-changelog": {
+        "url": "https://developers.facebook.com/documentation/instagram-platform/changelog",
+        "title": "Changelog for Instagram Platform | Meta for Developers",
+        "hash": "edbe989b66b3f6d391dc5c9041234a55488333d6df9a0493dc7f2438b728c684",
+        "length": 42902,
+        "checkedAt": "2026-11-02T00:06:24.747Z",
+        "changedAt": "2026-11-02T00:06:24.747Z",
+        "firstSeenAt": "2026-10-11T15:48:58.541Z"
+      },
+      "messaging-policy": {
+        "url": "https://developers.facebook.com/documentation/business-messaging/messenger-platform/policy",
+        "title": "Messenger Platform and IG Messaging API policy | Meta for Developers",
+        "hash": "dfd833ad7aed11a98a961d3dbc441ee75b624689f9a053e284c2fa1e1c0cabf5",
+        "length": 13123,
+        "checkedAt": "2026-10-19T06:31:11.365Z",
+        "changedAt": null,
+        "firstSeenAt": "2026-10-11T15:48:58.541Z",
+        "lastProblem": "timed out",
+        "lastProblemAt": "2026-11-02T00:06:24.747Z"
+      },
+      "ig-private-replies": {
+        "url": "https://developers.facebook.com/documentation/instagram-platform/private-replies",
+        "title": "Send a Private Reply to a Commenter | Meta for Developers",
+        "hash": "5435bf00ecddd62af4e559f9a8291464f6141051c65a18f80ebd130fae9fea33",
+        "length": 3775,
+        "checkedAt": "2026-11-02T00:06:24.747Z",
+        "changedAt": "2026-11-02T00:06:24.747Z",
+        "firstSeenAt": "2026-10-11T15:48:58.541Z"
+      },
+      "igm-private-replies": {
+        "url": "https://developers.facebook.com/documentation/business-messaging/instagram-messaging/features/private-replies",
+        "title": "Private replies - Instagram Messaging | Meta for Developers",
+        "hash": "9ea8bcd031afceca1b135a875d61760c32b8b7ce640ce6952e642f4b0050c5b9",
+        "length": 4989,
+        "checkedAt": "2026-11-02T00:06:24.748Z",
+        "changedAt": "2026-11-02T00:06:24.748Z",
+        "firstSeenAt": "2026-10-11T15:48:58.541Z"
+      },
+      "ig-send-messages": {
+        "url": "https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-instagram-login/messaging-api",
+        "title": "Send Messages | Meta for Developers",
+        "hash": "0e909f4efb3a8023f90c0f32daeffd7ce9b307f399de11b0bfdfa86ad8eeafd0",
+        "length": 13851,
+        "checkedAt": "2026-11-02T00:06:24.748Z",
+        "changedAt": "2026-11-02T00:06:24.748Z",
+        "firstSeenAt": "2026-10-11T15:48:58.542Z"
+      },
+      "ig-me-links": {
+        "url": "https://developers.facebook.com/documentation/business-messaging/instagram-messaging/features/ig-me-links",
+        "title": "Using ig.me Links | Meta for Developers",
+        "hash": "165681378c474a5598f6584e94018b3dfd8b8f54b04389f99b4f291b59bf401c",
+        "length": 5781,
+        "checkedAt": "2026-11-02T00:06:24.748Z",
+        "changedAt": "2026-11-02T00:06:24.748Z",
+        "firstSeenAt": "2026-10-11T15:48:58.542Z"
+      },
+      "click-to-instagram-ads": {
+        "url": "https://developers.facebook.com/documentation/ads-commerce/marketing-api/ad-creative/messaging-ads/click-to-instagram",
+        "title": "Ads that Click to Instagram | Meta for Developers",
+        "hash": "65606c1f5d77e5e5a0139b6ebba855aa1b9823f63155deb690482b2df0db0ce5",
+        "length": 19776,
+        "checkedAt": "2026-11-02T00:06:24.750Z",
+        "changedAt": "2026-11-02T00:06:24.750Z",
+        "firstSeenAt": "2026-10-11T15:48:58.543Z"
+      },
+      "instagram-overview": {
+        "url": "https://developers.facebook.com/documentation/instagram-platform/overview",
+        "title": "Instagram Platform overview | Meta for Developers",
+        "hash": "4d7522aa2a23d707e02fbffb1ed5ab4661192eea5c408181d57c826183b7f522",
+        "length": 20666,
+        "checkedAt": "2026-11-02T00:06:24.750Z",
+        "changedAt": "2026-11-02T00:06:24.750Z",
+        "firstSeenAt": "2026-10-11T15:48:58.543Z"
+      },
+      "messenger-changelog": {
+        "url": "https://developers.facebook.com/documentation/business-messaging/messenger-platform/changelog",
+        "title": "Messenger Platform Changelog | Meta for Developers",
+        "hash": "3ad0cf00c3f500d72158464f831fb993556d2033941638883db29cd2dad859e9",
+        "length": 67815,
+        "checkedAt": "2026-11-02T00:06:24.745Z",
+        "changedAt": "2026-11-02T00:06:24.745Z",
+        "firstSeenAt": "2026-10-11T15:51:15.648Z"
+      }
+    }
+  },
+  "pendingBriefs": [],
+  "failedBriefs": [
+    "research/colddms/watch/changes/2026-10-26.md",
+    "research/colddms/watch/changes/2026-11-02.md"
+  ],
+  "lastApply": {
+    "at": "2026-11-02T00:12:17.405Z",
+    "ok": false,
+    "outcome": "failed and restored: claude exited with code 1",
+    "briefs": [
+      "research/colddms/watch/changes/2026-10-26.md",
+      "research/colddms/watch/changes/2026-11-02.md"
+    ],
+    "backup": "research/colddms/watch/backups/20261102-075549.tar.gz",
+    "changedFiles": []
+  }
+}

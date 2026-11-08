@@ -1,0 +1,47 @@
+/* Shared styles for the popup and the options page. */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #111;
+  background: #fff;
+}
+h1 { font-size: 15px; margin: 0 0 8px; }
+h2 { font-size: 13px; margin: 14px 0 6px; }
+p { margin: 6px 0; }
+.muted { color: #666; font-size: 12px; }
+label { display: block; margin: 10px 0 3px; font-weight: 600; }
+label.check { display: flex; gap: 8px; align-items: center; font-weight: 400; margin: 8px 0; }
+input[type="text"], input[type="password"], input[type="number"], input[type="url"] {
+  width: 100%; padding: 6px 8px; border: 1px solid #bbb; border-radius: 6px; font: inherit;
+}
+button {
+  font: inherit; padding: 6px 10px; border-radius: 7px; border: 1px solid #111;
+  background: #111; color: #fff; cursor: pointer;
+}
+button.ghost { background: #fff; color: #111; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+.btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.col { display: flex; flex-direction: column; gap: 6px; }
+.box { border-radius: 7px; padding: 7px 9px; font-size: 12px; white-space: pre-wrap; word-break: break-word; margin: 8px 0; }
+.box.ok { background: #e8f7ec; color: #14622b; border: 1px solid #b4e0c1; }
+.box.error { background: #fde8e8; color: #8a1111; border: 1px solid #f3b4b4; }
+.box.info { background: #f2f2f2; color: #222; border: 1px solid #ddd; }
+.hidden { display: none !important; }
+.health { margin: 0; padding: 0; list-style: none; max-height: 260px; overflow-y: auto; border: 1px solid #ddd; border-radius: 7px; }
+.health li { padding: 5px 8px; border-bottom: 1px solid #eee; font-size: 12px; }
+.health li:last-child { border-bottom: 0; }
+.health .tag { display: inline-block; min-width: 76px; font-weight: 600; }
+.health .found .tag { color: #14622b; }
+.health .missing .tag { color: #8a1111; }
+.health .soft .tag { color: #8a6a11; }
+.health code { font-size: 11px; word-break: break-all; }
+.health details { margin-top: 2px; }
+.setup { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.setup li { display: flex; gap: 8px; align-items: flex-start; border: 1px solid #ddd; border-radius: 7px; padding: 7px 9px; }
+.setup li.done { background: #e8f7ec; border-color: #b4e0c1; }
+.setup .n { flex: none; width: 18px; height: 18px; border-radius: 50%; background: #111; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+.setup li.done .n { background: #14622b; }
+.setup .t { flex: 1; min-width: 0; }
+.setup .t b { display: block; }
+.setup button { margin-top: 5px; padding: 4px 9px; font-size: 12px; }

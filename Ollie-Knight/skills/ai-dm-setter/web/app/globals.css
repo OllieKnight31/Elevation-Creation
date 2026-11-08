@@ -1,0 +1,103 @@
+/* Scan only source folders. Scanning the whole project made the dev server rebuild whenever any
+   file changed, including its own log file, which reloaded the page in a loop. */
+@import "tailwindcss" source(none);
+@source "../app";
+@source "../components";
+@source "../lib";
+
+/* Ainable brand (playbook v1.2.0): ink on paper, bone on night, no accent colour.
+   Colour is used for states only (ok, warning, error, stage dots). */
+:root {
+  --c-canvas: #F6F6F4;
+  --c-surface: #FFFFFF;
+  --c-surface2: #EFEFEC;
+  --c-ink: #0E0E10;
+  --c-ink2: #45454A;
+  --c-mute: #7A7A80;
+  --c-line: rgba(14, 14, 16, .1);
+  --c-linestrong: rgba(14, 14, 16, .2);
+  --c-onbrand: #F6F6F4;
+  --c-ok: #1F8A5B;
+  --c-warn: #9A6200;
+  --c-err: #D93D3D;
+  --shadow-pop: 0 24px 60px -24px rgba(14, 14, 16, .28), 0 0 0 1px rgba(14, 14, 16, .08);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --c-canvas: #0A0A0B;
+  --c-surface: #111113;
+  --c-surface2: #1B1B1F;
+  --c-ink: #F5F5F7;
+  --c-ink2: #A8A8B0;
+  --c-mute: #7D7D87;
+  --c-line: rgba(245, 245, 247, .1);
+  --c-linestrong: rgba(245, 245, 247, .22);
+  --c-onbrand: #0A0A0B;
+  --c-ok: #4CC38A;
+  --c-warn: #E0A94A;
+  --c-err: #F0706B;
+  --shadow-pop: 0 24px 60px -24px rgba(0, 0, 0, .8), 0 0 0 1px rgba(245, 245, 247, .1);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-canvas: var(--c-canvas);
+  --color-surface: var(--c-surface);
+  --color-surface2: var(--c-surface2);
+  --color-line: var(--c-line);
+  --color-linestrong: var(--c-linestrong);
+  --color-ink: var(--c-ink);
+  --color-ink2: var(--c-ink2);
+  --color-mute: var(--c-mute);
+  --color-brand: var(--c-ink);
+  --color-brandsoft: var(--c-surface2);
+  --color-onbrand: var(--c-onbrand);
+  --color-ok: var(--c-ok);
+  --color-warn: var(--c-warn);
+  --color-err: var(--c-err);
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html, body { height: 100%; overflow: hidden; }
+body { background: var(--c-canvas); color: var(--c-ink); font-family: var(--font-sans); font-size: 14px; -webkit-font-smoothing: antialiased; }
+input, textarea, select { font: inherit; color: inherit; }
+::selection { background: var(--c-ink); color: var(--c-canvas); }
+:focus-visible { outline: 2px solid var(--c-linestrong); outline-offset: 2px; }
+
+.display { font-family: var(--font-display); font-weight: 400; letter-spacing: -.02em; }
+.display em { font-style: italic; font-weight: 300; color: var(--c-ink2); }
+.label { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--c-mute); }
+
+.field { width: 100%; border: 1px solid var(--c-linestrong); border-radius: 10px; padding: 8px 10px; background: var(--c-surface); outline: none; }
+.field:focus { border-color: var(--c-ink); box-shadow: 0 0 0 3px var(--c-line); }
+.field::placeholder { color: var(--c-mute); }
+.card { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: 16px; }
+.pop { background: var(--c-surface); border-radius: 14px; box-shadow: var(--shadow-pop); }
+.tone-ok { background: color-mix(in srgb, var(--c-ok) 12%, transparent); color: var(--c-ok); }
+.tone-warn { background: color-mix(in srgb, var(--c-warn) 14%, transparent); color: var(--c-warn); }
+.tone-err { background: color-mix(in srgb, var(--c-err) 12%, transparent); color: var(--c-err); }
+.scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.scroll::-webkit-scrollbar-thumb { background: var(--c-linestrong); border-radius: 8px; }
+.resizer { width: 5px; margin: 0 -2px; z-index: 5; cursor: col-resize; flex: none; position: relative; touch-action: none; }
+.resizer::after { content: ""; position: absolute; inset: 0 2px; background: transparent; transition: background .15s; }
+.resizer:hover::after, .resizer[data-active="true"]::after { background: var(--c-ink); }
+
+/* Compact density: tighter rows and panels everywhere. */
+:root[data-density="compact"] .d-row { padding-top: 6px; padding-bottom: 6px; }
+:root[data-density="compact"] .d-row .d-extra { display: none; }
+:root[data-density="compact"] .d-sec { padding-top: 6px; padding-bottom: 6px; }
+:root[data-density="compact"] .d-msgs { padding-top: 8px; padding-bottom: 8px; }
+:root[data-density="compact"] .d-avatar { width: 30px !important; height: 30px !important; font-size: 11px !important; }
+:root[data-density="compact"] td, :root[data-density="compact"] th { padding-top: 4px; padding-bottom: 4px; }
+:root[data-density="compact"] .d-page { padding: 12px; }
+:root[data-density="compact"] .d-avatar > span { width: 10px !important; height: 10px !important; font-size: 0 !important; bottom: -1px; right: -1px; }
+
+/* Step by step guides on Get connected: one step at a time, large and numbered. */
+.walk ul { list-style: decimal; padding-left: 1.4rem; margin-top: 0.85rem; }
+.walk ul > li { margin: 0.75rem 0; padding-left: 0.25rem; }
+.walk ul ul { list-style: lower-alpha; margin-top: 0.5rem; }
+.walk ul ul > li { margin: 0.45rem 0; }
+.walk b { color: var(--c-ink); }
+.walk li::marker { font-weight: 600; color: var(--c-ink); }

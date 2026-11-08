@@ -1,0 +1,441 @@
+[
+  {
+    "id": "welcome",
+    "title": "How Ainable Setter works",
+    "summary": "The whole tool in a few minutes: from the first message a lead sends to a call on your calendar. Plays the first time someone signs in.",
+    "group": "Start here",
+    "screen": "/",
+    "seconds": 177,
+    "chapters": [
+      {
+        "at": 0,
+        "title": "Welcome to Ainable Setter"
+      },
+      {
+        "at": 13,
+        "title": "From first message to booked call"
+      },
+      {
+        "at": 31.2,
+        "title": "Start in Get connected"
+      },
+      {
+        "at": 42.9,
+        "title": "Tell the AI about your business"
+      },
+      {
+        "at": 55.3,
+        "title": "Every conversation in one inbox"
+      },
+      {
+        "at": 64.8,
+        "title": "Off, Suggest or Autopilot"
+      },
+      {
+        "at": 78.6,
+        "title": "A draft, written in your voice"
+      },
+      {
+        "at": 90.4,
+        "title": "It keeps every lead's details up to date"
+      },
+      {
+        "at": 99.6,
+        "title": "It offers real times from your calendar"
+      },
+      {
+        "at": 113.1,
+        "title": "Connect Calendly once"
+      },
+      {
+        "at": 122.7,
+        "title": "When it doesn't know, it asks you once"
+      },
+      {
+        "at": 133.5,
+        "title": "See where every lead stands"
+      },
+      {
+        "at": 141.7,
+        "title": "Start conversations yourself, safely"
+      },
+      {
+        "at": 151.7,
+        "title": "Your numbers, and what to do next"
+      },
+      {
+        "at": 159,
+        "title": "A short video guide for every screen"
+      },
+      {
+        "at": 165.8,
+        "title": "Connect. Brief. Work the inbox."
+      }
+    ],
+    "builtAt": "2026-10-15"
+  },
+  {
+    "id": "connect",
+    "title": "Get connected",
+    "summary": "Add the helper to Chrome, sign in to Instagram and send a test message. Start here.",
+    "group": "Set up",
+    "screen": "/connect",
+    "seconds": 142,
+    "chapters": [
+      {
+        "at": 0,
+        "title": "Get connected"
+      },
+      {
+        "at": 8.6,
+        "title": "Open Get connected in the menu"
+      },
+      {
+        "at": 13.8,
+        "title": "Step 1: add the helper to Chrome"
+      },
+      {
+        "at": 24.7,
+        "title": "Download the helper, then unzip it"
+      },
+      {
+        "at": 40.7,
+        "title": "Copy chrome://extensions into a new tab"
+      },
+      {
+        "at": 50.6,
+        "title": "Two clicks, then choose the folder"
+      },
+      {
+        "at": 72.7,
+        "title": "It links itself. Nothing to copy"
+      },
+      {
+        "at": 81.5,
+        "title": "Step 2: sign in to Instagram"
+      },
+      {
+        "at": 93,
+        "title": "The app sees which account you are on"
+      },
+      {
+        "at": 99.6,
+        "title": "Step 3: send one test message"
+      },
+      {
+        "at": 112.6,
+        "title": "Chrome types it like a person"
+      },
+      {
+        "at": 126,
+        "title": "One switch turns all sending on or off"
+      },
+      {
+        "at": 134.7,
+        "title": "Next: connect your inbox and the AI"
+      }
+    ],
+    "builtAt": "2026-10-15"
+  },
+  {
+    "id": "connections",
+    "title": "Connect your inbox, the AI and your CRM",
+    "summary": "The three connection points under Get connected, with the exact page each link opens.",
+    "group": "Set up",
+    "screen": "/connect",
+    "seconds": 102,
+    "chapters": [
+      {
+        "at": 0,
+        "title": "Connect the rest"
+      },
+      {
+        "at": 12.7,
+        "title": "Your Instagram inbox"
+      },
+      {
+        "at": 21.8,
+        "title": "Every link opens the exact page"
+      },
+      {
+        "at": 31.4,
+        "title": "Paste the app ID once"
+      },
+      {
+        "at": 41,
+        "title": "Generate the token, paste it, press Connect"
+      },
+      {
+        "at": 52,
+        "title": "One button: Continue with Instagram"
+      },
+      {
+        "at": 65.2,
+        "title": "The AI that writes replies"
+      },
+      {
+        "at": 77.2,
+        "title": "Your CRM, if you use one"
+      },
+      {
+        "at": 92.2,
+        "title": "Each one shows a tick when it works"
+      }
+    ],
+    "builtAt": "2026-10-15"
+  },
+  {
+    "id": "brief",
+    "title": "Tell the AI about your business",
+    "summary": "The business brief: what you sell, who it is for, where to send leads, and what the AI must never say.",
+    "group": "Set up",
+    "screen": "/onboarding",
+    "seconds": 66,
+    "chapters": [
+      {
+        "at": 0,
+        "title": "Tell the AI about your business"
+      },
+      {
+        "at": 9.4,
+        "title": "Seven short sections, in any order"
+      },
+      {
+        "at": 16.2,
+        "title": "What you sell and what it costs"
+      },
+      {
+        "at": 26.2,
+        "title": "Who it is for, and who it is not"
+      },
+      {
+        "at": 36.9,
+        "title": "Where to send a lead"
+      },
+      {
+        "at": 49,
+        "title": "How you write, and what must never be said"
+      },
+      {
+        "at": 59,
+        "title": "Check it and save"
+      }
+    ],
+    "builtAt": "2026-10-15"
+  },
+  {
+    "id": "inbox",
+    "title": "Work the inbox",
+    "summary": "Read conversations, let the AI draft or send, reply yourself, and keep each lead's details up to date.",
+    "group": "Every day",
+    "screen": "/inbox",
+    "seconds": 91,
+    "chapters": [
+      {
+        "at": 0,
+        "title": "Work the inbox"
+      },
+      {
+        "at": 9.4,
+        "title": "Your conversations, newest first"
+      },
+      {
+        "at": 20.8,
+        "title": "The conversation itself"
+      },
+      {
+        "at": 29.2,
+        "title": "Choose what the AI does: Off, Suggest or Autopilot"
+      },
+      {
+        "at": 44.9,
+        "title": "A suggested reply, ready to send or change"
+      },
+      {
+        "at": 55.3,
+        "title": "Or write it yourself. Type / for shortcuts"
+      },
+      {
+        "at": 63.8,
+        "title": "Everything known about the lead"
+      },
+      {
+        "at": 75.5,
+        "title": "Follow up and Done"
+      },
+      {
+        "at": 82.5,
+        "title": "You can rearrange everything"
+      }
+    ],
+    "builtAt": "2026-10-15"
+  },
+  {
+    "id": "teach",
+    "title": "When the AI does not know the answer",
+    "summary": "The AI flags questions it cannot answer. Answer once and it remembers for every lead after.",
+    "group": "Every day",
+    "screen": "/playbook",
+    "seconds": 73,
+    "chapters": [
+      {
+        "at": 0,
+        "title": "When the AI does not know"
+      },
+      {
+        "at": 9.9,
+        "title": "The AI stops and asks you"
+      },
+      {
+        "at": 22,
+        "title": "Reply as normal. The AI learns your answer"
+      },
+      {
+        "at": 30.5,
+        "title": "A badge shows how many are waiting"
+      },
+      {
+        "at": 37.1,
+        "title": "Answer once for every lead who asked"
+      },
+      {
+        "at": 48.4,
+        "title": "It is now part of what the AI knows"
+      },
+      {
+        "at": 56.8,
+        "title": "Leads who were waiting get their answer"
+      },
+      {
+        "at": 66.6,
+        "title": "The more you answer, the less it asks"
+      }
+    ],
+    "builtAt": "2026-10-15"
+  },
+  {
+    "id": "outreach",
+    "title": "Send first messages",
+    "summary": "Add people to message, write several versions, set a safe daily pace, and use the conversation starters.",
+    "group": "Every day",
+    "screen": "/outreach",
+    "seconds": 89,
+    "chapters": [
+      {
+        "at": 0,
+        "title": "Send first messages"
+      },
+      {
+        "at": 10.2,
+        "title": "Five tabs, left to right"
+      },
+      {
+        "at": 16.5,
+        "title": "Prospects: the people to message"
+      },
+      {
+        "at": 29.8,
+        "title": "Campaigns: what to say"
+      },
+      {
+        "at": 44.2,
+        "title": "Sending and typing: a safe daily pace"
+      },
+      {
+        "at": 57.6,
+        "title": "Conversation starters: let people come to you"
+      },
+      {
+        "at": 71.9,
+        "title": "Overview: switch it on and watch it work"
+      },
+      {
+        "at": 79.8,
+        "title": "It stops itself if Instagram objects"
+      }
+    ],
+    "builtAt": "2026-10-15"
+  },
+  {
+    "id": "leads",
+    "title": "Track leads and results",
+    "summary": "The leads board, your stages and tags, and the numbers that show what to fix.",
+    "group": "Every day",
+    "screen": "/leads",
+    "seconds": 64,
+    "chapters": [
+      {
+        "at": 0,
+        "title": "Track leads and results"
+      },
+      {
+        "at": 4.4,
+        "title": "The leads board: one column per stage"
+      },
+      {
+        "at": 14,
+        "title": "Click a lead to open it without leaving the board"
+      },
+      {
+        "at": 21.8,
+        "title": "Stages you can rename, add or remove"
+      },
+      {
+        "at": 29.7,
+        "title": "Tags, with a rule for when the AI adds them"
+      },
+      {
+        "at": 37.5,
+        "title": "Insights starts with what to do next"
+      },
+      {
+        "at": 46.5,
+        "title": "Your forecast against your target"
+      },
+      {
+        "at": 54.3,
+        "title": "Connect. Brief. Work the inbox."
+      }
+    ],
+    "builtAt": "2026-10-15"
+  },
+  {
+    "id": "team",
+    "title": "Your team, shortcuts and automatic replies",
+    "summary": "Give people their own login, save messages you reuse, and reply to keywords straight away.",
+    "group": "Settings",
+    "screen": "/settings",
+    "seconds": 70,
+    "chapters": [
+      {
+        "at": 0,
+        "title": "Team, shortcuts and automatic replies"
+      },
+      {
+        "at": 9,
+        "title": "Settings is split into tabs"
+      },
+      {
+        "at": 21.4,
+        "title": "Team: a login for each person"
+      },
+      {
+        "at": 32.7,
+        "title": "Shortcuts: messages you send often"
+      },
+      {
+        "at": 43.9,
+        "title": "Keyword replies: answer straight away"
+      },
+      {
+        "at": 54.8,
+        "title": "Conversion links: where leads are sent"
+      },
+      {
+        "at": 62.4,
+        "title": "Every screen has a video guide"
+      }
+    ],
+    "builtAt": "2026-10-15"
+  }
+]

@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>fixture: guessed Instagram profile and thread layout (outreach)</title>
+    <style>
+      body { font: 14px sans-serif; margin: 0; }
+      header { display: flex; gap: 10px; padding: 10px; align-items: center; }
+      [role="button"] { padding: 6px 12px; border: 1px solid #999; border-radius: 8px; cursor: pointer; }
+      [role="row"] { display: flex; padding: 3px 8px; }
+      .bubble { margin-left: auto; max-width: 70%; padding: 6px 10px; border-radius: 12px; background: #def; white-space: pre-wrap; }
+      #composer { min-height: 30px; border: 1px solid #999; margin: 6px; padding: 4px; white-space: pre-wrap; }
+      [role="dialog"] { position: fixed; top: 80px; left: 80px; padding: 20px; background: #fff; border: 2px solid #c00; }
+    </style>
+  </head>
+  <body>
+    <nav role="navigation"><a role="link" href="/owner.acct/">Profile</a></nav>
+
+    <main id="profileView">
+      <header>
+        <h2 id="pname"></h2>
+        <div role="button" id="msgBtn" tabindex="0">Message</div>
+        <div role="button" id="moreBtn" tabindex="0">Options</div>
+      </header>
+      <p id="bio">Coach for founders. Pricing, offers and sales calls.</p>
+    </main>
+    <div id="gone" hidden><h2>Sorry, this page isn't available.</h2></div>
+
+    <div role="main" id="threadView" hidden>
+      <header><a id="threadLink" role="link" href="/lead.one/"><h2 id="threadName"></h2></a></header>
+      <div id="grid" role="grid" aria-label="Messages in conversation with the lead"></div>
+      <div id="composer" role="textbox" contenteditable="true" aria-label="Message..."></div>
+      <div id="send" role="button" aria-label="Send">Send</div>
+    </div>
+
+    <script>
+      window.__SITE = 'instagramOutreach';
+    </script>
+    <script src="/__ext/test/fixture/harness.js"></script>
+    <script>
+      // ---- a fake profile page and the thread its Message button opens ----
+      // mode "native": a plain contenteditable, the browser changes the text.
+      // mode "controlled": the editor cancels every beforeinput and applies the
+      // edit to its own model, then rebuilds its DOM a microtask later.
+      // mode "mixed": the closest guess at a rich editor. It cancels beforeinput
+      // for deletions, line breaks and the first character, lets the browser
+      // insert every other character, then reads the DOM back into its model
+      // and rebuilds it, which also throws the caret away.
+      var DEFAULTS = {
+        mode: 'native',
+        sendButton: true,
+        sendDead: false,
+        execOff: false,
+        notFound: false,
+        noButton: false,
+        draft: '',
+        mangle: false,
+        blockAt: 0,
+        challengeAfterClick: false,
+        threadHandle: ''
+      };
+      var F = (window.__F = Object.assign({ sent: [], sendClicks: 0, msgClicks: 0, navs: [], model: '', handle: '' }, DEFAULTS));
+      var $id = function (id) {
+        return document.getElementById(id);
+      };
+      var composer = $id('composer');
+
+      var realExec = document.execCommand.bind(document);
+      document.execCommand = function () {
+        if (F.execOff) return false;
+        return realExec.apply(null, arguments);
+      };
+
+      function render() {
+        composer.textContent = '';
+        var lines = F.model.split('\n');
+        lines.forEach(function (line, i) {
+          if (i) composer.appendChild(document.createElement('br'));
+          if (line) composer.appendChild(document.createTextNode(line));
+        });
+        if (lines.length > 1 && lines[lines.length - 1] === '') composer.appendChild(document.createElement('br'));
+      }
+
+      function domToModel() {
+        var out = '';
+        var nodes = composer.childNodes;
+        for (var i = 0; i < nodes.length; i++) {
+          if (nodes[i].nodeType === 3) out += nodes[i].data;
+          else if (nodes[i].tagName === 'BR') out += '\n';
+          else out += nodes[i].textContent;
+        }
+        // a <br> at the very end is the browser's placeholder, not a line
+        if (nodes.length && nodes[nodes.length - 1].tagName === 'BR') out = out.slice(0, -1);
+        return out;
+      }
+
+      composer.addEventListener('input', function (ev) {
+        if (F.mangle && ev.data === 'e') {
+          // an editor that swallows a letter
+          var last = composer.lastChild;
+          if (last && last.nodeType === 3 && /e$/.test(last.data)) last.data = last.data.slice(0, -1);
+        }
+        if (F.mode !== 'mixed') return;
+        F.model = domToModel();
+        queueMicrotask(render);
+      });
+
+      composer.addEventListener('beforeinput', function (ev) {
+        if (F.mode !== 'controlled' && F.mode !== 'mixed') return;
+        if (F.mode === 'mixed' && ev.inputType === 'insertText' && F.model !== '') return;
+        ev.preventDefault();
+        var sel = getSelection();
+        var ranged = sel.rangeCount > 0 && !sel.isCollapsed;
+        if (ev.inputType === 'insertText') F.model += F.mangle && ev.data === 'e' ? '' : ev.data;
+        else if (ev.inputType === 'insertLineBreak') F.model += '\n';
+        else if (ev.inputType === 'deleteContentBackward') F.model = ranged ? '' : Array.from(F.model).slice(0, -1).join('');
+        queueMicrotask(render);
+      });
+
+      function composerValue() {
+        return composer.innerText.replace(/ /g, ' ').replace(/\s+$/, '');
+      }
+
+      function doSend(via) {
+        var text = composerValue();
+        if (!text || F.sendDead) return;
+        F.sent.push({ text: text, via: via });
+        var row = document.createElement('div');
+        row.setAttribute('role', 'row');
+        var bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.setAttribute('dir', 'auto');
+        bubble.textContent = text;
+        row.appendChild(bubble);
+        $id('grid').appendChild(row);
+        composer.textContent = '';
+        F.model = '';
+      }
+      F.doSend = doSend;
+
+      $id('send').addEventListener('click', function () {
+        F.sendClicks++;
+        doSend('button');
+      });
+      composer.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' && !ev.shiftKey) {
+          ev.preventDefault();
+          doSend('enter');
+        }
+      });
+
+      function dialog(text) {
+        var d = document.createElement('div');
+        d.setAttribute('role', 'dialog');
+        d.className = 'fx-dialog';
+        d.textContent = text;
+        document.body.appendChild(d);
+      }
+
+      function openThread() {
+        history.pushState(null, '', F.challengeAfterClick ? '/challenge/action/abc/' : '/direct/t/999/');
+        $id('profileView').hidden = true;
+        $id('threadView').hidden = false;
+        $id('send').hidden = !F.sendButton;
+        $id('threadLink').setAttribute('href', '/' + (F.threadHandle || F.handle) + '/');
+        $id('threadName').textContent = F.threadHandle || F.handle;
+        if (F.draft) composer.textContent = F.draft;
+      }
+      F.openThread = openThread;
+
+      $id('msgBtn').addEventListener('click', function () {
+        F.msgClicks++;
+        setTimeout(openThread, 400);
+      });
+
+      // Stands in for a navigation of the tab to a profile URL.
+      function navigate(url) {
+        var path = new URL(url).pathname;
+        F.navs.push(url);
+        F.handle = path.replace(/\//g, '');
+        history.pushState(null, '', path);
+        Array.prototype.slice.call(document.getElementsByClassName('fx-dialog')).forEach(function (d) {
+          d.remove();
+        });
+        var note = $id('aidm-outreach-notice');
+        if (note) note.remove();
+        $id('grid').textContent = '';
+        composer.textContent = '';
+        F.model = '';
+        $id('threadView').hidden = true;
+        $id('profileView').hidden = F.notFound;
+        $id('gone').hidden = !F.notFound;
+        $id('msgBtn').hidden = F.noButton;
+        $id('pname').textContent = F.handle;
+      }
+      F.navigate = navigate;
+      F.reset = function (opts) {
+        Object.assign(F, DEFAULTS, opts || {});
+        F.sent = [];
+        F.sendClicks = 0;
+        F.msgClicks = 0;
+      };
+
+      // A "Try again later" dialog that appears once some text has been typed.
+      setInterval(function () {
+        if (F.blockAt && !document.getElementsByClassName('fx-dialog').length && composerValue().length >= F.blockAt) {
+          dialog('Try Again Later. We restrict certain activity to protect our community.');
+        }
+      }, 150);
+    </script>
+
+    <script src="/__ext/src/selectors.js"></script>
+    <script src="/__ext/src/lib/core.js"></script>
+    <script src="/__ext/src/lib/typing.js"></script>
+    <script src="/__ext/src/content/dom.js"></script>
+    <script src="/__ext/src/outreach/outreach-content.js"></script>
+    <script src="/__ext/src/outreach/outreach-runner.js"></script>
+
+    <script>
+      (async function () {
+        var T = window.__T;
+        var Typing = window.AIDMTyping;
+        var R = { errors: [] };
+
+        function seeded(a) {
+          return function () {
+            a |= 0;
+            a = (a + 0x6d2b79f5) | 0;
+            var t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+        function cmd(name, arg) {
+          return new Promise(function (resolve) {
+            T.listeners[0](Object.assign({ type: 'aidm:outreach', cmd: name }, arg || {}), { id: 'fixture-ext' }, resolve);
+          });
+        }
+
+        var TEXTS = [
+          'Hey Sam, saw your post about pricing for coaches and thought it was spot on. Are you taking on new clients this quarter?',
+          'Hi 👋🏽 love the page! Have a look at https://example.com/a?b=c and tag @jane.doe_1 🙌\nSecond line here 👨‍👩‍👧 ok.\n\nTalk soon, Ollie',
+          'Quick one:  two spaces, a tab\tand "quotes" (plus brackets) & symbols 100% #1!'
+        ];
+        var DETECT = { phrases: ['try again later', 'we restrict certain activity'], urlParts: ['/challenge/', '/accounts/login'] };
+
+        try {
+          /* ---------- A. the content commands on their own, no waits ---------- */
+          R.direct = [];
+          var modes = [
+            { name: 'native', opts: { mode: 'native' } },
+            { name: 'mixed', opts: { mode: 'mixed' } },
+            { name: 'controlled, execCommand off', opts: { mode: 'controlled', execOff: true } }
+          ];
+          for (var m = 0; m < modes.length; m++) {
+            for (var t = 0; t < TEXTS.length; t++) {
+              for (var seed = 1; seed <= 4; seed++) {
+                F.reset(modes[m].opts);
+                F.navigate('https://www.instagram.com/lead.one/');
+                F.openThread();
+                var target = Typing.canonical(TEXTS[t]);
+                var focus = await cmd('focus-composer');
+                var plan = Typing.planTyping(target, { wpmMin: 60, wpmMax: 60, typoRate: 0.12, rewriteRate: 1, pauseRate: 0 }, seeded(seed * 31 + t));
+                var methods = {};
+                var stepError = null;
+                for (var k = 0; k < plan.length && !stepError; k++) {
+                  if (plan[k].op === 'pause') continue;
+                  var r = await cmd('step', { op: plan[k].op, ch: plan[k].ch });
+                  if (!r.ok) stepError = r.error;
+                  else methods[r.method] = (methods[r.method] || 0) + 1;
+                }
+                var read = await cmd('read-composer');
+                var stats = Typing.summary(plan);
+                R.direct.push({
+                  mode: modes[m].name,
+                  text: t,
+                  seed: seed,
+                  focusOk: focus.ok,
+                  ok: !stepError && read.text === target,
+                  stepError: stepError,
+                  got: read.text === target ? null : read.text,
+                  methods: Object.keys(methods),
+                  typos: stats.typos,
+                  backspaces: stats.backspaces
+                });
+              }
+            }
+          }
+
+          // send refuses anything but the exact expected text, clear empties the box
+          F.reset({});
+          F.navigate('https://www.instagram.com/lead.one/');
+          F.openThread();
+          await cmd('focus-composer');
+          for (var c = 0; c < 5; c++) await cmd('step', { op: 'type', ch: 'hello'[c] });
+          R.sendMismatch = await cmd('send', { expect: 'hello there' });
+          R.sendNoExpect = await cmd('send', {});
+          R.sentAfterRefusals = F.sent.length;
+          R.cleared = await cmd('clear-composer');
+          F.reset({ execOff: true });
+          R.noInsert = await cmd('step', { op: 'type', ch: 'x' });
+          F.reset({});
+          try {
+            AIDM.dom.safeClick('instagramOutreach', document.getElementById('send'), 'send button');
+            R.sendGuard = 'CLICKED';
+          } catch (e) {
+            R.sendGuard = e.name;
+          }
+          R.sendClicksAfterGuard = F.sendClicks;
+          R.probeProfile = (function () {
+            F.reset({});
+            F.navigate('https://www.instagram.com/lead.one/');
+            return cmd('probe', { detect: DETECT });
+          })();
+          R.probeProfile = await R.probeProfile;
+          R.unknownCmd = await cmd('explode');
+
+          /* ---------- B. the real runner driving the real content commands ---------- */
+          var TAB = 7;
+          var store = {};
+          var sess = {};
+          function area(obj) {
+            return {
+              get: async function (key) {
+                var out = {};
+                (Array.isArray(key) ? key : [key]).forEach(function (k) {
+                  if (k in obj) out[k] = JSON.parse(JSON.stringify(obj[k]));
+                });
+                return out;
+              },
+              set: async function (o) {
+                Object.keys(o).forEach(function (k) {
+                  obj[k] = JSON.parse(JSON.stringify(o[k]));
+                });
+              },
+              remove: async function (k) {
+                delete obj[k];
+              }
+            };
+          }
+          var tabLog = { created: [], updated: [], messaged: {}, injected: 0, badge: '' };
+          var tabExists = false;
+          var RC = {
+            storage: { local: area(store), session: area(sess) },
+            tabs: {
+              get: async function (id) {
+                if (!tabExists || id !== TAB) throw new Error('No tab with id ' + id);
+                return { id: TAB, status: 'complete', pinned: true };
+              },
+              create: async function (o) {
+                tabLog.created.push(o);
+                tabExists = true;
+                F.navigate(o.url);
+                return { id: TAB };
+              },
+              update: async function (id, o) {
+                tabLog.updated.push(id);
+                F.navigate(o.url);
+                return { id: id };
+              },
+              sendMessage: function (id, msg) {
+                tabLog.messaged[id] = (tabLog.messaged[id] || 0) + 1;
+                return new Promise(function (resolve) {
+                  T.listeners[0](msg, { id: 'fixture-ext' }, resolve);
+                });
+              }
+            },
+            scripting: {
+              executeScript: async function () {
+                tabLog.injected++;
+              }
+            },
+            alarms: { get: async function () { return null; }, create: async function () {} },
+            runtime: { getPlatformInfo: function (cb) { cb({}); } },
+            action: { setBadgeText: async function (o) { tabLog.badge = o.text; } }
+          };
+          var app = { queue: [], results: [], nextCalls: 0, accounts: [] };
+          function api(call, arg) {
+            if (call === 'outreachNext') {
+              app.nextCalls++;
+              app.accounts.push(arg.account);
+              var task = app.queue.shift();
+              return Promise.resolve(task ? { task: task } : { task: null, reason: 'queue empty', retryInSec: 0 });
+            }
+            if (call === 'outreachResult') {
+              app.results.push(JSON.parse(JSON.stringify(arg)));
+              return Promise.resolve({ ok: true, paused: false, pauseReason: null });
+            }
+            return Promise.reject(new Error('unexpected call ' + call));
+          }
+          var runner = window.AIDMOutreach.createRunner({ chrome: RC, api: api, Typing: Typing, rng: seeded(99) });
+
+          var n = 0;
+          function task(mode, text, handle) {
+            n++;
+            return {
+              id: 'task_' + n,
+              handle: handle || 'lead.one',
+              profileUrl: 'https://www.instagram.com/' + (handle || 'lead.one') + '/',
+              text: text,
+              mode: mode,
+              readMs: 1200,
+              typing: { wpmMin: 70, wpmMax: 90, typoRate: 0.06, rewriteRate: 0.5, pauseRate: 0.05 },
+              detect: DETECT
+            };
+          }
+          async function snapshot() {
+            var st = await runner.localStatus();
+            return {
+              result: app.results.length ? app.results[app.results.length - 1] : null,
+              results: app.results.length,
+              sent: F.sent.slice(),
+              sendClicks: F.sendClicks,
+              msgClicks: F.msgClicks,
+              composer: Typing.canonical(document.getElementById('composer').innerText),
+              enabled: st.enabled,
+              note: st.note,
+              hold: st.hold,
+              stored: !!store.outreachTask,
+              notice: (function () {
+                var host = document.getElementById('aidm-outreach-notice');
+                return host && host.shadowRoot ? host.shadowRoot.textContent : null;
+              })(),
+              path: location.pathname
+            };
+          }
+          async function scenario(opts, tk) {
+            F.reset(opts);
+            app.results = [];
+            app.nextCalls = 0;
+            app.queue = [tk];
+            var t0 = Date.now();
+            await runner.setEnabled(true);
+            await runner.idle();
+            var snap = await snapshot();
+            snap.ms = Date.now() - t0;
+            snap.target = Typing.canonical(tk.text);
+            return snap;
+          }
+
+          // 1. no Message button before the selector ever matched: an error, not "unreachable"
+          R.missFirst = await scenario({ noButton: true }, task('auto', TEXTS[0]));
+          // 2. auto mode, plain editor, send button
+          R.auto = await scenario({}, task('auto', TEXTS[0]));
+          R.accountAfterAuto = (await runner.localStatus()).account;
+          // 3. auto mode, emoji, URL, handle and line breaks, mixed editor, no send button (Enter)
+          R.autoEnter = await scenario({ mode: 'mixed', sendButton: false }, task('auto', TEXTS[1], 'lead.two'));
+          // 4. auto mode, controlled editor, execCommand unavailable (beforeinput path)
+          R.autoBeforeInput = await scenario({ mode: 'controlled', execOff: true }, task('auto', TEXTS[0]));
+          // 5. assisted mode: typed, not sent, notice shown, then held until the person sends
+          R.assisted = await scenario({}, task('assisted', TEXTS[1]));
+          app.queue = [task('auto', 'Second message after the person sent the first one.', 'lead.three')];
+          app.nextCalls = 0;
+          await runner.tick();
+          R.heldNextCalls = app.nextCalls;
+          R.heldPath = location.pathname;
+          R.heldBadge = tabLog.badge;
+          F.doSend('person');
+          app.results = [];
+          await runner.tick();
+          R.afterHold = await snapshot();
+          R.afterHoldBadge = tabLog.badge;
+          // 6. a block phrase appears in a dialog while typing
+          R.blocked = await scenario({ blockAt: 12 }, task('auto', TEXTS[0]));
+          app.queue = [task('auto', TEXTS[0])];
+          app.nextCalls = 0;
+          await runner.tick();
+          R.nextCallsWhileOff = app.nextCalls;
+          // 7. a challenge URL after clicking Message
+          R.blockedUrl = await scenario({ challengeAfterClick: true }, task('auto', TEXTS[0]));
+          // 8. the profile does not exist
+          R.notFound = await scenario({ notFound: true }, task('auto', TEXTS[0], 'ghost.account'));
+          // 9. the composer already holds a draft
+          R.draft = await scenario({ draft: 'half written by a person' }, task('auto', TEXTS[0]));
+          // 10. the editor swallows a letter, so the typed text is wrong
+          R.mangled = await scenario({ mode: 'mixed', mangle: true }, task('auto', TEXTS[0]));
+          // 11. no Message button now that the selector is proven
+          R.missLater = await scenario({ noButton: true }, task('auto', TEXTS[0]));
+          // 12. send does nothing
+          R.sendDead = await scenario({ sendDead: true }, task('auto', TEXTS[0]));
+          // 13. the opened thread belongs to someone else
+          R.wrongThread = await scenario({ threadHandle: 'someone.else' }, task('auto', TEXTS[0]));
+          // 14. a task that points somewhere else is refused before any navigation
+          var navsBefore = F.navs.length;
+          var evil = task('auto', TEXTS[0]);
+          evil.profileUrl = 'https://evil.example/lead.one/';
+          R.badUrl = await scenario({}, evil);
+          R.badUrlNavs = F.navs.length - navsBefore;
+
+          R.tabLog = { created: tabLog.created, updatedIds: Array.from(new Set(tabLog.updated)), messagedIds: Object.keys(tabLog.messaged) };
+          R.accounts = app.accounts.slice(0, 3);
+          R.log = (await runner.localStatus()).log.map(function (l) {
+            return l.status;
+          });
+        } catch (e) {
+          R.errors.push(String(e && e.stack ? e.stack : e));
+        }
+        T.finish(R);
+      })();
+    </script>
+  </body>
+</html>

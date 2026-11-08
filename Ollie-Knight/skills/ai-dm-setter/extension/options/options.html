@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ainable Setter options</title>
+    <link rel="stylesheet" href="../ui.css" />
+    <style>
+      main { max-width: 560px; margin: 24px auto; padding: 0 16px 40px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Ainable Setter options</h1>
+      <p class="muted">
+        The extension sends data to this app address only. Capture, labels and the side panel never send a message.
+        The one exception is "Outreach sending", which is off by default and is switched on or off in the popup.
+        It uses this same address and token.
+      </p>
+
+      <label for="baseUrl">App base URL</label>
+      <input id="baseUrl" type="url" placeholder="https://ainable-setter.vercel.app" spellcheck="false" />
+      <p class="muted">Chrome will ask you to allow this address the first time you save a new one.</p>
+
+      <label for="token">Workspace token</label>
+      <input id="token" type="password" autocomplete="off" spellcheck="false" />
+      <p class="muted">From the web app. Stored in this browser profile only.</p>
+
+      <label for="captureCap">Capture cap per run (1 to 150 threads)</label>
+      <input id="captureCap" type="number" min="1" max="150" step="1" />
+      <p class="muted">A bulk capture or label sync stops after this many conversations. Default 40.</p>
+
+      <label class="check"><input id="showPanel" type="checkbox" /> Show side panel</label>
+      <label class="check"><input id="applyLabels" type="checkbox" /> Apply labels in Business Suite</label>
+      <label class="check">
+        <input id="skipUnread" type="checkbox" /> Skip unread threads in bulk capture (opening one marks it as seen)
+      </label>
+
+      <div class="btns">
+        <button id="save" type="button">Save</button>
+        <button id="test" type="button" class="ghost">Test connection</button>
+      </div>
+      <div id="status" class="box info hidden"></div>
+    </main>
+    <script src="../src/lib/core.js"></script>
+    <script src="../src/lib/api.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

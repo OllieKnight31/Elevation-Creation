@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ainable Setter</title>
+    <link rel="stylesheet" href="../ui.css" />
+    <style>
+      body { width: 360px; padding: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>Ainable Setter</h1>
+    <div id="conn" class="box info">Checking connection...</div>
+
+    <h2>Get set up</h2>
+    <ol id="setup" class="setup"></ol>
+    <div class="btns">
+      <button id="openApp" type="button" class="ghost">Open Ainable Setter</button>
+      <button id="openGuide" type="button" class="ghost">Setup guide</button>
+    </div>
+
+    <div id="page" class="muted"></div>
+
+    <div class="col" style="margin-top: 8px">
+      <button id="captureThread" type="button">Capture this thread</button>
+      <button id="captureRecent" type="button">Capture recent threads</button>
+      <button id="syncLabels" type="button">Sync labels now</button>
+      <button id="healthCheck" type="button" class="ghost">Selector health check</button>
+      <button id="stop" type="button" class="ghost hidden">Stop the current run</button>
+    </div>
+    <div id="note" class="box info hidden"></div>
+
+    <h2>Outreach sending</h2>
+    <label class="check">
+      <input id="outreachSwitch" type="checkbox" /> <span>Outreach sending <strong id="outreachWord">off</strong></span>
+    </label>
+    <div id="outreachStatus" class="box info">Off. Nothing is sent.</div>
+    <div id="outreachLogWrap" class="hidden">
+      <div class="muted">Last results</div>
+      <ul id="outreachLog" class="health"></ul>
+    </div>
+
+    <h2>Live inbox sync</h2>
+    <div id="syncStatus" class="box info">Open Instagram in a tab and the helper copies every new message, sent or received, into Ainable Setter within seconds. It never opens a chat, so nobody sees "Seen".</div>
+
+    <h2>Last run</h2>
+    <div id="lastRun" class="box info">Nothing has run yet.</div>
+
+    <div id="healthWrap" class="hidden">
+      <h2>Selector health</h2>
+      <div id="healthSummary" class="muted"></div>
+      <ul id="health" class="health"></ul>
+    </div>
+
+    <p class="muted">
+      Capture, labels and the side panel never send a message. Only "Outreach sending" does, in its own pinned tab,
+      and only while the switch above is on. <a href="#" id="openOptions">Options</a> · <a href="#" id="openManage">Update or reload the helper</a>
+    </p>
+    <script src="../src/lib/core.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
