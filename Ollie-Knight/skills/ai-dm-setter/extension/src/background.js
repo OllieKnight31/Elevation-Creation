@@ -8,18 +8,21 @@
  *
  * It also hosts the outreach runner (src/outreach/outreach-runner.js): the
  * alarm that polls the app for the next outreach task, and the two messages
- * the popup uses to switch outreach on or off and to read its status. This
- * file itself holds no sending code.
+ * the popup uses to switch outreach on or off and to read its status. And the
+ * Business Suite runner (src/suite/suite-runner.js), which sends inbox
+ * messages inside Meta Business Suite when the app's own setting says so.
+ * This file itself holds no sending code.
  */
 'use strict';
 
-importScripts('/src/selectors.js', '/src/lib/core.js', '/src/lib/api.js', '/src/lib/typing.js', '/src/outreach/outreach-runner.js', '/src/faces.js', '/src/followers.js');
+importScripts('/src/selectors.js', '/src/lib/core.js', '/src/lib/api.js', '/src/lib/typing.js', '/src/outreach/outreach-runner.js', '/src/suite/suite-runner.js', '/src/faces.js', '/src/followers.js');
 
 var Core = self.AIDMCore;
 var Api = self.AIDMApi;
 
 var Typing = self.AIDMTyping;
 var OutreachLib = self.AIDMOutreach;
+var SuiteLib = self.AIDMSuite;
 
 var INBOX_HOSTS = ['www.instagram.com', 'business.facebook.com'];
 // Calls a content script or the popup may ask for. The outreach calls are
@@ -118,6 +121,26 @@ function outreachApi(call, arg) {
 
 var Outreach = OutreachLib.createRunner({ chrome: chrome, api: outreachApi, Typing: Typing });
 
+// The Business Suite sender: inbox messages Meta's connection will not take, sent inside Meta Business Suite only.
+// It shares the outreach calls to the app, runs in a tab of its own, and stands back while the outreach sender works.
+var Suite = SuiteLib.createRunner({ chrome: chrome, api: outreachApi, Typing: Typing, isBlocked: function () { return Outreach.isBusy(); } });
+function sending() {
+  return Outreach.isBusy() || Suite.isBusy();
+}
+
+// The switch for it lives in the app (Settings). The helper reads it here, on its heartbeat, and stays off until
+// the app says yes. An app too old to know about Business Suite never says yes.
+function syncSuite(s) {
+  return Api.createApiClient({ baseUrl: s.baseUrl, token: s.token })
+    .outreachStatus()
+    .then(function (st) {
+      return Suite.setEnabled(st.suiteSending === true);
+    })
+    .catch(function () {
+      /* the switch keeps its last known value until the app answers again */
+    });
+}
+
 // Profile pictures Meta will not share, read anonymously from each lead's public profile preview (src/faces.js).
 function facesApi(call, arg) {
   if (FACES_CALLS.indexOf(call) < 0) return Promise.reject(fail('Unknown faces call: ' + call, 'BAD_CALL'));
@@ -138,7 +161,7 @@ function followersApi(call, arg) {
     return Api.createApiClient({ baseUrl: s.baseUrl, token: s.token })[call](arg || {});
   });
 }
-var Followers = self.AIDMFollowers.createFollowers({ chrome: chrome, api: followersApi, isBusy: function () { return Outreach.isBusy && Outreach.isBusy(); } });
+var Followers = self.AIDMFollowers.createFollowers({ chrome: chrome, api: followersApi, isBusy: sending });
 
 function startOutreach() {
   Outreach.init().catch(function () {
@@ -148,10 +171,15 @@ function startOutreach() {
 chrome.alarms.onAlarm.addListener(function (alarm) {
   if (alarm && alarm.name === 'aidm-hello') return hello();
   if (alarm && alarm.name === self.AIDMFaces.ALARM) return Faces.onAlarm(alarm);
-  return Outreach.onAlarm(alarm);
+  // The same once a minute alarm drives both senders: outreach first, then Business Suite, never both at once.
+  return Outreach.onAlarm(alarm).then(function (did) {
+    if (alarm && alarm.name === OutreachLib.ALARM) Suite.tick();
+    return did;
+  });
 });
 chrome.tabs.onRemoved.addListener(function (tabId) {
   Outreach.onTabRemoved(tabId);
+  Suite.onTabRemoved(tabId);
 });
 chrome.runtime.onInstalled.addListener(startOutreach);
 chrome.runtime.onStartup.addListener(startOutreach);
@@ -224,7 +252,7 @@ function selfUpdate(latest) {
     return chrome.storage.local.get('reloadTried').then(function (d) {
       if (d && d.reloadTried === latest) return null;
       // Never mid send: try again shortly, once the step in progress is over.
-      if (Outreach.isBusy && Outreach.isBusy()) {
+      if (sending()) {
         setTimeout(function () { selfUpdate(latest); }, 20000);
         return null;
       }
@@ -239,7 +267,7 @@ function selfUpdate(latest) {
 // Heartbeat to the app. Silent when the helper is not linked or the app is not running.
 // The version of this code. Chrome can keep running an old copy of the background code after an update while the
 // manifest version moves on, so the app compares the two to spot that. Bump together with manifest.json.
-var CODE_VERSION = '0.3.22';
+var CODE_VERSION = '0.3.23';
 
 function hello() {
   return Promise.all([getSettings(), outreachLocal(), chrome.storage.local.get('igAccount')])
@@ -256,6 +284,7 @@ function hello() {
         // The app asked for the follower list: collect it now, unless a newer helper has to load first.
         var updating = selfUpdate(res && res.latest);
         if (!updating && res && res.followers) Followers.run().catch(function () {});
+        if (!updating) syncSuite(s);
         return updating;
       });
       });
@@ -467,7 +496,7 @@ function handle(msg, sender) {
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   if (!msg || typeof msg.type !== 'string' || msg.type.indexOf('aidm:') !== 0) return false;
-  if (msg.type === 'aidm:cmd' || msg.type === 'aidm:outreach') return false; // meant for content scripts
+  if (msg.type === 'aidm:cmd' || msg.type === 'aidm:suite' || msg.type === 'aidm:outreach') return false; // meant for content scripts
   if (msg.type.indexOf('aidm:app-') === 0) {
     appOriginOf(sender)
       .then(function (origin) {

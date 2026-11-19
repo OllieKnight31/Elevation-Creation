@@ -6,4 +6,6 @@ Runs real Google Chrome with this extension against the app and a local stand-in
 2. Start the app on port 3000 with scratch data and no waiting between sends: `SETTER_DATA_DIR=/tmp/setter-e2e SETTER_OUTREACH_GAP_SCALE=0 PORT=3000 node ../../../web/scripts/serve.mjs`
 3. `node fake-ig.mjs` in one terminal, `node run.mjs` in another (add `--headed` to watch it).
 
-It sends five tasks: a normal send, a profile that does not exist, a business name with no first name, an assisted send, and a profile that shows an Instagram warning. Expect 23 passes.
+It sends five tasks: a normal send, a profile that does not exist, a business name with no first name, an assisted send, and a profile that shows an Instagram warning. The third profile (lead.two) has no Message button, so its chat is opened through the three dots menu next to the name. Expect 24 passes.
+
+`three-dots-fixture.html` is not part of this run. It is the stand-in page of the three dots cases in `../run-browser-tests.js`.

@@ -9,7 +9,7 @@ import { crmTouch } from "./crm";
 import { sheetsTouch } from "./sheets";
 import { bubblesOf, expand, type FillContext } from "./shortcuts";
 import { flagGap } from "./knowledge";
-import { queueReply } from "./outreach";
+import { queueReply, suiteSending } from "./outreach";
 
 export const uid = (p: string) => `${p}_${randomUUID().slice(0, 12)}`;
 
@@ -305,31 +305,63 @@ export function readingMs(text: string) {
   return Math.round(Math.min(20000, 1500 + text.length * 45 * (0.7 + Math.random() * 0.6)));
 }
 
-/** Sends bubbles through the official API and records them. Throws with Meta's message on failure. */
+// Whether the helper may send inbox messages inside Meta Business Suite. Lives with the queue in outreach.ts.
+export { suiteSending };
+
+/** A name Business Suite can be searched for. The stand in names the app makes up are not one. */
+export const searchableName = (conv: Conversation) => {
+  const n = conv.name.trim();
+  return n && n !== "Unknown" && !/^Instagram user \d{4}$/.test(n) ? n : "";
+};
+
 /**
- * How a message on this thread goes out. meta: the official connection. helper: typed by the helper in Chrome.
- * none: neither can reach it, and why.
+ * How a message on this thread goes out. meta: the official connection. suite: typed by the helper inside Meta
+ * Business Suite's inbox. helper: typed by the helper inside instagram.com. none: nothing can reach it.
  */
-export function sendVia(db: Db, conv: Conversation): "meta" | "helper" | "none" {
+export function sendVia(db: Db, conv: Conversation): "meta" | "suite" | "helper" | "none" {
   const ws = db.workspace;
   // Meta takes an app's message only within 24 hours of the lead's last one, unless the app is approved for the
-  // Human Agent tag. Outside that, a reply goes through the helper when there is one.
-  if (conv.scopedUserId && (conv.platform === "instagram" ? ws.meta.instagram : ws.meta.page) && (windowState(conv.lastInboundAt).open || humanAgentApproved())) return "meta";
-  if (conv.platform === "instagram" && conv.handle && ws.helper) return "helper";
+  // Human Agent tag.
+  // That tag only covers 7 days from the lead's last message, and never a lead who has not written at all.
+  // Everything Meta will take goes through Meta; anything older falls through to Business Suite below.
+  if (conv.scopedUserId && (conv.platform === "instagram" ? ws.meta.instagram : ws.meta.page) && (windowState(conv.lastInboundAt).open || humanAgentOpen(conv.lastInboundAt))) return "meta";
+  // Every other Instagram chat, however old and whether or not the lead ever wrote, goes through Business Suite
+  // when the owner has switched that on. The helper has to find the chat there, so it needs a username or a name.
+  if (conv.platform === "instagram" && ws.helper && suiteSending(db) && (conv.handle || searchableName(conv))) return "suite";
+  // Typing into instagram.com from the helper is off unless the owner switches it on.
+  if (conv.platform === "instagram" && conv.handle && ws.helper && ws.settings.instagramTyping === true) return "helper";
   return "none";
 }
 
-/** Why a thread cannot be sent to from the app, in words for the person who tried. */
 /** Set META_HUMAN_AGENT=approved once Meta has approved the app for the Human Agent tag (App Review). */
 export const humanAgentApproved = () => process.env.META_HUMAN_AGENT === "approved";
 
+/** Meta's Human Agent tag reaches a lead for 7 days after their last message. Leave an hour of margin. */
+export const HUMAN_AGENT_MS = 7 * 24 * 3600 * 1000 - 3600 * 1000;
+
+/** True when the app is approved for the Human Agent tag and this lead wrote within its 7 days. */
+export function humanAgentOpen(lastInboundAt: string | null | undefined, now = Date.now()) {
+  if (!humanAgentApproved() || !lastInboundAt) return false;
+  const t = new Date(lastInboundAt).getTime();
+  return Number.isFinite(t) && now - t < HUMAN_AGENT_MS;
+}
+
+/** Why a thread cannot be sent to from the app, in words for the person who tried. */
 export function cannotSend(db: Db, conv: Conversation) {
-  if (conv.scopedUserId && db.workspace.meta.instagram && !windowState(conv.lastInboundAt).open) {
-    return "It is more than 24 hours since their last message, and Meta only lets apps reply within 24 hours. Reply in Instagram, or switch on the Chrome helper to send it from here.";
+  if (conv.platform !== "instagram") {
+    return conv.scopedUserId && db.workspace.meta.page
+      ? "It is more than 24 hours since their last message, and Meta only lets apps reply within 24 hours. Reply to this one yourself in Meta Business Suite."
+      : "Connect the Facebook Page on Get connected to reply to Messenger threads from here.";
   }
-  if (conv.platform !== "instagram") return "Connect the Facebook Page on Get connected to reply to Messenger threads from here.";
-  if (!db.workspace.helper) return "Add the Ainable Setter Helper to Chrome on Get connected. It sends your replies for free.";
-  return "This thread has no Instagram username yet. Open it once in Instagram with the helper on, then send again.";
+  if (suiteSending(db)) {
+    if (!db.workspace.helper) return "Add the Ainable Setter Helper to Chrome on Get connected. It sends this one for you inside Meta Business Suite.";
+    return "This chat has no username or name yet, so the helper cannot find it in Meta Business Suite. Reply to this one yourself in Meta Business Suite.";
+  }
+  if (db.workspace.settings.instagramTyping === true) {
+    if (!db.workspace.helper) return "Add the Ainable Setter Helper to Chrome on Get connected. It sends your replies for free.";
+    return "This thread has no Instagram username yet. Open it once in Instagram with the helper on, then send again.";
+  }
+  return "Meta only lets apps reply within 24 hours of their last message. Reply to this one yourself in Meta Business Suite, or switch on Send through Meta Business Suite in Settings so the helper does it for you there.";
 }
 
 /** Tagged Close friend by the owner: the AI and every automation leave this lead alone. */
@@ -343,14 +375,19 @@ export async function deliver(db: Db, conv: Conversation, bubbles: string[], sen
   const firstAi = sender === "ai" && !db.messages.some((m) => m.conversationId === conv.id && m.sender === "ai");
   const out = firstAi && ws.settings.disclosure.trim() ? [ws.settings.disclosure.trim(), ...bubbles] : bubbles;
   const sent: Message[] = [];
-  // Without the Meta connection the helper types it into the thread in the owner's Chrome, which costs nothing.
-  if (sendVia(db, conv) === "helper") {
+  // What Meta will not take, the helper types in the owner's Chrome: inside Business Suite's inbox, or inside
+  // instagram.com when the owner has switched that on. The message waits in the queue until the helper reports back.
+  const via = sendVia(db, conv);
+  if (via === "suite" || via === "helper") {
     if (ws.outreach.settings.paused) throw new Error(`Sending from Chrome is paused. ${ws.outreach.settings.pauseReason}`);
     for (const text of out) {
       const m = addMessage(db, conv, { direction: "out", sender, text, sentAt: new Date().toISOString(), source: "app", memberId }, true);
       if (m) { m.delivery = "queued"; sent.push(m); }
     }
-    queueReply(db, { conversationId: conv.id, handle: conv.handle!, messages: sent.map((m) => ({ id: m.id, text: m.text })) });
+    queueReply(db, {
+      conversationId: conv.id, handle: conv.handle ?? "", messages: sent.map((m) => ({ id: m.id, text: m.text })),
+      ...(via === "suite" ? { suite: { name: searchableName(conv), auto: sender !== "owner" } } : {}),
+    });
     conv.unread = false;
     conv.suggestion = null;
     saveDb();
@@ -365,7 +402,7 @@ export async function deliver(db: Db, conv: Conversation, bubbles: string[], sen
       await sendTyping(ws, conv);
       await new Promise((r) => setTimeout(r, typingMs(out[i])));
     }
-    const res = await sendMessage(ws, conv, out[i], !windowOpen && humanAgentApproved());
+    const res = await sendMessage(ws, conv, out[i], !windowOpen && humanAgentOpen(conv.lastInboundAt));
     const m = addMessage(db, conv, { direction: "out", sender, text: out[i], sentAt: new Date().toISOString(), source: "app", externalId: res?.message_id, memberId }, true);
     if (m) sent.push(m);
     if (i < out.length - 1) await new Promise((r) => setTimeout(r, human ? 600 + Math.random() * 1800 : 1200 + Math.min(4000, out[i + 1].length * 40)));

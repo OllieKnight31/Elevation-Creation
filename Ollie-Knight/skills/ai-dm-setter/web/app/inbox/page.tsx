@@ -6,6 +6,7 @@ import type { AiMode, StageId } from "@/lib/types";
 import { bubblesOf, expand } from "@/lib/shortcuts";
 import { api, Avatar, avatarSrc, Banner, Button, every, hasArea, LabelChip, nudgeHelper, Segmented, StageBadge, timeAgo, Toggle, useAppState, usePipeline, type ConvView, type PublicWorkspace } from "@/components/ui";
 import { Icon, ICONS, move, ResizeHandle, setLayout, swap, useLayout, type PaneId, type SectionId } from "@/components/layout";
+import AutopilotActivity from "@/components/AutopilotActivity";
 import { Activity, Composer, fillFor, instagramChatUrl, LeadFacts, LeadMeta, Messages, reach, StagePicker, SummaryCard, TagPicker, useThread, type ThreadData } from "@/components/thread";
 
 type Filter = "all" | "unread" | "follow_up" | "needs_human" | "autopilot" | "done";
@@ -156,6 +157,8 @@ function Inbox() {
             </label>)}
             <button onClick={() => setHidden("list", true)} aria-label="Hide conversation list" title="Hide this panel ( [ )" className="text-mute hover:text-ink"><Icon d={ICONS.eyeOff} /></button>
           </div>
+
+          <AutopilotActivity canSettings={hasArea(state.me, "settings")} onOpenChat={(id) => { setOutreach(null); setSelected(id); }} />
 
           {!ws.meta.instagram && hasArea(state.me, "settings") && (
             <div className="mt-3 rounded-[12px] tone-warn px-3 py-2.5 text-[12.5px] leading-snug">
@@ -471,7 +474,7 @@ function ThreadPane({ t, ws, demoEngine, grip, dropProps, dropRing, listHidden, 
       <div className="border-t border-line p-3 flex flex-col gap-2">
         {err && <Banner tone="error">{err}</Banner>}
         {note && <Banner tone="info">{note}</Banner>}
-        {!outreach && !c.window.open && c.lastInboundAt && c.sendVia !== "helper" && (
+        {!outreach && !c.window.open && c.lastInboundAt && c.sendVia !== "helper" && c.sendVia !== "suite" && (
           <Banner tone="warn">The 24 hour window has closed. Meta only allows a person to send here, up to 7 days after the lead&apos;s last message. The AI can still draft it for you.</Banner>
         )}
         {!outreach && !isDemo && c.sendVia === "none" && (

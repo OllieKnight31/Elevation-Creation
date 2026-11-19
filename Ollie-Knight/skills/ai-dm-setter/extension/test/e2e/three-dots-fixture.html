@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>fixture: guessed Instagram profile with a three dots menu (outreach)</title>
+    <style>
+      body { font: 14px sans-serif; margin: 0; }
+      header { display: flex; gap: 10px; padding: 10px; align-items: center; }
+      [role="button"] { padding: 6px 12px; border: 1px solid #999; border-radius: 8px; cursor: pointer; }
+      [role="row"] { display: flex; padding: 3px 8px; }
+      #composer { min-height: 30px; border: 1px solid #999; margin: 6px; padding: 4px; white-space: pre-wrap; }
+      [role="dialog"] { position: fixed; top: 80px; left: 80px; padding: 20px; background: #fff; border: 2px solid #333; display: flex; flex-direction: column; gap: 4px; }
+    </style>
+  </head>
+  <body>
+    <!--
+      Used by test/run-browser-tests.js. It lives in test/e2e only because that
+      was the folder this change was allowed to write to. It works like
+      test/fixture/outreach.html: the real content scripts and the real runner
+      against a GUESSED page shape. It proves nothing about the real Instagram.
+    -->
+    <nav role="navigation"><a role="link" href="/owner.acct/">Profile</a></nav>
+
+    <main id="profileView">
+      <header id="phead"></header>
+      <p>Coach for founders. Pricing, offers and sales calls.</p>
+    </main>
+
+    <div role="main" id="threadView" hidden>
+      <header><a id="threadLink" role="link" href="/lead.one/"><h2 id="threadName"></h2></a></header>
+      <div id="grid" role="grid" aria-label="Messages in conversation with the lead"></div>
+      <div id="composer" role="textbox" contenteditable="true" aria-label="Message..."></div>
+      <div id="send" role="button" aria-label="Send">Send</div>
+    </div>
+
+    <script>
+      window.__SITE = 'instagramOutreach';
+    </script>
+    <script src="/__ext/test/fixture/harness.js"></script>
+    <script>
+      // ---- a fake profile whose way to message can sit inside the three dots menu ----
+      // button:  the profile shows a Message button (2 = two of them)
+      // dots:    "button" = a role button holding the Options icon, "icon" = only the
+      //          icon matches the selector, "two" = two such buttons, "" = none
+      // menu:    the entries of the menu the three dots open
+      // aria:    the Send message entry carries its label in aria-label, not as text
+      var DEFAULTS = { button: 0, dots: 'button', menu: ['Block', 'Restrict', 'Report', 'Send message', 'Cancel'], aria: false, menuDelay: 350 };
+      var F = (window.__F = Object.assign({ sent: [], sendClicks: 0, clicks: {}, navs: [], handle: '' }, DEFAULTS));
+      var $id = function (id) {
+        return document.getElementById(id);
+      };
+      var composer = $id('composer');
+
+      function count(what) {
+        F.clicks[what] = (F.clicks[what] || 0) + 1;
+      }
+
+      function closeMenus() {
+        Array.prototype.slice.call(document.getElementsByClassName('fx-menu')).forEach(function (d) {
+          d.remove();
+        });
+      }
+
+      function openThread() {
+        closeMenus();
+        history.pushState(null, '', '/direct/t/999/');
+        $id('profileView').hidden = true;
+        $id('threadView').hidden = false;
+        $id('threadLink').setAttribute('href', '/' + F.handle + '/');
+        $id('threadName').textContent = F.handle;
+      }
+      F.openThread = openThread;
+
+      function openMenu() {
+        closeMenus();
+        var d = document.createElement('div');
+        d.setAttribute('role', 'dialog');
+        d.className = 'fx-menu';
+        F.menu.forEach(function (label) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          if (F.aria && label === 'Send message') {
+            b.setAttribute('aria-label', label);
+            b.textContent = '>';
+          } else {
+            b.textContent = label;
+          }
+          b.addEventListener('click', function () {
+            count(label);
+            if (label === 'Send message' || label === 'Message') setTimeout(openThread, 300);
+            else closeMenus();
+          });
+          d.appendChild(b);
+        });
+        document.body.appendChild(d);
+      }
+      F.openMenu = openMenu;
+
+      function dotsControl(kind) {
+        var svg = '<svg aria-label="Options" role="img" width="24" height="24"><circle cx="6" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="18" cy="12" r="2"></circle></svg>';
+        var el = document.createElement(kind === 'icon' ? 'span' : 'div');
+        if (kind !== 'icon') {
+          el.setAttribute('role', 'button');
+          el.setAttribute('tabindex', '0');
+        }
+        el.innerHTML = svg;
+        el.addEventListener('click', function () {
+          count('dots');
+          setTimeout(openMenu, F.menuDelay);
+        });
+        return el;
+      }
+
+      function buildProfile() {
+        var head = $id('phead');
+        head.textContent = '';
+        var name = document.createElement('h2');
+        name.textContent = F.handle;
+        head.appendChild(name);
+        for (var i = 0; i < F.button; i++) {
+          var m = document.createElement('div');
+          m.setAttribute('role', 'button');
+          m.setAttribute('tabindex', '0');
+          m.textContent = 'Message';
+          m.addEventListener('click', function () {
+            count('message button');
+            setTimeout(openThread, 400);
+          });
+          head.appendChild(m);
+        }
+        if (F.dots) head.appendChild(dotsControl(F.dots));
+        if (F.dots === 'two') head.appendChild(dotsControl('button'));
+      }
+
+      // Stands in for a navigation of the tab to a profile URL.
+      function navigate(url) {
+        var path = new URL(url).pathname;
+        F.navs.push(url);
+        F.handle = path.replace(/\//g, '');
+        history.pushState(null, '', path);
+        closeMenus();
+        var note = $id('aidm-outreach-notice');
+        if (note) note.remove();
+        $id('grid').textContent = '';
+        composer.textContent = '';
+        $id('threadView').hidden = true;
+        $id('profileView').hidden = false;
+        buildProfile();
+      }
+      F.navigate = navigate;
+      F.reset = function (opts) {
+        Object.assign(F, DEFAULTS, opts || {});
+        F.sent = [];
+        F.sendClicks = 0;
+        F.clicks = {};
+      };
+
+      function doSend(via) {
+        var text = composer.innerText.replace(/\s+$/, '');
+        if (!text) return;
+        F.sent.push({ text: text, via: via });
+        var row = document.createElement('div');
+        row.setAttribute('role', 'row');
+        var bubble = document.createElement('div');
+        bubble.setAttribute('dir', 'auto');
+        bubble.textContent = text;
+        row.appendChild(bubble);
+        $id('grid').appendChild(row);
+        composer.textContent = '';
+      }
+      $id('send').addEventListener('click', function () {
+        F.sendClicks++;
+        doSend('button');
+      });
+    </script>
+
+    <script src="/__ext/src/selectors.js"></script>
+    <script src="/__ext/src/lib/core.js"></script>
+    <script src="/__ext/src/lib/typing.js"></script>
+    <script src="/__ext/src/content/dom.js"></script>
+    <script src="/__ext/src/outreach/outreach-content.js"></script>
+    <script src="/__ext/src/outreach/outreach-runner.js"></script>
+
+    <script>
+      (async function () {
+        var T = window.__T;
+        var Typing = window.AIDMTyping;
+        var R = { errors: [] };
+        var PROFILE = 'https://www.instagram.com/lead.one/';
+        var TEXT = 'Hey Sam, saw your post about pricing for coaches. Are you taking on clients this quarter?';
+        var DETECT = { phrases: ['try again later'], urlParts: ['/challenge/'] };
+
+        function seeded(a) {
+          return function () {
+            a |= 0;
+            a = (a + 0x6d2b79f5) | 0;
+            var t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+        function cmd(name, arg) {
+          return new Promise(function (resolve) {
+            T.listeners[0](Object.assign({ type: 'aidm:outreach', cmd: name }, arg || {}), { id: 'fixture-ext' }, resolve);
+          });
+        }
+        function open(opts) {
+          F.reset(opts);
+          F.navigate(PROFILE);
+        }
+        function state() {
+          return {
+            clicks: Object.assign({}, F.clicks),
+            path: location.pathname,
+            menus: document.getElementsByClassName('fx-menu').length,
+            thread: !$id('threadView').hidden
+          };
+        }
+
+        try {
+          /* ---------- A. the content commands on their own ---------- */
+
+          // 1. Message button and three dots both there: the button is used, the menu never opens
+          open({ button: 1 });
+          R.bothProbe = await cmd('probe', { detect: DETECT });
+          R.bothClick = await cmd('click-message');
+          await T.sleep(600);
+          R.bothAfter = state();
+
+          // 2. only the three dots, the menu holds Send message: two presses, one per command
+          open({});
+          R.dotsProbe = await cmd('probe', { detect: DETECT });
+          R.dotsFirst = await cmd('click-message');
+          R.dotsEarly = await cmd('click-message', { menu: 'opened' }); // the menu is not there yet
+          await T.sleep(500);
+          R.dotsMenuProbe = await cmd('probe', { detect: DETECT });
+          // the shared click helper refuses this entry because of its label, which is why the sender has its own guard
+          try {
+            AIDM.dom.safeClick('instagramOutreach', document.querySelector('.fx-menu button:nth-child(4)'), 'the entry');
+            R.sharedGuard = 'CLICKED';
+          } catch (e) {
+            R.sharedGuard = e.name;
+          }
+          R.dotsSecond = await cmd('click-message', { menu: 'opened' });
+          await T.sleep(500);
+          R.dotsAfter = state();
+
+          // 3. the same with the label in aria-label, and with only the icon matching the selector
+          open({ aria: true, dots: 'icon' });
+          R.iconProbe = await cmd('probe', { detect: DETECT });
+          R.iconFirst = await cmd('click-message');
+          await T.sleep(500);
+          R.iconSecond = await cmd('click-message', { menu: 'opened' });
+          await T.sleep(500);
+          R.iconAfter = state();
+
+          // 4. the menu holds no Send message: nothing in it is pressed but Cancel
+          open({ menu: ['Block', 'Restrict', 'Report', 'Share to...', 'About this account', 'Cancel'] });
+          R.noneFirst = await cmd('click-message');
+          await T.sleep(500);
+          R.noneWait = await cmd('click-message', { menu: 'opened' });
+          R.noneOpen = state();
+          R.noneClose = await cmd('close-menu');
+          R.noneAfter = state();
+          R.closeAgain = await cmd('close-menu'); // nothing open: not an error
+
+          // 5. ambiguous matches: nothing is pressed
+          open({ button: 2 });
+          R.twoButtons = await cmd('click-message');
+          R.twoButtonsAfter = state();
+          open({ dots: 'two' });
+          R.twoDotsProbe = await cmd('probe', { detect: DETECT });
+          R.twoDots = await cmd('click-message');
+          R.twoDotsAfter = state();
+          open({ menu: ['Send message', 'Report', 'Send message', 'Cancel'] });
+          await cmd('click-message');
+          await T.sleep(500);
+          R.twoEntries = await cmd('click-message', { menu: 'opened' });
+          R.twoEntriesAfter = state();
+
+          // 6. neither a Message button nor three dots: a selector miss
+          open({ dots: '' });
+          R.nothing = await cmd('click-message');
+
+          // 7. a Send message entry while a message box is on the page is refused
+          open({});
+          F.openMenu();
+          $id('threadView').hidden = false;
+          R.withComposer = await cmd('click-message', { menu: 'opened' });
+          R.withComposerAfter = state();
+
+          /* ---------- B. the real runner driving the real content commands ---------- */
+          var TAB = 7;
+          var store = {};
+          var sess = {};
+          function area(obj) {
+            return {
+              get: async function (key) {
+                var out = {};
+                (Array.isArray(key) ? key : [key]).forEach(function (k) {
+                  if (k in obj) out[k] = JSON.parse(JSON.stringify(obj[k]));
+                });
+                return out;
+              },
+              set: async function (o) {
+                Object.keys(o).forEach(function (k) {
+                  obj[k] = JSON.parse(JSON.stringify(o[k]));
+                });
+              },
+              remove: async function (k) {
+                delete obj[k];
+              }
+            };
+          }
+          var tabExists = false;
+          var RC = {
+            storage: { local: area(store), session: area(sess) },
+            tabs: {
+              get: async function (id) {
+                if (!tabExists || id !== TAB) throw new Error('No tab with id ' + id);
+                return { id: TAB, status: 'complete', pinned: true };
+              },
+              create: async function (o) {
+                tabExists = true;
+                F.navigate(o.url);
+                return { id: TAB };
+              },
+              update: async function (id, o) {
+                F.navigate(o.url);
+                return { id: id };
+              },
+              sendMessage: function (id, msg) {
+                return new Promise(function (resolve) {
+                  T.listeners[0](msg, { id: 'fixture-ext' }, resolve);
+                });
+              }
+            },
+            scripting: { executeScript: async function () {} },
+            alarms: { get: async function () { return null; }, create: async function () {} },
+            runtime: { getPlatformInfo: function (cb) { cb({}); } },
+            action: { setBadgeText: async function () {} }
+          };
+          var app = { queue: [], results: [] };
+          function api(call, arg) {
+            if (call === 'outreachNext') {
+              var task = app.queue.shift();
+              return Promise.resolve(task ? { task: task } : { task: null, reason: 'queue empty', retryInSec: 0 });
+            }
+            if (call === 'outreachResult') {
+              app.results.push(JSON.parse(JSON.stringify(arg)));
+              return Promise.resolve({ ok: true, paused: false, pauseReason: null });
+            }
+            return Promise.reject(new Error('unexpected call ' + call));
+          }
+          var runner = window.AIDMOutreach.createRunner({ chrome: RC, api: api, Typing: Typing, rng: seeded(99) });
+          var n = 0;
+          async function scenario(opts, mode) {
+            F.reset(opts);
+            app.results = [];
+            n++;
+            app.queue = [{
+              id: 'task_' + n, handle: 'lead.one', profileUrl: PROFILE, text: TEXT, mode: mode || 'auto', readMs: 1200,
+              typing: { wpmMin: 70, wpmMax: 90, typoRate: 0.06, rewriteRate: 0.5, pauseRate: 0.05 }, detect: DETECT
+            }];
+            await runner.setEnabled(true);
+            await runner.idle();
+            var snap = state();
+            snap.result = app.results.length ? app.results[app.results.length - 1] : null;
+            snap.sent = F.sent.slice();
+            snap.sendClicks = F.sendClicks;
+            snap.composer = Typing.canonical(composer.innerText);
+            snap.stored = !!store.outreachTask;
+            snap.proven = store.outreachProven || null;
+            snap.target = Typing.canonical(TEXT);
+            return snap;
+          }
+
+          // 8. no Message button, the menu holds Send message: opened through the menu, typed and sent
+          R.runMenu = await scenario({});
+          // 9. the same, the menu holds no Send message: unreachable, the menu is closed, nothing is typed
+          R.runNoEntry = await scenario({ menu: ['Block', 'Restrict', 'Report', 'Cancel'] });
+          // 10. a Message button and three dots: the button, one press
+          R.runButton = await scenario({ button: 1 });
+          // 11. two Send message entries: an error, neither is pressed
+          R.runTwoEntries = await scenario({ menu: ['Send message', 'Send message', 'Cancel'] });
+          // 12. the three dots open nothing: a selector error, not an unreachable lead
+          R.runNoMenu = await scenario({ menu: [] });
+          // 13. assisted mode through the menu: typed, never sent
+          R.runAssisted = await scenario({}, 'assisted');
+        } catch (e) {
+          R.errors.push(String(e && e.stack ? e.stack : e));
+        }
+        T.finish(R);
+      })();
+    </script>
+  </body>
+</html>

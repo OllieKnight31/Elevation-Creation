@@ -197,7 +197,8 @@
         return request('POST', '/api/ext/label-queue/ack', { body: payload });
       },
 
-      // GET /api/ext/outreach/status -> { enabled, mode, paused, pauseReason, sentToday, capToday, inWindow, nextAt, account, detect }
+      // GET /api/ext/outreach/status -> { enabled, mode, paused, pauseReason, sentToday, capToday, inWindow, nextAt, account, detect,
+      //   suiteSending, suiteWaiting }
       outreachStatus: function () {
         return request('GET', '/api/ext/outreach/status').then(function (d) {
           if (typeof d.enabled !== 'boolean') throw ApiError('Outreach status did not return enabled.', null, 'BAD_SHAPE');
@@ -229,9 +230,13 @@
       },
 
       // POST /api/ext/outreach/next -> { task: null, reason, retryInSec } or { task: {...} }
+      // channel "suite" asks for an inbox message to send inside Meta Business Suite. Without it the app hands
+      // out only what is typed inside instagram.com.
       outreachNext: function (body) {
         var account = body && typeof body.account === 'string' ? body.account : '';
-        return request('POST', '/api/ext/outreach/next', { body: { account: account } }).then(function (d) {
+        var payload = { account: account };
+        if (body && body.channel === 'suite') payload.channel = 'suite';
+        return request('POST', '/api/ext/outreach/next', { body: payload }).then(function (d) {
           if (!('task' in d) || (d.task !== null && typeof d.task !== 'object')) throw ApiError('Outreach next did not return a task field.', null, 'BAD_SHAPE');
           return d;
         });

@@ -139,6 +139,15 @@ With the Autopilot master switch on, new messages are answered as they arrive (M
 
 "How far back" limits both to chats with a message in the last N days (90 by default, 0 for every chat). Each send passes the same checks as any Autopilot reply: never Close friend or Do not contact, never past the setter's stages, never when the AI asks for a person. Inside Meta's 24 hour window the message goes through Meta; outside it the Chrome helper types it, during the outreach sending hours. The clock is the helper checking in (every two minutes with Autopilot on) plus the daily timed job, so nothing depends on an open screen or a terminal. `/api/sweep` shows how many chats are due.
 
+## How messages are sent (rules set 2026-11-19)
+
+1. **Inbox messages go through Meta's official connection first.** Replies and follow ups are never typed inside instagram.com (`settings.instagramTyping` is off by default and should stay off).
+2. **Past Meta's 24 hour window** the Chrome helper can send inside Meta Business Suite only (`settings.businessSuiteSending`, Settings, AI, off by default; `extension/src/suite/`). No age limit, one a minute, 300 a day at most (`SUITE` in `web/lib/outreach.ts`). Its selectors are unverified against the real Business Suite: run the supervised first test in `.swarm/2026-11-19-meta-only/units/bsuite-sender.md` before switching it on.
+3. **Typing inside instagram.com is only for cold outreach** to accounts that do not follow you: 5 to 10 an hour, 50 a day. Followers are recorded (Outreach, Prospects) only so they can be left out. When a profile has no Message button the helper uses Send message in the three dots menu.
+4. **The clock is in the database.** A pg_cron job (`setter-tick`, installed with `web/scripts/install-tick.mjs`) calls `/api/cron/tick` every minute with `TICK_SECRET`, so Autopilot runs with no browser and no terminal.
+
+The inbox has an Autopilot activity strip and panel (`web/components/AutopilotActivity.tsx`, `/api/sweep`): sent, due, who cannot be reached and why. Get connected has a card on messaging after 24 hours, including how to apply for Meta's Human Agent approval. Tests: `node test/sweep-check.mjs`, `node test/outreach-rules-check.mjs`, `node extension/test/run-tests.js`, `node extension/test/run-browser-tests.js`.
+
 ## How the AI talks
 
 Every reply is written to read like a person texting, for every business that uses the setter. The rules live in `web/lib/style.ts` and go into every draft, whether it comes from Autopilot, the Suggest button or the helper.

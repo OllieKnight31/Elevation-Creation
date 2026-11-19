@@ -115,8 +115,19 @@ export interface CalendarConfig {
 export interface Conversation {
   /** Follow ups sent since the lead's last message (anchor is that message's time) */
   followUp?: { count: number; at: string; anchor: string | null };
-  /** When the inbox sweep last looked at this chat and sent nothing, so it is not asked about again for a day */
+  /**
+   * When the inbox sweep last took this chat. Set before the AI writes and cleared when a message goes, so a chat
+   * that was skipped, or whose run died part way, is not asked about again for a day.
+   */
   sweepTriedAt?: string;
+  /** Failed tries in a row with nothing sent. Under 3, the chat is tried again after 30 minutes instead of a day. */
+  sweepFails?: number;
+  /**
+   * Which run of the inbox sweep is working this chat. Saved before the AI writes, so another copy of the server
+   * that picked the same chat sees it lost and leaves the chat alone. prev is the follow up count to put back
+   * when the run lets the chat go without sending anything, and fails is the failed tries it had before.
+   */
+  sweepClaim?: { by: string; at: string; kind: "answer" | "followUp"; prev?: { count: number; at: string; anchor: string | null } | null; fails?: number };
   id: string;
   platform: Platform;
   externalId: string;
@@ -382,17 +393,50 @@ export interface InboxSweep {
   answerWaiting: boolean;
   /** Send a follow up when the lead has not replied */
   followUp: boolean;
-  /** Hours of silence before a follow up */
+  /**
+   * Hours of silence before a follow up. Not used while the sweep sends through Meta only: there the follow up
+   * goes in the last 4 hours of Meta's 24 hour window. Kept so a saved setting is not lost.
+   */
   followUpHours: number;
-  /** Follow ups per silence. The count starts again when the lead replies. */
+  /** Follow ups per silence. Always 1: a lead who stays quiet is never asked twice. */
   followUpMax: number;
-  /** Minutes between these automatic messages */
+  /** Minutes to pause between batches. 0 means the next batch starts on the next tick of the clock. */
   gapMinutes: number;
+  /** Chats the AI writes for in one batch (1 to 12). A batch has to finish inside one background job of about 45 seconds. */
+  batchSize?: number;
   /** Only chats with a message in the last this many days. 0 means every chat, however old. */
   maxAgeDays: number;
-  /** When the last one was started, and a short hold so two servers never work the same chat */
+  /** When the last batch was started, and a short hold so two servers never run a batch at once */
   lastAt?: string;
   busyUntil?: string;
+  /** The run that set busyUntil, so only that run clears it */
+  busyBy?: string;
+  /** Chats still due after the last batch was picked */
+  backlog?: number;
+  /** When the clock last looked, saved at most every 10 minutes so an idle clock does not make every screen reload */
+  checkedAt?: string;
+}
+
+/** One line of the inbox sweep's activity log: what it did with one chat. */
+export interface SweepLogEntry {
+  at: string;
+  conversationId: string;
+  /** Instagram username, or "" when the chat has none */
+  handle: string;
+  name: string;
+  kind: "answer" | "followUp";
+  /** sent: gone through Meta. skipped: the AI or a check held it back. failed: it could not be written or sent. */
+  outcome: "sent" | "skipped" | "failed";
+  /** Why nothing went, in a few plain words. Empty when it was sent. */
+  reason: string;
+  /** The start of the message that went */
+  text?: string;
+}
+
+/** Totals for the inbox sweep by day, kept apart from the log so they stay right when old lines drop off. */
+export interface SweepStats {
+  /** YYYY-MM-DD in the sending timezone. The newest 14 days are kept. */
+  days: Record<string, { sent: number; skipped: number; failed: number }>;
 }
 
 export interface Workspace {
@@ -408,6 +452,11 @@ export interface Workspace {
     replyDelaySeconds: number;
     /** Replies wait as long as a person would take to read and type, with a typing indicator. */
     humanTiming?: boolean;
+    /**
+     * Whether the Chrome helper may type and send messages inside instagram.com. Off unless switched on: typed
+     * sends there can get an account limited, so everything goes through Meta's official connection instead.
+     */
+    instagramTyping?: boolean;
     /** With Autopilot on: answer chats left unanswered, and follow up when a lead goes quiet. */
     inboxSweep?: InboxSweep;
   };
@@ -425,6 +474,9 @@ export interface Workspace {
   targets: { bookedPerMonth: number };
   outreach: Outreach;
   knowledge: Knowledge;
+  /** What the inbox sweep did, oldest first. The newest 300 lines are kept. */
+  sweepLog?: SweepLogEntry[];
+  sweepStats?: SweepStats;
   calendar: CalendarConfig;
   /** Last word from the Chrome helper: that it is installed and linked, and which Instagram account Chrome is signed in to. */
   helper?: { seenAt: string; version: string; code?: string; account: string; outreachOn: boolean; faces?: { done: number; note: string; last: string; lastAt: number } };
@@ -568,6 +620,8 @@ export interface OutreachSettings {
   /** Days on which at least one message went out, used by the ramp */
   daysSent: number;
   minGapSeconds: number;
+  /** First messages allowed in any 60 minutes (1 to 10) */
+  hourlyMax?: number;
   typing: { wpmMin: number; wpmMax: number; typoRate: number; rewriteRate: number; pauseRate: number };
   paused: boolean;
   pauseReason: string;

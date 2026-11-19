@@ -2,6 +2,7 @@
  * Reads the followers file from Instagram's own "Download your information" export
  * (connections/followers_and_following/followers_1.json, or the .html version) into handles, newest follower first.
  * Runs in the browser, so only the handles leave the owner's computer.
+ * The handles are used for one thing: leaving followers out of cold messages. They are never a list to message.
  */
 const HANDLE = /^[a-z0-9._]{1,30}$/;
 const RESERVED = new Set(["accounts", "explore", "reels", "direct", "p", "stories", "about", "legal", "privacy", "_u"]);

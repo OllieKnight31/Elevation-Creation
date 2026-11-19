@@ -11,7 +11,9 @@
  * It holds no logic of its own about WHAT to send or WHEN. It answers small
  * commands from the service worker, one at a time:
  *   probe            what the page shows: block signal, profile, composer
- *   click-message    click the Message button on the profile (guarded click)
+ *   click-message    open the chat from the profile: the Message button, or
+ *                    the three dots menu and its Send message entry
+ *   close-menu       close a three dots menu that holds no Send message entry
  *   focus-composer   put the caret at the end of the composer
  *   step             apply ONE typing step (insert a character or backspace)
  *   read-composer    current composer text
@@ -154,6 +156,8 @@
       notFound: pageTextHit(SEL[SITE].markers.notFoundTexts, ownAndThreadElements()),
       profile: !!dom.find(SITE, 'profileHeader'),
       messageButtons: dom.findAll(SITE, 'messageButton').length,
+      optionsButtons: optionsButtons().length,
+      menuMessages: dom.findAll(SITE, 'menuMessage').length,
       composer: !!composer,
       composerText: composerText(composer),
       sendButton: !!dom.find(SITE, 'sendButton'),
@@ -162,16 +166,106 @@
     };
   }
 
-  /* ---------------------------- the Message button ---------------------------- */
+  /* ---------------------------- opening the chat ---------------------------- */
 
-  function clickMessage() {
-    var buttons = dom.findAll(SITE, 'messageButton');
-    if (!buttons.length) throw dom.SelectorMiss(SITE, 'messageButton');
-    if (buttons.length > 1) {
-      throw fail(buttons.length + ' elements match ' + SITE + '.messageButton. Not clicking any of them. Fix src/selectors.js.', 'AMBIGUOUS');
+  var MENU_CLOSE = ['cancel'];
+
+  function ambiguous(count, key) {
+    return fail(count + ' elements match ' + SITE + '.' + key + '. Not clicking any of them. Fix src/selectors.js.', 'AMBIGUOUS');
+  }
+
+  // The three dots selector can match the icon itself. Only an HTML element
+  // can be pressed, so each match is swapped for the control that holds it.
+  function optionsButtons() {
+    var out = [];
+    dom.findAll(SITE, 'optionsButton').forEach(function (el) {
+      var cur = el;
+      while (cur && typeof cur.click !== 'function') cur = cur.parentElement;
+      if (cur && out.indexOf(cur) < 0) out.push(cur);
+    });
+    return out;
+  }
+
+  function entryName(el) {
+    return Core.foldText((el.getAttribute && el.getAttribute('aria-label')) || dom.textOf(el));
+  }
+
+  // Every visible entry of an open menu or dialog, as the menuMessage text
+  // rule sees them.
+  function menuEntries() {
+    return dom.q(document, SEL[SITE].targets.menuMessage.text.candidates).filter(dom.isVisible);
+  }
+
+  function menuLabels() {
+    return menuEntries()
+      .map(function (el) {
+        return entryName(el).slice(0, 40);
+      })
+      .filter(Boolean)
+      .slice(0, 12);
+  }
+
+  /*
+   * Presses the menu entry that opens the chat. The shared click guard reads
+   * the label "Send message" as a send control and refuses it, so this entry
+   * has its own, narrower guard: the label must be exactly one of the
+   * menuMessage values (never Block, Restrict or Report), the entry must not
+   * submit a form, and no message box may be on the page, so there is no
+   * text this press could send.
+   */
+  function pressMenuEntry(el) {
+    var allowed = SEL[SITE].targets.menuMessage.text.values.map(Core.foldText);
+    var name = entryName(el);
+    if (allowed.indexOf(name) < 0) throw fail('Refusing to press a menu entry that reads "' + name.slice(0, 40) + '".', 'SAFETY');
+    if (!dom.isVisible(el)) throw fail('Refusing to press the Send message entry: it is not visible.', 'SAFETY');
+    if ((el.getAttribute('type') || '').toLowerCase() === 'submit') throw fail('Refusing to press the Send message entry: it submits a form.', 'SAFETY');
+    if (dom.find(SITE, 'composer')) throw fail('Refusing to press the Send message entry: a message box is already open on this page.', 'SAFETY');
+    if (!dom.looksLikeSend(SITE, el)) {
+      dom.safeClick(SITE, el, 'the Send message entry');
+      return;
     }
-    dom.safeClick(SITE, buttons[0], 'the Message button');
-    return { ok: true };
+    el.click();
+  }
+
+  /*
+   * Opens the chat with the person whose profile is showing. One call does at
+   * most one press, and the service worker does the waiting in between:
+   *   1. a Message button: press it, done.
+   *   2. a Send message entry in an open menu: press it, done.
+   *   3. msg.menu "opened" (the worker is waiting for the menu): press
+   *      nothing, report what the menu holds so far.
+   *   4. otherwise press the three dots next to the name, not done yet.
+   */
+  function clickMessage(msg) {
+    var buttons = dom.findAll(SITE, 'messageButton');
+    if (buttons.length > 1) throw ambiguous(buttons.length, 'messageButton');
+    if (buttons.length === 1) {
+      dom.safeClick(SITE, buttons[0], 'the Message button');
+      return { ok: true, done: true, via: 'button' };
+    }
+    var entries = dom.findAll(SITE, 'menuMessage');
+    if (entries.length > 1) throw ambiguous(entries.length, 'menuMessage');
+    if (entries.length === 1) {
+      pressMenuEntry(entries[0]);
+      return { ok: true, done: true, via: 'menu' };
+    }
+    if (msg.menu === 'opened') return { ok: true, done: false, via: 'menu', entries: menuLabels() };
+    var dots = optionsButtons();
+    if (!dots.length) throw dom.SelectorMiss(SITE, 'messageButton');
+    if (dots.length > 1) throw ambiguous(dots.length, 'optionsButton');
+    dom.safeClick(SITE, dots[0], 'the three dots menu');
+    return { ok: true, done: false, via: 'menu' };
+  }
+
+  // Closes a menu that turned out to hold no Send message entry. Presses its
+  // Cancel entry and nothing else. Not finding one is not an error.
+  function closeMenu() {
+    var hits = menuEntries().filter(function (el) {
+      return MENU_CLOSE.indexOf(entryName(el)) >= 0;
+    });
+    if (hits.length !== 1) return { ok: true, closed: false };
+    dom.safeClick(SITE, hits[0], 'the Cancel entry of the menu');
+    return { ok: true, closed: true };
   }
 
   /* ---------------------------- composer editing ---------------------------- */
@@ -423,7 +517,9 @@
       case 'probe':
         return probe(msg);
       case 'click-message':
-        return clickMessage();
+        return clickMessage(msg);
+      case 'close-menu':
+        return closeMenu();
       case 'focus-composer':
         return focusComposer();
       case 'step':

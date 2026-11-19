@@ -101,6 +101,8 @@ rows = (await call(`/api/outreach?list=${v.lists[0].id}`)).rows;
 ev = (await events()).filter((e) => e.kind === "sent");
 ok("message 3 sent with the fallback greeting", l.status === "sent" && ev.length === 2 && ev[1].text === rows[2].text && !/ACME|Acme|acme/.test(rows[2].text), JSON.stringify({ l, got: ev[1]?.text, want: rows[2].text }));
 ok("a different version was used", rows[0].variantId !== rows[2].variantId);
+const menuEv = (await events()).filter((e) => e.handle === "lead.two" && e.kind === "menu-press");
+ok("message 3 opened the chat from the three dots menu, pressing only Send message", menuEv.length === 1 && menuEv[0].label === "Send message", JSON.stringify(menuEv));
 
 // 4. assisted mode
 await o({ action: "settings", settings: { mode: "assisted" } });

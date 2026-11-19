@@ -224,6 +224,8 @@ export default function ConnectPage() {
           )}
         </Block>
 
+        <After24h dashId={v.meta.dashId} />
+
         <details className="card p-5 group">
           <summary className="cursor-pointer list-none flex items-center gap-3">
             <div className="flex-1">
@@ -437,6 +439,79 @@ function FullGuide({ site }: { site: string }) {
           <li>Reply to a chat older than 24 hours. It goes out through the helper within seconds while Chrome is open.</li>
           <li>Anything not working: the sections above each show a red status saying what is wrong.</li>
         </ol>
+      </div>
+    </details>
+  );
+}
+
+/**
+ * What Meta's official connection can and cannot send once 24 hours have passed since a lead's last message, and how
+ * to apply for the one feature that stretches it (Human Agent). Checked against Meta's developer documentation on
+ * 19 November 2026. Meta changes these rules, so the links go to its own pages.
+ */
+function After24h({ dashId }: { dashId: string }) {
+  const H = ({ children }: { children: React.ReactNode }) => <h3 className="font-semibold text-ink mt-5 mb-1.5">{children}</h3>;
+  const app = dashId ? `https://developers.facebook.com/apps/${dashId}` : "";
+  return (
+    <details className="card p-5 group">
+      <summary className="cursor-pointer list-none flex items-center gap-3">
+        <div className="flex-1">
+          <h2 className="font-semibold">Messaging after 24 hours</h2>
+          <p className="text-[13px] text-mute">What the setter can and cannot send through Meta once a lead has been quiet for more than a day, and how to apply to Meta for a 7 day reply window.</p>
+        </div>
+        <span className="text-[12.5px] underline text-mute group-open:hidden">Show</span>
+      </summary>
+      <div className="text-[14px] text-ink2 mt-2">
+        <H>The short version</H>
+        <ul className="list-disc pl-5 space-y-1.5">
+          <li><b>Inside 24 hours of the lead&apos;s last message:</b> the setter sends through Meta. Replies, follow ups and the AI all work. This is the normal case.</li>
+          <li><b>After 24 hours:</b> Meta refuses messages from any app. The AI cannot send, and neither can a follow up. The chat reopens for another 24 hours the moment the lead writes again.</li>
+          <li><b>From 24 hours to 7 days:</b> a person on your team can still reply through Meta, but only once Meta has approved your app for <b>Human Agent</b>. It covers replies typed by a person. It does not cover the AI or any automatic message.</li>
+          <li><b>After 7 days, or to someone who has never messaged you:</b> Meta has no way for an app to send. Not with any approval, and not for a fee.</li>
+          <li>Whenever Meta cannot send, reply yourself in the Meta Business Suite inbox. The setter does not type inbox replies inside instagram.com. <ExtLink href="https://business.facebook.com/latest/inbox">Open the Meta Business Suite inbox</ExtLink></li>
+        </ul>
+
+        <H>What Meta allows, one by one</H>
+        <ul className="list-disc pl-5 space-y-1.5">
+          <li><b>The standard window (built in).</b> 24 hours from the lead&apos;s last message. Free. No approval needed for your own account.</li>
+          <li><b>Human Agent (built in, needs Meta&apos;s approval).</b> Up to 7 days from the lead&apos;s last message, for a reply written by a person. Steps below.</li>
+          <li><b>Comment to DM (built in).</b> When someone comments on your post or reel, the setter can send them one direct message, within 7 days of the comment. They have to answer before anything more can be sent, and their answer opens the normal 24 hours. Set the keywords in <Link className="underline font-medium" href="/outreach">Outreach</Link>.</li>
+          <li><b>Ads that open a chat (partly built in).</b> Someone who taps a click to message ad and then writes to you arrives in the inbox tagged Ad click. Meta says the window after that first message can last up to 7 days. The setter still treats it as 24 hours, so use Meta Business Suite for later replies to those chats. The ads are paid for in Meta Ads Manager.</li>
+          <li><b>Links and story replies (built in).</b> A lead who opens one of your ig.me chat links and writes, or replies to your story, has written first, so that opens the 24 hours.</li>
+          <li><b>Opt in marketing messages (not built in).</b> Meta has a feature where a lead taps to agree to later updates. The setter does not use it, and Meta&apos;s own notice says no new apps are being let in.</li>
+        </ul>
+
+        <H>What does not exist</H>
+        <ul className="list-disc pl-5 space-y-1.5">
+          <li>No way for an app to send the first message to someone who has not written to you, commented, or tapped your ad or link. That is why cold outreach is the one job the Chrome helper types in Instagram.</li>
+          <li>No way to reach a lead through Meta more than 7 days after their last message.</li>
+          <li>No reminder, receipt or event tags for Instagram. Meta&apos;s older message tags were for Facebook Messenger, and Meta has been switching them off.</li>
+          <li>No paid or sponsored messages into Instagram DMs, and no one time notification. Meta offers both for Messenger only.</li>
+        </ul>
+
+        <H>How to apply for Human Agent</H>
+        <p className="mb-2">Optional. Worth it if you or your team often answer leads a day or more late. Meta asks for a verified business and reviews the request by hand. It gives no fixed time: allow a few weeks.</p>
+        <ol className="list-decimal pl-5 space-y-1.5">
+          <li><b>Check the basics.</b> Your Meta app is published (Live), your Instagram is connected at the top of this page, and you have replied to a real DM from the Ainable Setter inbox at least once.</li>
+          <li><b>Verify your business.</b> In your Meta app open <b>App settings</b>, <b>Basic</b>, find <b>Verification</b> and press <b>Start verification</b>. Meta takes you to your business portfolio to finish it, and asks for documents that show the business name and address. The app must belong to that business portfolio. {app ? <ExtLink href={`${app}/settings/basic/`}>Open my app&apos;s basic settings</ExtLink> : <ExtLink href="https://developers.facebook.com/apps/">Open my Meta apps</ExtLink>} <ExtLink href="https://www.facebook.com/business/help/1095661473946872">What Meta asks for</ExtLink></li>
+          <li><b>Open App Review.</b> In your Meta app open <b>App Review</b>, then <b>Requests</b>, and press <b>Request permissions or features</b>. {app ? <ExtLink href={`${app}/app-review/permissions/`}>Open my app&apos;s permissions and features</ExtLink> : null}</li>
+          <li><b>Find Human Agent</b> in the list and request it. If Meta says it depends on <code className="rounded-md bg-surface2 px-1.5 py-0.5 text-[12.5px]">instagram_business_manage_messages</code>, add that to the same request.</li>
+          <li><b>Say why you need 7 days.</b> Meta asks why a reply can take up to 7 days instead of 24 hours. Write it in your own words, for example: leads often answer in the evening or at the weekend, a person on the team answers questions the AI hands over, and that person is not always free within a day.</li>
+          <li><b>Record your screen.</b> Show a lead&apos;s DM arriving in the Ainable Setter inbox, then a person typing a reply and sending it, then the reply showing in Instagram. Meta wants to see a person answering, in the same app you are submitting.</li>
+          <li><b>Tell the reviewer how to test it.</b> Give your Instagram username and say: send this account a DM, and a person replies from the inbox.</li>
+          <li><b>Submit and wait for Meta&apos;s email.</b> If Meta says no, it says why. Fix that and send it again.</li>
+          <li><b>Once approved,</b> whoever runs this app switches Human Agent on (the <code className="rounded-md bg-surface2 px-1.5 py-0.5 text-[12.5px]">META_HUMAN_AGENT</code> setting on the host, set to <code className="rounded-md bg-surface2 px-1.5 py-0.5 text-[12.5px]">approved</code>). From then on, a reply you send yourself goes through Meta for up to 7 days.</li>
+        </ol>
+
+        <H>Meta&apos;s own pages</H>
+        <ul className="list-disc pl-5 space-y-1">
+          <li><ExtLink href="https://developers.facebook.com/docs/features-reference/human-agent">Human Agent</ExtLink></li>
+          <li><ExtLink href="https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/messaging-api">Instagram messaging and the 24 hour window</ExtLink></li>
+          <li><ExtLink href="https://developers.facebook.com/docs/instagram-platform/app-review">App Review for Instagram apps</ExtLink></li>
+          <li><ExtLink href="https://developers.facebook.com/docs/development/release/business-verification">Business verification</ExtLink></li>
+          <li><ExtLink href="https://developers.facebook.com/docs/instagram-platform/private-replies">Private replies to comments</ExtLink></li>
+        </ul>
+        <p className="text-[12.5px] text-mute mt-3">Checked against Meta&apos;s developer pages on 19 November 2026. Meta changes these rules from time to time, so its own pages have the final word.</p>
       </div>
     </details>
   );
@@ -664,8 +739,8 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
     <div className="mt-4 rounded-[10px] bg-surface2 p-3 text-[13px] text-ink2">
       <div className="font-semibold text-ink mb-1">Good to know</div>
       <ul className="list-disc pl-5 space-y-1">
-        <li><b>The 24 hour rule.</b> Meta lets an app reply only within 24 hours of the lead&apos;s last message. After that, reply in Instagram (each chat has an Open in Instagram link) or switch on the Chrome helper, which sends it from your own Chrome.</li>
-        <li><b>Human Agent.</b> Replying up to 7 days later through Meta needs Meta&apos;s approval for the Human Agent feature (App Review, with business verification). It is not needed to use the setter.</li>
+        <li><b>The 24 hour rule.</b> Meta lets an app reply only within 24 hours of the lead&apos;s last message. What can be sent after that, and how, is in <b>Messaging after 24 hours</b> further down this page.</li>
+        <li><b>Human Agent.</b> Replying up to 7 days later through Meta needs Meta&apos;s approval for the Human Agent feature (App Review, with business verification). It is not needed to use the setter. The steps are in <b>Messaging after 24 hours</b>.</li>
         <li><b>Close friend tag.</b> A lead tagged Close friend never gets a message from the AI or any automation until the tag is removed. You can still message them yourself.</li>
         <li><b>The Instagram login lasts 60 days</b> and renews itself every week. If Instagram ever shows as disconnected, press Continue with Instagram again.</li>
       </ul>

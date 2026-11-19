@@ -2,10 +2,12 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { followersFromFile } from "@/lib/followers-file";
-import type { CommentTrigger, EntryLink, FollowerJob, OutreachCampaign, OutreachLogItem, OutreachSettings, Prospect, ProspectList } from "@/lib/types";
+import type { CommentTrigger, EntryLink, FollowerJob, OutreachCampaign, OutreachLogItem, OutreachSettings as BaseSettings, Prospect, ProspectList } from "@/lib/types";
 import { api, Banner, Button, every, PageHeader, timeAgo, Toggle } from "@/components/ui";
 import { Field, Row, Section } from "@/components/settings/parts";
 
+// hourlyMin is new and optional on saved workspaces. It moves into types.ts with the next tidy up.
+type OutreachSettings = BaseSettings & { hourlyMin?: number };
 interface Stat { id: string; sent: number; replied: number; booked: number; queued: number; failed: number; variants: { id: string; sent: number; replied: number; booked: number }[] }
 interface View {
   settings: OutreachSettings;
@@ -18,8 +20,9 @@ interface View {
   links: EntryLink[];
   commentTriggers: CommentTrigger[];
   followers: FollowerJob | null;
+  followerList: { count: number; updatedAt: string; max: number };
   igUsername: string;
-  limits: { hardMax: number; minPerCampaign: number; maxPerCampaign: number; privateReplyPerHour: number };
+  limits: { hardMax: number; hourlyMin: number; hourlyMax: number; hourlyHardMax: number; minPerCampaign: number; maxPerCampaign: number; privateReplyPerHour: number };
 }
 
 const TABS = [["overview", "Overview"], ["campaigns", "Campaigns"], ["prospects", "Prospects"], ["starters", "Conversation starters"], ["sending", "Sending and typing"]] as const;
@@ -56,7 +59,7 @@ function Outreach() {
   return (
     <div className="h-full overflow-y-auto scroll p-6">
       <div className="max-w-[1040px]">
-        <PageHeader title="Outreach" sub="Start conversations with people who have not messaged you yet." />
+        <PageHeader title="Outreach" sub="Start conversations with people who do not follow you and have not messaged you yet." />
         <div className="flex flex-wrap gap-1 mb-5 border-b border-line" role="tablist" aria-label="Outreach sections">
           {TABS.map(([t, l]) => (
             <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`px-3 py-2 text-[13.5px] font-medium border-b-2 -mb-px ${tab === t ? "border-ink text-ink" : "border-transparent text-mute hover:text-ink"}`}>{l}</button>
@@ -86,19 +89,22 @@ function Overview({ v, act, setTab }: P) {
   const s = v.status;
   const waiting = v.stats.reduce((n, c) => n + (v.campaigns.find((x) => x.id === c.id)?.status === "active" ? c.queued : 0), 0);
   const sent = v.stats.reduce((n, c) => n + c.sent, 0), replied = v.stats.reduce((n, c) => n + c.replied, 0), booked = v.stats.reduce((n, c) => n + c.booked, 0);
-  const state = !s.enabled ? "Off" : s.paused ? "Paused" : !waiting ? "Nothing to send" : !s.inWindow ? "Outside sending hours" : s.sentToday >= s.capToday ? "Done for today" : "Sending";
+  const noFollowers = !v.followerList.updatedAt;
+  const hMin = v.settings.hourlyMin ?? v.limits.hourlyMin, hMax = v.settings.hourlyMax ?? v.limits.hourlyMax;
+  const state = !s.enabled ? "Off" : s.paused ? "Paused" : !waiting ? "Nothing to send" : noFollowers ? "Waiting for your followers" : !s.inWindow ? "Outside sending hours" : s.sentToday >= s.capToday ? "Done for today" : "Sending";
   const nextIn = s.nextAt ? Math.round((new Date(s.nextAt).getTime() - Date.now()) / 60000) : null;
   return (
     <>
       <Section title="Today" action={<div className="flex items-center gap-2 text-[13px]"><span className="text-mute">Outreach sending</span><Toggle label="Outreach sending" on={s.enabled} onChange={(on) => act({ action: "settings", settings: { enabled: on } })} /></div>}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3">
           <Tile label="Status" value={state} sub={s.enabled && !s.paused && s.inWindow && waiting && s.sentToday < s.capToday ? (nextIn !== null && nextIn > 0 ? `Next message in about ${nextIn} min` : "Next message when the extension checks in") : v.settings.mode === "auto" ? "The extension presses send" : "You press send"} />
-          <Tile label="Sent today" value={`${s.sentToday} of ${s.capToday}`} sub={v.cap.ramp ? `Building up: the limit rises by ${v.settings.rampStep} each sending day` : v.settings.dailyMin === v.settings.dailyMax ? `${v.settings.dailyMax} a day` : `A different number each day, ${v.settings.dailyMin} to ${v.settings.dailyMax}`} />
+          <Tile label="Sent today" value={`${s.sentToday} of ${s.capToday}`} sub={`${hMin === hMax ? hMax : `${hMin} to ${hMax}`} an hour at most. ` + (v.cap.ramp ? `Building up: the limit rises by ${v.settings.rampStep} each sending day` : v.settings.dailyMin === v.settings.dailyMax ? `${v.settings.dailyMax} a day` : `A different number each day, ${v.settings.dailyMin} to ${v.settings.dailyMax}`)} />
           <Tile label="Waiting to be messaged" value={waiting} sub={waiting ? ((d) => `About ${d} sending ${d === 1 ? "day" : "days"}`)(Math.ceil(waiting / Math.max(1, v.settings.dailyMax))) : "Add prospects and start a campaign"} />
           <Tile label="Replied" value={`${replied} of ${sent}`} sub={`${pct(replied, sent)} reply rate, ${booked} booked`} />
         </div>
       </Section>
-      {!v.campaigns.length && <div className="mb-6"><Banner>Three steps to start: add a list under <button className="underline" onClick={() => setTab("prospects")}>Prospects</button>, write a campaign with at least {v.limits.minPerCampaign} versions of the message under <button className="underline" onClick={() => setTab("campaigns")}>Campaigns</button>, then switch on Outreach sending here and in the Chrome extension.</Banner></div>}
+      {noFollowers && <div className="mb-6"><Banner tone="warn">Cold messages only go to people who do not follow you, so nothing is sent until your full follower file is on record. Add it under <button className="underline" onClick={() => setTab("prospects")}>Prospects</button>, in "People who follow you".</Banner></div>}
+      {!v.campaigns.length && <div className="mb-6"><Banner>Four steps to start: record your followers and add a list under <button className="underline" onClick={() => setTab("prospects")}>Prospects</button>, write a campaign with at least {v.limits.minPerCampaign} versions of the message under <button className="underline" onClick={() => setTab("campaigns")}>Campaigns</button>, then switch on Outreach sending here and in the Chrome extension.</Banner></div>}
       <Section title="Results by campaign" sub="A reply is counted when the person shows up in your inbox after the message went out.">
         {v.campaigns.length ? (
           <table className="w-full text-[13px]">
@@ -180,7 +186,7 @@ function Campaigns({ v, act }: P) {
       }>
         <div className="p-4 grid gap-4">
           <Field label="Name"><input className="field" value={cur.name} onChange={(e) => setCur({ ...cur, name: e.target.value })} placeholder="Gym owners, October" /></Field>
-          <Field label="Prospect lists" hint="Everyone waiting on these lists gets one message.">
+          <Field label="Prospect lists" hint="Everyone waiting on these lists gets one message, unless they follow you or are already in your inbox.">
             {v.lists.length ? (
               <div className="flex flex-wrap gap-2">
                 {v.lists.map((l) => {
@@ -231,14 +237,15 @@ function Prospects({ v, act, say }: P) {
   const [rows, setRows] = useState<{ total: number; rows: Prospect[] } | null>(null);
   const file = useRef<HTMLInputElement>(null);
   const followFile = useRef<HTMLInputElement>(null);
+  const fl = v.followerList;
   useEffect(() => { if (open) api<{ total: number; rows: Prospect[] }>(`/api/outreach?list=${open}`).then(setRows); else setRows(null); }, [open, v.lists]);
   const run = async () => {
-    const r = await act<{ added: number; duplicates: number; invalid: number; alreadyLeads: number }>({ action: "import", name, text, listId: into || undefined });
-    if (r) { setText(""); setName(""); say(`${r.added} added.${r.duplicates ? ` ${r.duplicates} already on a list.` : ""}${r.alreadyLeads ? ` ${r.alreadyLeads} already in your inbox, left out.` : ""}${r.invalid ? ` ${r.invalid} rows had no usable handle.` : ""}`); }
+    const r = await act<{ added: number; duplicates: number; invalid: number; alreadyLeads: number; followers: number }>({ action: "import", name, text, listId: into || undefined });
+    if (r) { setText(""); setName(""); say(`${r.added} added.${r.duplicates ? ` ${r.duplicates} already on a list.` : ""}${r.alreadyLeads ? ` ${r.alreadyLeads} already in your inbox, left out.` : ""}${r.followers ? ` ${r.followers} follow you, left out.` : ""}${r.invalid ? ` ${r.invalid} rows had no usable handle.` : ""}`); }
   };
   return (
     <>
-      <Section title="Add prospects" sub="Paste handles or profile links, one per line, or a CSV with a header row. A column called username (or a profile link) is required; a name column and any others are kept for the message.">
+      <Section title="Add prospects" sub="People who do not follow you. Paste handles or profile links, one per line, or a CSV with a header row. A column called username (or a profile link) is required; a name column and any others are kept for the message.">
         <div className="p-4 grid gap-3">
           <div className="grid md:grid-cols-2 gap-3">
             <Field label="Add to">
@@ -254,38 +261,48 @@ function Prospects({ v, act, say }: P) {
           </div>
         </div>
       </Section>
-      <Section title="Import my followers" sub="Message followers who have never been in your inbox. Anyone already in your inbox is left out, and nobody is messaged twice.">
+      <Section title="People who follow you" sub="Cold messages only go to people who do not follow you. Your followers are recorded here for one reason: so they are left out. They are never added to a list and never messaged from here.">
         <div className="p-4 grid gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] bg-canvas p-3 text-[13px]">
+            <span>{fl.updatedAt ? <><b>{fl.count.toLocaleString()} followers on record</b>, full file last added {timeAgo(fl.updatedAt)}. All of them are left out of cold messages.</> : fl.count ? <><b>{fl.count.toLocaleString()} followers on record so far</b>, and they are left out. Cold messages wait until the full file below has been added, so every follower is covered.</> : <><b>No followers on record yet.</b> Cold messages wait until the full file below has been added, because nobody can be told apart from a follower.</>}{fl.count >= fl.max ? ` That is the most that can be kept (${fl.max.toLocaleString()}), so older followers beyond it are not covered.` : ""}</span>
+            {fl.count > 0 && <Button variant="ghost" onClick={() => window.confirm("Forget the followers on record? Cold messages will wait until you add them again.") && act({ action: "followers.clear" }, "Followers forgotten. Cold messages wait until you add them again.")}>Forget them</Button>}
+          </div>
           <div>
             <div className="font-semibold mb-1">All of them, from Instagram's own download</div>
             <ol className="list-decimal pl-5 text-[13px] text-mute space-y-0.5 mb-2">
               <li>In Instagram open Settings, Accounts Centre, Your information and permissions, Download your information.</li>
               <li>Choose Some of your information, tick Followers and following, format JSON, date range All time.</li>
-              <li>Instagram emails a zip, usually within the hour. Unzip it and choose followers_1.json below (in connections, followers_and_following).</li>
+              <li>Instagram emails a zip, usually within the hour. Unzip it and choose followers_1.json below (in connections, followers_and_following). If there are more followers files, choose them all.</li>
             </ol>
             <Button variant="primary" onClick={() => followFile.current?.click()}>Choose the followers file</Button>
             <input ref={followFile} type="file" accept=".json,.html,application/json,text/html" multiple hidden onChange={async (e) => {
               const files = [...(e.target.files ?? [])];
               e.target.value = "";
               if (!files.length) return;
-              const handles = [...new Set((await Promise.all(files.map((f) => f.text()))).flatMap(followersFromFile))];
+              const handles = [...new Set((await Promise.all(files.map((f) => f.text()))).flatMap(followersFromFile))].slice(0, fl.max);
               if (!handles.length) { say("No followers found in that file. Choose followers_1.json from the unzipped download."); return; }
-              const mine = v.lists.find((l) => l.name === "My followers");
-              const r = await act<{ added: number; duplicates: number; alreadyLeads: number }>({ action: "import", name: "My followers", text: "username\n" + handles.slice(0, 20000).join("\n"), listId: mine?.id });
-              if (r) say(`${handles.length} followers read, newest first. ${r.added} added.${r.duplicates ? ` ${r.duplicates} already on a list.` : ""}${r.alreadyLeads ? ` ${r.alreadyLeads} already in your inbox, left out.` : ""}`);
+              // Sent in parts so a large account's file never makes one request too big.
+              let recorded = 0, leftOut = 0, total = 0;
+              for (let i = 0; i < handles.length; i += 10000) {
+                const r = await act<{ recorded: number; leftOut: number; total: number }>({ action: "followers.record", handles: handles.slice(i, i + 10000) });
+                if (!r) return;
+                recorded += r.recorded; leftOut += r.leftOut; total = r.total;
+              }
+              say(`${handles.length.toLocaleString()} followers read, ${recorded.toLocaleString()} new. ${total.toLocaleString()} are on record and left out of cold messages.${leftOut ? ` ${leftOut} of them were waiting on a list and have been taken off it.` : ""}`);
             }} />
+            <p className="text-[12.5px] text-mute mt-2">Do this again every few weeks so new followers are covered too. The file is read on this computer and only the usernames are saved.</p>
           </div>
           <div className="border-t border-line pt-4">
-            <div className="font-semibold mb-1">Just the newest few, straight away</div>
-            <p className="text-[12.5px] text-mute mb-2">The Chrome helper opens your Followers list in a window and reads what Instagram shows there, which is only about your newest 14. It starts within 15 minutes and the window closes itself.</p>
+            <div className="font-semibold mb-1">Top up with the newest few</div>
+            <p className="text-[12.5px] text-mute mb-2">The Chrome helper opens your Followers list in a window and reads what Instagram shows there, which is only about your newest 14. It reads and never types. It starts within 15 minutes and the window closes itself. Use it between downloads, not instead of one.</p>
             <div className="flex flex-wrap items-center gap-3">
               <Button onClick={() => act({ action: "followers.collect", max: 500 }, "Asked the helper for your newest followers.")} disabled={v.followers?.status === "wanted" || v.followers?.status === "running"}>Read my newest followers</Button>
-              {v.followers && <span className="text-[12.5px] text-mute">{v.followers.status === "wanted" ? "Waiting for the helper." : v.followers.status === "running" ? `Reading: ${v.followers.collected} so far.` : v.followers.status === "done" ? `Done: ${v.followers.collected} read, ${v.followers.added} added.` : `Stopped: ${v.followers.error}`}</span>}
+              {v.followers && <span className="text-[12.5px] text-mute">{v.followers.status === "wanted" ? "Waiting for the helper." : v.followers.status === "running" ? `Reading: ${v.followers.collected} so far.` : v.followers.status === "done" ? `Done: ${v.followers.collected} read, ${v.followers.added} new on record.` : `Stopped: ${v.followers.error}`}</span>}
             </div>
           </div>
         </div>
       </Section>
-      <Section title="Lists" sub="A handle is only ever on one list, and anyone already in your inbox is left out.">
+      <Section title="Lists" sub="A handle is only ever on one list. Anyone who follows you or is already in your inbox is left out.">
         {v.lists.length ? v.lists.map((l) => (
           <div key={l.id} className="border-b border-line last:border-b-0">
             <Row title={l.name} sub={`${l.counts.total} people: ${l.counts.queued ?? 0} waiting, ${(l.counts.sent ?? 0) + (l.counts.typed ?? 0)} sent, ${(l.counts.unreachable ?? 0) + (l.counts.not_found ?? 0) + (l.counts.failed ?? 0)} could not be sent${l.columns.length ? `. Columns: ${l.columns.join(", ")}` : ""}`}>
@@ -375,7 +392,7 @@ function Sending({ v, act }: P) {
   const sample = Math.round((120 / 5 / ((t.wpmMin + t.wpmMax) / 2)) * 60 * (1 + t.typoRate * 6 + t.rewriteRate * 0.3));
   return (
     <>
-      <Section title="How messages are sent" sub="Messages are typed into Instagram by the Chrome extension, in the browser where you are signed in to Instagram. Chrome has to stay open." action={<Button variant="primary" disabled={!dirty} onClick={async () => { const r = await act({ action: "settings", settings: s }, "Sending settings saved."); if (r) setS(r.settings); }}>Save</Button>}>
+      <Section title="How messages are sent" sub="First messages to people who do not follow you are typed into Instagram by the Chrome extension, in the browser where you are signed in. Nothing else is typed there: replies and follow ups to people in your inbox go through Meta. Chrome has to stay open." action={<Button variant="primary" disabled={!dirty} onClick={async () => { const r = await act({ action: "settings", settings: s }, "Sending settings saved."); if (r) setS(r.settings); }}>Save</Button>}>
         <Row title="Who presses send" sub="Automatic sends the message once it is typed. Assisted types it and waits for you to press send yourself.">
           <select className="field !w-auto" value={s.mode} onChange={(e) => setS({ ...s, mode: e.target.value as "auto" | "assisted" })} aria-label="Send mode"><option value="auto">Automatic</option><option value="assisted">Assisted</option></select>
         </Row>
@@ -389,8 +406,10 @@ function Sending({ v, act }: P) {
           <Num label="End hour" value={s.hourEnd} min={1} max={24} onChange={(n) => setS({ ...s, hourEnd: n })} />
           <Field label="Time zone" className="col-span-2"><input className="field" value={s.timezone} onChange={(e) => setS({ ...s, timezone: e.target.value })} aria-label="Time zone" /></Field>
           <Num label="Shortest gap" hint="Seconds between two messages" value={s.minGapSeconds} min={60} max={3600} onChange={(n) => setS({ ...s, minGapSeconds: n })} />
+          <Num label="Fewest in an hour" hint="Each hour gets its own number between the two" value={s.hourlyMin ?? v.limits.hourlyMin} min={1} max={v.limits.hourlyHardMax} onChange={(n) => setS({ ...s, hourlyMin: n })} />
+          <Num label="Most in an hour" hint={`In any 60 minutes. Never above ${v.limits.hourlyHardMax}`} value={s.hourlyMax ?? v.limits.hourlyMax} min={1} max={v.limits.hourlyHardMax} onChange={(n) => setS({ ...s, hourlyMax: n })} />
         </div>
-        <Row title="Build up slowly" sub={`Start at ${s.rampStart} a day and add ${s.rampStep} each day messages go out, until the daily range is reached. ${s.daysSent} sending days so far.`}>
+        <Row title="Build up slowly" sub={`Optional. Best left on for an account that has not sent cold messages before. Start at ${s.rampStart} a day and add ${s.rampStep} each day messages go out, until the daily range is reached. ${s.daysSent} sending days so far.`}>
           <div className="flex items-center gap-3">
             <input type="number" className="field !w-20" min={1} max={v.limits.hardMax} value={s.rampStart} onChange={(e) => setS({ ...s, rampStart: Number(e.target.value) })} aria-label="First day limit" />
             <input type="number" className="field !w-20" min={1} max={20} value={s.rampStep} onChange={(e) => setS({ ...s, rampStep: Number(e.target.value) })} aria-label="Daily increase" />
@@ -412,7 +431,8 @@ function Sending({ v, act }: P) {
         <div className="p-4 text-[13px] text-ink2 grid gap-1.5">
           <p>Any Instagram warning, "try again later" notice, request to confirm it is you, or a signed out session pauses everything until you press Resume.</p>
           <p>Two failed sends in one day pause sending too, which usually means Instagram changed its page and the extension needs its selector check.</p>
-          <p>People already in your inbox are never messaged, and a handle is only ever contacted once.</p>
+          <p>People who follow you and people already in your inbox are never cold messaged, and a handle is only ever contacted once.</p>
+          <p>The hourly number is reached at most, never passed, in any 60 minutes, and the day stops at {v.limits.hardMax} whatever else is set.</p>
         </div>
       </Section>
     </>

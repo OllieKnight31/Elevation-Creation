@@ -13,9 +13,24 @@ const log = (kind, extra) => fetch("/__event", { method: "POST", body: JSON.stri
 let inputs = 0, deletes = 0, trusted = 0;
 function profile() {
   if (handle === "missing.user") { root.innerHTML = "<h2>Sorry, this page isn't available.</h2><p>The link you followed may be broken, or the page may have been removed.</p>"; return; }
+  // lead.two has no Message button: the way to message sits in the three dots menu next to the name.
+  if (handle === "lead.two") {
+    root.innerHTML = '<header><section><h2>' + handle + '</h2><div role="button" tabindex="0">Follow</div><div role="button" tabindex="0" id="o"><svg aria-label="Options" role="img" width="24" height="24"><circle cx="12" cy="12" r="2"></circle></svg></div></section></header><article>posts</article>';
+    document.getElementById("o").addEventListener("click", () => { log("menu-open", {}); setTimeout(menu, 400); });
+    return;
+  }
   root.innerHTML = '<header><section><h2>' + handle + '</h2><div role="button" tabindex="0">Follow</div><div role="button" tabindex="0" id="m">Message</div></section></header><article>posts</article>';
   if (handle === "blocked.user") setTimeout(() => { const d = document.createElement("div"); d.setAttribute("role", "dialog"); d.innerHTML = "<h3>Try Again Later</h3><p>We restrict certain activity to protect our community.</p><button>OK</button>"; document.body.appendChild(d); }, 1500);
   document.getElementById("m").addEventListener("click", () => setTimeout(thread, 700));
+}
+function menu() {
+  const d = document.createElement("div"); d.setAttribute("role", "dialog");
+  ["Block", "Restrict", "Report", "Send message", "Cancel"].forEach((label) => {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = label;
+    b.addEventListener("click", () => { log("menu-press", { label }); d.remove(); if (label === "Send message") setTimeout(thread, 700); });
+    d.appendChild(b);
+  });
+  document.body.appendChild(d);
 }
 function thread() {
   history.pushState({}, "", "/direct/t/1234567890/");

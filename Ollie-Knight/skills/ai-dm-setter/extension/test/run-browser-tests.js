@@ -8,8 +8,8 @@
  * this script's own server on 127.0.0.1. Nothing here contacts Instagram.
  *
  * The fixtures imitate a GUESSED page structure. Passing proves the capture,
- * label, panel, outreach and safety code paths work end to end against that
- * guess. It does not verify a single selector against the real Instagram or
+ * label, panel, outreach, Business Suite sender and safety code paths work end
+ * to end against that guess. It does not verify a single selector against the real Instagram or
  * Business Suite pages.
  */
 'use strict';
@@ -299,11 +299,11 @@ test('business suite pacing: every pause was between 4 and 9 seconds', () => {
 // its own path the way the real site does (/handle/ then /direct/t/id/), which
 // a file URL cannot do. Any path that is not under /__ext/ gets the fixture.
 const ROOT = path.resolve(__dirname, '..');
-function startFixtureServer() {
+function startFixtureServer(page) {
   const types = { '.js': 'text/javascript', '.html': 'text/html', '.css': 'text/css', '.json': 'application/json' };
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, 'http://127.0.0.1');
-    let file = path.join(__dirname, 'fixture', 'outreach.html');
+    let file = page || path.join(__dirname, 'fixture', 'outreach.html');
     if (url.pathname.startsWith('/__ext/')) {
       file = path.normalize(path.join(ROOT, url.pathname.slice('/__ext/'.length)));
       if (!file.startsWith(ROOT + path.sep) || !fs.existsSync(file)) {
@@ -355,6 +355,8 @@ test('outreach commands: send refuses anything but the exact text, the generic c
   assert.equal(out.sendGuard, 'SafetyError');
   assert.equal(out.sendClicksAfterGuard, 0);
   assert.equal(out.probeProfile.messageButtons, 1);
+  assert.equal(out.probeProfile.optionsButtons, 0, 'a button that only reads "Options" is not taken for the three dots');
+  assert.equal(out.probeProfile.menuMessages, 0);
   assert.equal(out.probeProfile.profile, true);
   assert.equal(out.probeProfile.block, null);
   assert.equal(out.probeProfile.notFound, null);
@@ -422,6 +424,7 @@ test('outreach block detection: a phrase or a challenge URL stops at once, repor
 test('outreach failures: precise status and detail, nothing wrong is ever sent', () => {
   assert.equal(out.missFirst.result.status, 'error');
   assert.match(out.missFirst.result.detail, /Selector miss: instagramOutreach\.messageButton/);
+  assert.match(out.missFirst.result.detail, /no three dots menu either/);
   assert.equal(out.missFirst.msgClicks, 0);
   assert.equal(out.missLater.result.status, 'unreachable', 'once the selector has matched for real, a missing button means unreachable');
   assert.equal(out.notFound.result.status, 'not_found');
@@ -452,6 +455,267 @@ test('outreach tab: one pinned background tab, created once, the only tab ever t
   assert.deepEqual(out.tabLog.updatedIds, [7]);
   assert.deepEqual(out.tabLog.messagedIds, ['7']);
   assert.deepEqual(out.accounts, ['', '', 'owner.acct'], 'the account handle is sent once it has been read');
+});
+
+/* ---------------------------- three dots menu fixture ---------------------------- */
+
+// The page lives in test/e2e (see the note at its top) and is served the same way as the outreach fixture.
+const HARMFUL = ['Block', 'Restrict', 'Report'];
+const noHarm = (clicks, tag) => HARMFUL.forEach((label) => assert.equal(clicks[label] || 0, 0, tag + ': ' + label + ' was never pressed'));
+
+let td;
+test('three dots fixture runs to the end', async () => {
+  const srv = await startFixtureServer(path.join(__dirname, 'e2e', 'three-dots-fixture.html'));
+  try {
+    td = await runFixture(srv.base + '/start/');
+  } finally {
+    srv.server.close();
+  }
+  assert.deepEqual(td.errors, []);
+});
+
+test('three dots: with a Message button the button is pressed and the menu is never opened', () => {
+  assert.equal(td.bothProbe.messageButtons, 1);
+  assert.equal(td.bothProbe.optionsButtons, 1, 'the probe reports the three dots too');
+  assert.deepEqual(td.bothClick, { ok: true, done: true, via: 'button' });
+  assert.deepEqual(td.bothAfter.clicks, { 'message button': 1 });
+  assert.equal(td.bothAfter.thread, true);
+});
+
+test('three dots: without a Message button the chat opens through the menu, one guarded press per command', () => {
+  assert.equal(td.dotsProbe.messageButtons, 0);
+  assert.equal(td.dotsProbe.optionsButtons, 1);
+  assert.equal(td.dotsProbe.menuMessages, 0, 'no menu before the three dots are pressed');
+  assert.deepEqual(td.dotsFirst, { ok: true, done: false, via: 'menu' });
+  assert.deepEqual(td.dotsEarly, { ok: true, done: false, via: 'menu', entries: [] }, 'while the menu is still opening nothing is pressed');
+  assert.equal(td.dotsMenuProbe.menuMessages, 1);
+  assert.equal(td.dotsMenuProbe.block, null, 'a menu that lists Block, Restrict and Report is not a block signal');
+  assert.equal(td.sharedGuard, 'SafetyError', 'the shared click helper still refuses anything labelled Send message');
+  assert.deepEqual(td.dotsSecond, { ok: true, done: true, via: 'menu' });
+  assert.deepEqual(td.dotsAfter.clicks, { dots: 1, 'Send message': 1 }, 'two presses in all, the three dots once and the entry once');
+  assert.equal(td.dotsAfter.thread, true);
+  assert.equal(td.dotsAfter.path, '/direct/t/999/');
+  assert.equal(td.dotsAfter.menus, 0);
+  // the label in aria-label, and a selector that only matches the icon inside the control
+  assert.equal(td.iconProbe.optionsButtons, 1);
+  assert.equal(td.iconFirst.done, false);
+  assert.deepEqual(td.iconSecond, { ok: true, done: true, via: 'menu' });
+  assert.deepEqual(td.iconAfter.clicks, { dots: 1, 'Send message': 1 });
+  assert.equal(td.iconAfter.thread, true);
+});
+
+test('three dots: a menu without Send message is read, closed with Cancel and nothing else in it is pressed', () => {
+  assert.equal(td.noneFirst.done, false);
+  assert.deepEqual(td.noneWait, { ok: true, done: false, via: 'menu', entries: ['block', 'restrict', 'report', 'share to...', 'about this account', 'cancel'] });
+  assert.equal(td.noneOpen.menus, 1);
+  assert.deepEqual(td.noneClose, { ok: true, closed: true });
+  assert.deepEqual(td.noneAfter.clicks, { dots: 1, Cancel: 1 });
+  assert.equal(td.noneAfter.menus, 0, 'the menu is closed again');
+  assert.equal(td.noneAfter.thread, false);
+  assert.deepEqual(td.closeAgain, { ok: true, closed: false }, 'closing with nothing open is not an error');
+});
+
+test('three dots: ambiguous matches, a missing menu and an open message box press nothing', () => {
+  assert.equal(td.twoButtons.ok, false);
+  assert.equal(td.twoButtons.code, 'AMBIGUOUS');
+  assert.match(td.twoButtons.error, /2 elements match instagramOutreach\.messageButton/);
+  assert.deepEqual(td.twoButtonsAfter.clicks, {});
+  assert.equal(td.twoDotsProbe.optionsButtons, 2);
+  assert.equal(td.twoDots.code, 'AMBIGUOUS');
+  assert.match(td.twoDots.error, /2 elements match instagramOutreach\.optionsButton/);
+  assert.deepEqual(td.twoDotsAfter.clicks, {});
+  assert.equal(td.twoEntries.code, 'AMBIGUOUS');
+  assert.match(td.twoEntries.error, /2 elements match instagramOutreach\.menuMessage/);
+  assert.deepEqual(td.twoEntriesAfter.clicks, { dots: 1 }, 'neither entry was pressed');
+  assert.equal(td.nothing.ok, false);
+  assert.equal(td.nothing.code, 'SELECTOR');
+  assert.equal(td.nothing.selectorKey, 'instagramOutreach.messageButton');
+  assert.equal(td.withComposer.ok, false);
+  assert.equal(td.withComposer.code, 'SAFETY');
+  assert.match(td.withComposer.error, /message box is already open/);
+  assert.deepEqual(td.withComposerAfter.clicks, {}, 'the entry is not pressed while a message box is on the page');
+});
+
+test('three dots, whole task: menu route sends once, a menu without the entry is unreachable, the button still wins', () => {
+  const m = td.runMenu;
+  assert.equal(m.result.status, 'sent', m.result.detail);
+  assert.match(m.result.detail, /read back from the thread/);
+  assert.deepEqual(m.clicks, { dots: 1, 'Send message': 1 });
+  assert.equal(m.sent.length, 1);
+  assert.equal(m.sent[0].text, m.target, 'the thread holds exactly the target text');
+  assert.equal(m.sendClicks, 1);
+  assert.equal(m.proven, null, 'a profile without a Message button does not mark that selector as proven');
+  assert.equal(m.stored, false);
+
+  const u = td.runNoEntry;
+  assert.equal(u.result.status, 'unreachable', u.result.detail);
+  assert.match(u.result.detail, /three dots menu has no Send message entry \(it shows: block, restrict, report, cancel\)/);
+  assert.match(u.result.detail, /The menu was closed again\./);
+  assert.deepEqual(u.clicks, { dots: 1, Cancel: 1 });
+  assert.equal(u.menus, 0);
+  assert.equal(u.result.keystrokes, 0);
+  assert.deepEqual(u.sent, []);
+
+  const b = td.runButton;
+  assert.equal(b.result.status, 'sent', b.result.detail);
+  assert.deepEqual(b.clicks, { 'message button': 1 });
+  assert.deepEqual(b.proven, { messageButton: true });
+
+  const t = td.runTwoEntries;
+  assert.equal(t.result.status, 'error');
+  assert.match(t.result.detail, /not clicked: 2 elements match instagramOutreach\.menuMessage/);
+  assert.deepEqual(t.clicks, { dots: 1 });
+  assert.deepEqual(t.sent, []);
+
+  const e = td.runNoMenu;
+  assert.equal(e.result.status, 'error');
+  assert.match(e.result.detail, /Selector miss: instagramOutreach\.menuMessage/);
+  assert.deepEqual(e.clicks, { dots: 1 });
+
+  const a = td.runAssisted;
+  assert.equal(a.result.status, 'typed', a.result.detail);
+  assert.deepEqual(a.clicks, { dots: 1, 'Send message': 1 });
+  assert.equal(a.composer, a.target);
+  assert.deepEqual(a.sent, []);
+  assert.equal(a.sendClicks, 0);
+
+  for (const k of ['bothAfter', 'dotsAfter', 'iconAfter', 'noneAfter', 'twoEntriesAfter', 'withComposerAfter', 'runMenu', 'runNoEntry', 'runButton', 'runTwoEntries', 'runNoMenu', 'runAssisted']) noHarm(td[k].clicks, k);
+});
+
+/* ---------------------------- Business Suite sender fixture ---------------------------- */
+
+// The stand in inbox lives in test/suite. It is a guess at the page, like every Business Suite fixture here.
+let su;
+test('business suite sender fixture runs to the end', async () => {
+  su = await runFixture(path.join('..', 'suite', 'suite-sender.html'));
+  assert.deepEqual(su.errors, []);
+});
+
+const suNothing = (s, tag) => {
+  assert.deepEqual(s.sent, [], tag + ': nothing was sent');
+  assert.equal(s.sendClicks, 0, tag + ': send was never pressed');
+  assert.equal(s.result.keystrokes, 0, tag + ': nothing was typed');
+  assert.equal(s.composer, '', tag + ': the reply box is empty');
+  assert.equal(s.stored, false, tag + ': no task left in storage');
+};
+
+test('business suite sender commands: the page is read, one entry opens only under its own title, send is guarded', () => {
+  assert.equal(su.probe.onInbox, true);
+  assert.equal(su.probe.list, true);
+  assert.equal(su.probe.rows, 2);
+  assert.equal(su.probe.search, true);
+  assert.equal(su.probe.block, null);
+  assert.deepEqual(su.rows.rows.map((r) => r.title), ['Bob Stone', 'Cy Short']);
+  assert.equal(su.threadAtLoad.name, 'Bob Stone', 'the inbox opens with the newest chat showing');
+  assert.equal(su.searched.value, 'jane.doe');
+  assert.deepEqual(su.rowsAfterSearch.rows.map((r) => r.title), ['Jane Doe']);
+  assert.equal(su.openMoved.ok, false);
+  assert.equal(su.openMoved.code, 'MOVED');
+  assert.equal(su.openedAfterMoved, 0, 'an entry whose title changed is not clicked');
+  assert.deepEqual(su.openOk, { ok: true, title: 'Jane Doe' });
+  assert.equal(su.thread.name, 'Jane Doe');
+  assert.equal(su.thread.handle, 'jane.doe');
+  assert.equal(su.thread.platform, 'instagram');
+  assert.deepEqual(su.thread.texts, ['hi, how much is the programme', 'Want me to send the link?', 'Sounds good, send me the details when you can'], 'the time line and the Seen line are not messages');
+  assert.equal(su.thread.composer, true);
+  assert.equal(su.thread.sendButtons, 1);
+  assert.equal(su.thread.cannotReply, null);
+  assert.equal(su.sendMismatch.ok, false);
+  assert.equal(su.sendMismatch.code, 'MISMATCH');
+  assert.equal(su.sendNoExpect.ok, false);
+  assert.equal(su.sentAfterRefusals, 0);
+  assert.equal(su.clicksAfterRefusals, 0);
+  assert.equal(su.cleared.text, '');
+  assert.equal(su.sendGuard, 'SafetyError', 'the shared click helper still refuses the send control');
+  assert.equal(su.clicksAfterGuard, 0);
+  assert.equal(su.sendAmbiguous.ok, false);
+  assert.equal(su.sendAmbiguous.code, 'AMBIGUOUS');
+  assert.equal(su.clicksAfterAmbiguous, 0, 'with two send controls neither is pressed');
+  assert.deepEqual(su.rowsEmpty.rows, []);
+  assert.equal(su.rowsEmpty.noResults, 'No results');
+  assert.equal(su.unknownCmd.ok, false);
+  assert.equal(su.wrongSite.ok, false);
+  assert.equal(su.wrongSite.code, 'WRONG_SITE');
+  assert.equal(su.wrongSiteSend.code, 'WRONG_SITE', 'nothing can be sent from it on any other site');
+});
+
+test('business suite sender: the right chat is found by search, matched, typed like a person, sent once and read back', () => {
+  assert.equal(su.askedWhileOff, 0, 'off until the app setting is on');
+  for (const s of [su.right, su.rightArea]) {
+    assert.equal(s.result.status, 'sent', s.result.detail);
+    assert.match(s.result.detail, /read back from the chat/);
+    assert.deepEqual(s.sent, [{ to: 'Jane Doe', text: s.target }], 'one message, to the right person, exactly the target text');
+    assert.equal(s.sendClicks, 1);
+    assert.deepEqual(s.opened, ['Jane Doe'], 'only the lead was opened');
+    assert.deepEqual(s.searches, ['jane.doe'], 'the username was searched first and was enough');
+    assert.equal(s.composer, '');
+    assert.ok(s.result.keystrokes >= Array.from(s.target).length - 20, 'keystrokes: ' + s.result.keystrokes);
+    assert.ok(s.result.typedMs > 5000, 'typing took ' + s.result.typedMs + ' ms');
+    assert.equal(s.stored, false);
+  }
+  assert.ok(su.rightArea.target.includes('\n') && su.rightArea.target.includes('https://example.com/a?b=c'));
+});
+
+test('business suite sender: a wrong thread is refused and nothing is typed', () => {
+  assert.equal(su.wrong.result.status, 'skipped');
+  assert.match(su.wrong.result.detail, /Not certain this is the right person, so nothing was typed/);
+  assert.match(su.wrong.result.detail, /last message on record .* is not among the last 2 messages of the open chat/);
+  assert.deepEqual(su.wrong.opened, ['Jane Doe']);
+  suNothing(su.wrong, 'same name, other person');
+  assert.equal(su.wrongOpens.result.status, 'skipped');
+  assert.match(su.wrongOpens.result.detail, /belongs to @bob\.stone, not @jane\.doe/);
+  suNothing(su.wrongOpens, 'another chat opened');
+  assert.equal(su.messenger.result.status, 'skipped');
+  assert.match(su.messenger.result.detail, /Messenger chat/);
+  suNothing(su.messenger, 'messenger chat');
+});
+
+test('business suite sender: a search that finds nothing is reported as not found, no chat is opened', () => {
+  assert.equal(su.none.result.status, 'not_found');
+  assert.match(su.none.result.detail, /No chat for @jane\.doe \/ "Jane Doe" was found in the Business Suite inbox/);
+  assert.deepEqual(su.none.searches, ['jane.doe', 'Jane Doe'], 'username, then name');
+  assert.deepEqual(su.none.opened, []);
+  assert.equal(su.none.noResultsShown, true);
+  suNothing(su.none, 'not found');
+});
+
+test('business suite sender: warning text stops it at once and reports blocked', () => {
+  const w = su.warned;
+  assert.equal(w.result.status, 'blocked');
+  assert.match(w.result.detail, /Warning while typing: dialog shows "try again later"/i);
+  assert.deepEqual(w.sent, []);
+  assert.equal(w.sendClicks, 0);
+  assert.ok(w.composer.length > 0 && w.composer.length < w.target.length, 'typing stopped part way and the page was left alone');
+  assert.equal(su.login.result.status, 'blocked');
+  assert.match(su.login.result.detail, /Warning on the inbox page: login form/);
+  suNothing(su.login, 'signed out');
+});
+
+test('business suite sender: a closed chat, a lead who writes meanwhile and a dead send control send nothing', () => {
+  assert.equal(su.closed.result.status, 'unreachable');
+  assert.match(su.closed.result.detail, /the page shows "You can't reply to this conversation"/);
+  suNothing(su.closed, 'closed chat');
+  assert.equal(su.leadWrote.result.status, 'skipped');
+  assert.match(su.leadWrote.result.detail, /The open chat changed while typing, so nothing was sent/);
+  assert.match(su.leadWrote.result.detail, /hey, are you still there\?/);
+  assert.deepEqual(su.leadWrote.sent, []);
+  assert.equal(su.leadWrote.sendClicks, 0);
+  assert.equal(su.leadWrote.composer, '', 'what was typed was removed');
+  assert.equal(su.sendDead.result.status, 'error');
+  assert.match(su.sendDead.result.detail, /stayed in the reply box/);
+  assert.equal(su.sendDead.sendClicks, 1, 'send is pressed once and never again');
+  assert.equal(su.sendDead.composer, '');
+  assert.deepEqual(su.sendDead.sent, []);
+});
+
+test('business suite sender tab: one pinned background tab, only ever on the Business Suite inbox, only Business Suite messages asked for', () => {
+  assert.equal(su.tabLog.created.length, 1);
+  assert.equal(su.tabLog.created[0].pinned, true);
+  assert.equal(su.tabLog.created[0].active, false);
+  assert.deepEqual(su.tabLog.urls, ['https://business.facebook.com/latest/inbox']);
+  assert.deepEqual(su.tabLog.updatedIds, [9]);
+  assert.deepEqual(su.tabLog.messagedIds, ['9']);
+  assert.deepEqual(su.asked, ['{"account":"","channel":"suite"}']);
 });
 
 /* ---------------------------- */

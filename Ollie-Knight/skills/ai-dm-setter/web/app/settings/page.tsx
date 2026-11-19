@@ -47,6 +47,8 @@ function Settings() {
   useEffect(() => { loadSweep(); }, []);
   const sw: InboxSweep = sweep?.settings ?? { answerWaiting: false, followUp: false, followUpHours: 24, followUpMax: 1, gapMinutes: 4, maxAgeDays: 90 };
   const putSweep = async (patch: Partial<InboxSweep>) => { await api("/api/workspace", "PUT", { settings: { inboxSweep: { ...sw, ...patch } } }); await loadSweep(); reload(); };
+  // Off unless switched on. The field is not in types.ts yet (it belongs next to instagramTyping).
+  const suiteOn = (ws.settings as { businessSuiteSending?: boolean }).businessSuiteSending === true;
   const metaMsg = q.get("meta");
   const admin = state.me.role === "owner" || state.me.role === "admin";
   const tabs = TABS.filter(([t]) => admin || (t !== "team" && t !== "setup" && t !== "sheets"));
@@ -87,13 +89,13 @@ function Settings() {
           <Row title="Answer every waiting chat" sub={`With Autopilot on, the AI also works back through the inbox and replies to chats whose last message is the lead's and has no answer, newest first.${sweep ? ` ${sweep.waiting} waiting now.` : ""}`}>
             <Toggle label="Answer every waiting chat" on={sw.answerWaiting} onChange={(v) => putSweep({ answerWaiting: v })} />
           </Row>
-          <Row title="Follow up when a lead goes quiet" sub={`With Autopilot on, a lead who has not replied gets a follow up written for their conversation. The AI skips anyone a follow up would be wrong for. Chats tagged Close friend or Do not contact are never messaged.${sweep ? ` ${sweep.followUps} due now.` : ""}`}>
+          <Row title="Follow up when a lead goes quiet" sub={`With Autopilot on, a lead who has not replied gets a follow up written for their conversation, sent in the last 4 hours before Meta's 24 hour window closes (after that Meta does not let an app message them). The AI skips anyone a follow up would be wrong for. Chats tagged Close friend or Do not contact are never messaged.${sweep ? ` ${sweep.followUps} due now.` : ""}`}>
             <Toggle label="Follow up when a lead goes quiet" on={sw.followUp} onChange={(v) => putSweep({ followUp: v })} />
           </Row>
           <Row title="How far back" sub="Only chats with a message in the last this many days are answered or followed up. 0 means every chat, however old.">
             <input type="number" min={0} max={3650} className="field !w-24" defaultValue={sw.maxAgeDays} onBlur={(e) => putSweep({ maxAgeDays: Number(e.target.value) || 0 })} aria-label="Days back" />
           </Row>
-          <Row title="Follow up timing" sub="Hours of silence before a follow up, how many follow ups per silence, and minutes between these automatic messages. Outside Meta's 24 hour window they are typed by the Chrome helper, during your outreach sending hours.">
+          <Row title="Follow up timing" sub="Hours of silence before a follow up, how many follow ups per silence, and minutes between these automatic messages. They go through Meta's official connection only, so they reach leads whose last message was within Meta's 24 hour window.">
             <div className="flex gap-2">
               <input type="number" min={1} max={720} className="field !w-20" defaultValue={sw.followUpHours} onBlur={(e) => putSweep({ followUpHours: Number(e.target.value) || 24 })} aria-label="Hours before a follow up" />
               <input type="number" min={1} max={5} className="field !w-16" defaultValue={sw.followUpMax} onBlur={(e) => putSweep({ followUpMax: Number(e.target.value) || 1 })} aria-label="Follow ups per silence" />
@@ -113,6 +115,12 @@ function Settings() {
           </Row>
           <Row title="Engine" sub={state.flags.aiError ? state.flags.aiError : state.flags.ai ? "A Claude key is set." : "No Anthropic key found. Running the demo engine, which never sends automatically. Add a key under Database and setup."}>
             <span className={`font-semibold ${state.flags.ai && !state.flags.aiError ? "text-ok" : "text-warn"}`}>{state.flags.aiError ? "Claude unavailable" : state.flags.ai ? "Claude" : "Demo"}</span>
+          </Row>
+        </Section>
+
+        <Section title="Chats Meta cannot reach" sub="Meta only lets an app message someone within 24 hours of their last message. Older chats, and people who never replied, need another way.">
+          <Row title="Send through Meta Business Suite" sub={`Off: those chats can only be messaged by you, by hand. On: the Chrome helper sends them for you inside Meta Business Suite's inbox (business.facebook.com), however old the chat is. It never types inside instagram.com. It finds the chat by username, then by name, checks that the name and the last message match what is on record here, and sends nothing if it is not sure. One message a minute at most, and automatic ones only in your sending hours. Chrome has to be open and signed in to Meta Business Suite. The helper picks this switch up within 15 minutes.${ws.helper ? "" : " The Chrome helper is not linked yet: add it on Get connected first."}`}>
+            <Toggle label="Send through Meta Business Suite" on={suiteOn} onChange={(v) => put({ settings: { businessSuiteSending: v } })} />
           </Row>
         </Section>
 

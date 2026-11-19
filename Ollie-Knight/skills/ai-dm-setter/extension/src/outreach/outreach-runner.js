@@ -3,7 +3,8 @@
  *
  * The task state machine. One task is one message to one lead:
  *   open      open the lead's profile in the dedicated outreach tab
- *   profile   check for block signals, find the Message button, click it
+ *   profile   check for block signals, find the Message button and click it,
+ *             or open the three dots menu and press its Send message entry
  *   composer  wait for the composer of the thread that opens
  *   reading   wait readMs
  *   typing    send the typing plan to the tab, one step per message
@@ -367,16 +368,25 @@
       return String(p.path || '').toLowerCase().replace(/\/+$/, '') === '/' + current.handle.toLowerCase();
     }
 
-    // Polls the page until the Message button shows, or decides why it will not.
+    // Polls the page until a way to message shows (the Message button, or the
+    // three dots menu), or decides why it will not.
     function waitForProfile(detect) {
       var deadline = now() + 25000;
       var last = null;
+      var dotsSeen = 0;
       function attempt() {
         return probe(detect).then(function (p) {
           last = p;
           stopIfBlocked(p, 'on the profile page');
           if (p.notFound && onProfilePath(p)) throw Stop('not_found', 'The profile page shows "' + p.notFound + '".');
           if (onProfilePath(p) && p.messageButtons > 0) return p;
+          // The three dots can render a moment before the Message button, so
+          // they only count once the page has shown them three looks in a row.
+          if (onProfilePath(p) && p.optionsButtons > 0) {
+            if (++dotsSeen >= 3) return p;
+          } else {
+            dotsSeen = 0;
+          }
           if (now() >= deadline) return null;
           return wait(1000).then(attempt);
         });
@@ -388,20 +398,92 @@
         }
         return get(KEY.proven).then(function (proven) {
           if (last.profile && proven && proven.messageButton) {
-            throw Stop('unreachable', 'The profile loaded but shows no Message button, so this account cannot be messaged from its profile.');
+            throw Stop('unreachable', 'The profile loaded but shows no Message button and no three dots menu, so this account cannot be messaged from its profile.');
           }
           throw Stop(
             'error',
             'Selector miss: instagramOutreach.messageButton' + (last.profile ? '' : ' and instagramOutreach.profileHeader') +
-              ' on /' + current.handle + '/. Nothing was clicked. The Message button selector has never matched on the live site yet, ' +
+              ' on /' + current.handle + '/, and no three dots menu either (instagramOutreach.optionsButton). Nothing was clicked. ' +
+              'The Message button selector has never matched on the live site yet, ' +
               'so this is reported as an error and not as an unreachable profile. Run "Selector health check" on a profile page and fix src/selectors.js.'
           );
         });
       });
     }
 
-    function waitForComposer(detect) {
+    // One click-message command. The page does at most one press per command.
+    function clickMessage(arg) {
+      return tabCmd(current.tabId, 'click-message', arg, true).then(
+        function (r) {
+          if (!r.ok) throw Stop('error', 'The Message button was not clicked: ' + r.error);
+          return r;
+        },
+        function (err) {
+          throw Stop('error', 'The Message button was not clicked: ' + err.message);
+        }
+      );
+    }
+
+    /*
+     * Opens the chat from the profile. With a Message button that is one
+     * press. Without one, the page presses the three dots, this waits for the
+     * menu, and the page presses its Send message entry. A menu with no such
+     * entry is closed again and the profile is reported as unreachable.
+     * Returns "button" or "menu".
+     */
+    function openChat(detect) {
+      return clickMessage({}).then(function (first) {
+        if (first.done !== false) return first.via || 'button';
+        var deadline = now() + 8000;
+        var last = first;
+        function poll(pause) {
+          return wait(pause)
+            .then(function () {
+              return clickMessage({ menu: 'opened' });
+            })
+            .then(function (r) {
+              if (r.done !== false) return 'menu';
+              last = r;
+              if (now() >= deadline) return null;
+              return poll(700);
+            });
+        }
+        return poll(between(900, 2200)).then(function (via) {
+          if (via) return via;
+          return probe(detect).then(function (p) {
+            stopIfBlocked(p, 'after opening the three dots menu');
+            var entries = Array.isArray(last.entries) ? last.entries : [];
+            if (!entries.length) {
+              throw Stop(
+                'error',
+                'Selector miss: instagramOutreach.menuMessage. The three dots on /' + current.handle + '/ were pressed but no menu could be read within 8 seconds. ' +
+                  'Nothing else was clicked. Check instagramOutreach.optionsButton and menuMessage in src/selectors.js.'
+              );
+            }
+            return tabCmd(current.tabId, 'close-menu', {}, true)
+              .then(
+                function (c) {
+                  return !!(c && c.closed);
+                },
+                function () {
+                  return false;
+                }
+              )
+              .then(function (closed) {
+                throw Stop(
+                  'unreachable',
+                  'The profile shows no Message button and its three dots menu has no Send message entry (it shows: ' + entries.join(', ') + '), ' +
+                    'so this account cannot be messaged from its profile. ' + (closed ? 'The menu was closed again.' : 'The menu could not be closed, the next task reloads the tab.')
+                );
+              });
+          });
+        });
+      });
+    }
+
+    function waitForComposer(detect, via) {
       var deadline = now() + 25000;
+      var opened = via === 'menu' ? 'The Send message entry of the three dots menu was pressed' : 'The Message button was clicked';
       function attempt() {
         return probe(detect).then(function (p) {
           stopIfBlocked(p, 'after clicking Message');
@@ -409,7 +491,7 @@
           if (now() >= deadline) {
             throw Stop(
               'error',
-              'Selector miss: instagramOutreach.composer. The Message button was clicked but no composer appeared within 25 seconds (page: ' + p.path + '). Nothing was typed.'
+              'Selector miss: instagramOutreach.composer. ' + opened + ' but no composer appeared within 25 seconds (page: ' + p.path + '). Nothing was typed.'
             );
           }
           return wait(1000).then(attempt);
@@ -578,7 +660,8 @@
           return waitForProfile(detect);
         })
         .then(function (p) {
-          var jobs = [set(KEY.proven, { messageButton: true })];
+          // Only a Message button that was really seen proves its selector.
+          var jobs = p.messageButtons > 0 ? [set(KEY.proven, { messageButton: true })] : [];
           if (p.account) jobs.push(patchSettings({ account: p.account }));
           return Promise.all(jobs);
         })
@@ -586,20 +669,12 @@
           return wait(between(1200, 3800));
         })
         .then(function () {
-          return tabCmd(current.tabId, 'click-message', {}, true).then(
-            function (r) {
-              if (!r.ok) throw Stop('error', 'The Message button was not clicked: ' + r.error);
-            },
-            function (err) {
-              throw Stop('error', 'The Message button was not clicked: ' + err.message);
-            }
-          );
+          return openChat(detect);
         })
-        .then(function () {
-          return stage('composer');
-        })
-        .then(function () {
-          return waitForComposer(detect);
+        .then(function (via) {
+          return stage('composer').then(function () {
+            return waitForComposer(detect, via);
+          });
         })
         .then(function (p) {
           checkThread(p);

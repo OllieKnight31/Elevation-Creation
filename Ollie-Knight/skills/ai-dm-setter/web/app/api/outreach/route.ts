@@ -1,7 +1,7 @@
 import { access } from "@/lib/auth";
 import { fail, json } from "@/lib/api";
 import { saveDb } from "@/lib/store";
-import { OUTREACH_DEFAULTS, capToday, cleanCommentTriggers, cleanLinks, cleanSettings, fill, importProspects, outreachStats, requestFollowers, outreachStatus, resume, saveCampaign } from "@/lib/outreach";
+import { OUTREACH_DEFAULTS, capToday, cleanCommentTriggers, cleanLinks, cleanSettings, fill, clearFollowers, followersKnown, importProspects, outreachStats, recordFollowers, requestFollowers, outreachStatus, resume, saveCampaign } from "@/lib/outreach";
 import type { Db } from "@/lib/types";
 
 function view(db: Db) {
@@ -24,6 +24,8 @@ function view(db: Db) {
     links: o.links,
     commentTriggers: o.commentTriggers,
     followers: o.followers ?? null,
+    // Only the count goes to the browser. The handles stay on the server.
+    followerList: followersKnown(db),
     igUsername: db.workspace.meta.instagram?.username ?? "",
     limits: { ...OUTREACH_DEFAULTS.pacing, ...OUTREACH_DEFAULTS.variants, privateReplyPerHour: OUTREACH_DEFAULTS.privateReply.perHour },
   };
@@ -57,6 +59,9 @@ export async function POST(req: Request) {
       case "resume": resume(db); break;
       case "import": extra = importProspects(db, String(body.name ?? ""), String(body.text ?? ""), typeof body.listId === "string" ? body.listId : undefined); break;
       case "followers.collect": requestFollowers(db, body.max); break;
+      // People who follow the owner are recorded so they are left out. They are never put on a list to message.
+      case "followers.record": extra = recordFollowers(db, body.handles); break;
+      case "followers.clear": clearFollowers(db); break;
       case "prospect.skip": { const p = o.prospects.find((x) => x.id === body.id && x.status === "queued"); if (p) { p.status = "skipped"; p.detail = "Left out by you."; } break; }
       case "list.delete": {
         // What was already sent stays on record under its campaign; only the waiting rows go.

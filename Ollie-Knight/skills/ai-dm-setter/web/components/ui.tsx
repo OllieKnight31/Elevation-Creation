@@ -4,7 +4,7 @@ import type { Area, Conversation, CrmConfig, LabelQueueItem, Member, SheetsConfi
 import { pipelineOf, type Pipeline } from "@/lib/pipeline";
 import type { StageId } from "@/lib/types";
 
-export type ConvView = Conversation & { window: { open: boolean; hoursLeft: number; closing: boolean }; preview: string; messageCount: number; profileUrl: string; summaryStale?: boolean; gap?: KnowledgeGap | null; sendVia?: "meta" | "helper" | "none"; helperReady?: boolean; seen?: boolean };
+export type ConvView = Conversation & { window: { open: boolean; hoursLeft: number; closing: boolean }; preview: string; messageCount: number; profileUrl: string; summaryStale?: boolean; gap?: KnowledgeGap | null; sendVia?: "meta" | "suite" | "helper" | "none"; helperReady?: boolean; seen?: boolean };
 export type PublicMember = Omit<Member, "passwordHash"> & { hasPassword: boolean };
 export type PublicWorkspace = Omit<Workspace, "meta" | "secret" | "members" | "crm" | "outreach" | "knowledge" | "calendar" | "sheets"> & {
   sheets: Omit<SheetsConfig, "secret" | "leadHashes" | "tallies"> | null;

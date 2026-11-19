@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>fixture: guessed Business Suite inbox layout (sender)</title>
+    <!--
+      Test only. A stand in for Meta Business Suite's inbox, built to the GUESSED structure in src/selectors.js.
+      Passing here proves the Business Suite sender's code paths against that guess. It proves nothing about the
+      real page: no selector in it has been checked against business.facebook.com.
+    -->
+    <style>
+      body { font: 14px sans-serif; margin: 0; display: flex; }
+      #list { width: 260px; height: 320px; overflow-y: auto; }
+      [role="listitem"] { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+      [role="main"] { width: 520px; padding: 8px; }
+      [role="row"] { display: flex; padding: 3px 8px; }
+      .out { margin-left: auto; }
+      .bubble { max-width: 70%; padding: 6px 10px; background: #eee; white-space: pre-wrap; }
+      .badge { display: inline-block; width: 12px; height: 12px; background: purple; }
+      #composer, #composerArea { display: block; width: 480px; min-height: 30px; border: 1px solid #999; margin: 6px 0; padding: 4px; white-space: pre-wrap; }
+      [role="button"] { display: inline-block; padding: 6px 12px; border: 1px solid #999; border-radius: 8px; cursor: pointer; }
+      [hidden] { display: none !important; }
+      [role="dialog"] { position: fixed; top: 80px; left: 80px; padding: 20px; background: #fff; border: 2px solid #c00; }
+    </style>
+  </head>
+  <body>
+    <div role="navigation">
+      <input id="search" placeholder="Search" />
+      <div id="list" role="list" aria-label="Conversation list"></div>
+      <p id="empty" hidden>No results found</p>
+    </div>
+    <div role="main">
+      <h2 id="hdr"></h2>
+      <a id="plink" href="https://www.instagram.com/nobody/">View profile</a>
+      <span id="badge" class="badge" aria-label="Instagram"></span>
+      <div id="grid" role="grid"></div>
+      <p id="closed" hidden>You can't reply to this conversation. It has been too long since their last message.</p>
+      <div id="composer" role="textbox" contenteditable="true" aria-label="Write a reply"></div>
+      <textarea id="composerArea" placeholder="Reply..." hidden></textarea>
+      <div id="send" role="button" aria-label="Send">Send</div>
+    </div>
+
+    <script>
+      window.__SITE = 'businessSuite';
+    </script>
+    <script src="../fixture/harness.js"></script>
+    <script>
+      // ---- a fake inbox: a list, a search box that filters it, one open chat ----
+      var JANE = ['hi, how much is the programme', 'Want me to send the link?', 'Sounds good, send me the details when you can'];
+      function chats() {
+        return [
+          { name: 'Bob Stone', handle: 'bob.stone', platform: 'Instagram', texts: ['hello there', 'see you at four'] },
+          { name: 'Cy Short', handle: 'cy.short', platform: 'Instagram', texts: ['thanks'] },
+          // not among the newest, so only a search brings her up
+          { name: 'Jane Doe', handle: 'jane.doe', platform: 'Instagram', texts: JANE.slice(), hidden: true }
+        ];
+      }
+      var DEFAULTS = { textarea: false, blockAt: 0, loginForm: false, leadWritesAt: 0, sendDead: false };
+      var F = (window.__F = Object.assign({ chats: chats(), open: null, sent: [], sendClicks: 0, opened: [], searches: [], navs: [] }, DEFAULTS));
+      var $id = function (id) {
+        return document.getElementById(id);
+      };
+
+      function box() {
+        return F.textarea ? $id('composerArea') : $id('composer');
+      }
+      function boxText() {
+        var el = box();
+        return (F.textarea ? el.value : el.innerText).replace(/ /g, ' ').replace(/\s+$/, '');
+      }
+      function clearBox() {
+        $id('composer').textContent = '';
+        $id('composerArea').value = '';
+      }
+
+      function addRow(grid, text, out) {
+        var row = document.createElement('div');
+        row.setAttribute('role', 'row');
+        var b = document.createElement('div');
+        b.className = 'bubble' + (out ? ' out' : '');
+        var t = document.createElement('div');
+        t.setAttribute('dir', 'auto');
+        t.textContent = text;
+        b.appendChild(t);
+        row.appendChild(b);
+        grid.appendChild(row);
+      }
+
+      function renderOpen() {
+        var c = F.open;
+        var grid = $id('grid');
+        grid.textContent = '';
+        if (!c) {
+          $id('hdr').textContent = '';
+          return;
+        }
+        $id('hdr').textContent = c.header || c.name;
+        $id('plink').hidden = !c.handle;
+        $id('plink').setAttribute('href', 'https://www.instagram.com/' + (c.handle || 'nobody') + '/');
+        $id('badge').setAttribute('aria-label', c.platform);
+        grid.setAttribute('aria-label', 'Messages in conversation with ' + c.name);
+        // a time line above the messages and a status line under the last one, the way an inbox draws them
+        addRow(grid, '10:42', false);
+        c.texts.forEach(function (text, i) {
+          addRow(grid, text, i % 2 === 1);
+        });
+        addRow(grid, 'Seen', true);
+        $id('closed').hidden = !c.closed;
+        $id('composer').hidden = !!c.closed || F.textarea;
+        $id('composerArea').hidden = !!c.closed || !F.textarea;
+        $id('send').hidden = !!c.closed;
+      }
+
+      function renderList(term) {
+        var list = $id('list');
+        list.textContent = '';
+        var q = String(term || '').toLowerCase();
+        var shown = F.chats.filter(function (c) {
+          if (!q) return !c.hidden;
+          return c.name.toLowerCase().indexOf(q) >= 0 || (c.handle || '').toLowerCase() === q.replace(/^@/, '');
+        });
+        shown.forEach(function (c) {
+          var row = document.createElement('div');
+          row.setAttribute('role', 'listitem');
+          var title = document.createElement('span');
+          title.setAttribute('title', c.name);
+          title.textContent = c.name;
+          var preview = document.createElement('div');
+          preview.textContent = c.texts[c.texts.length - 1];
+          row.appendChild(title);
+          row.appendChild(preview);
+          row.addEventListener('click', function () {
+            F.opened.push(c.name);
+            // the chat that was open stays on screen for a moment, as it does in a real inbox
+            setTimeout(function () {
+              F.open = F.opensInstead ? F.chats.filter(function (x) { return x.name === F.opensInstead; })[0] : c;
+              clearBox();
+              renderOpen();
+            }, 500);
+          });
+          list.appendChild(row);
+        });
+        $id('empty').hidden = shown.length > 0;
+      }
+
+      var searchTimer = null;
+      $id('search').addEventListener('input', function () {
+        var term = $id('search').value;
+        F.searches.push(term);
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function () {
+          renderList(term);
+        }, 600);
+      });
+
+      $id('send').addEventListener('click', function () {
+        F.sendClicks++;
+        var text = boxText();
+        if (!text || F.sendDead || !F.open) return;
+        F.sent.push({ to: F.open.name, text: text });
+        F.open.texts.push(text);
+        clearBox();
+        renderOpen();
+      });
+
+      function dialog(text) {
+        var d = document.createElement('div');
+        d.setAttribute('role', 'dialog');
+        d.className = 'fx-dialog';
+        d.textContent = text;
+        document.body.appendChild(d);
+      }
+
+      // Stands in for loading the inbox address in the tab.
+      function navigate(url) {
+        F.navs.push(url);
+        Array.prototype.slice.call(document.getElementsByClassName('fx-dialog')).forEach(function (d) {
+          d.remove();
+        });
+        var form = $id('fx-login');
+        if (form) form.remove();
+        if (F.loginForm) {
+          var f = document.createElement('form');
+          f.id = 'fx-login';
+          var pass = document.createElement('input');
+          pass.type = 'password';
+          pass.name = 'pass';
+          f.appendChild(pass);
+          document.body.appendChild(f);
+        }
+        $id('search').value = '';
+        clearBox();
+        F.open = F.chats[0] || null; // the inbox opens with the newest chat showing
+        renderList('');
+        renderOpen();
+      }
+      F.navigate = navigate;
+      F.reset = function (opts, list) {
+        Object.assign(F, DEFAULTS, { opensInstead: '' }, opts || {});
+        F.chats = list || chats();
+        F.sent = [];
+        F.sendClicks = 0;
+        F.opened = [];
+        F.searches = [];
+        F.wrote = false;
+      };
+
+      // A warning that appears once some text has been typed, and a lead who writes while the helper is typing.
+      setInterval(function () {
+        var n = boxText().length;
+        if (F.blockAt && !document.getElementsByClassName('fx-dialog').length && n >= F.blockAt) {
+          dialog('Try Again Later. We restrict certain activity to protect our community.');
+        }
+        if (F.leadWritesAt && !F.wrote && n >= F.leadWritesAt && F.open) {
+          F.wrote = true;
+          F.open.texts.push('hey, are you still there?');
+          renderOpen();
+        }
+      }, 150);
+    </script>
+
+    <script src="../../src/selectors.js"></script>
+    <script src="../../src/lib/core.js"></script>
+    <script src="../../src/lib/typing.js"></script>
+    <script src="../../src/content/dom.js"></script>
+    <script src="../../src/suite/suite-content.js"></script>
+    <script src="../../src/suite/suite-runner.js"></script>
+    <script src="suite-sender-run.js"></script>
+  </body>
+</html>

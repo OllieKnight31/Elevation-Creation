@@ -14,11 +14,12 @@ export function reach(c: ConvView): { ok: boolean; text: string } {
   if (c.labels.includes("Do not contact")) return { ok: false, text: "Tagged Do not contact" };
   if (c.labels.includes("Close friend") && c.window.open) return { ok: true, text: "Close friend: only you message them. The AI and automations never will" };
   if (c.externalId.startsWith("demo_")) return { ok: true, text: "Demo thread, nothing is sent to Meta" };
+  if (c.sendVia === "suite") return { ok: true, text: "Sends inside Meta Business Suite through the helper in Chrome" };
   if (c.sendVia === "helper") return { ok: true, text: c.helperReady ? "Sends from your Chrome through the helper, free" : "Sends when the helper is on in Chrome" };
   if (c.window.open) return { ok: true, text: "Inside the 24 hour window" };
   if (c.sendVia === "meta") return { ok: true, text: "Window closed. Goes out as your own reply, allowed up to 7 days" };
   return { ok: false, text: c.platform === "instagram" && c.handle
-    ? "Over 24 hours since their last message. Meta only lets apps reply within 24 hours, so reply in Instagram or switch on the Chrome helper"
+    ? "Over 24 hours since their last message. Meta only lets apps reply within 24 hours, so reply in Meta Business Suite yourself, or switch on Send through Meta Business Suite in Settings"
     : "Over 24 hours since their last message. Meta only lets apps reply within 24 hours" };
 }
 

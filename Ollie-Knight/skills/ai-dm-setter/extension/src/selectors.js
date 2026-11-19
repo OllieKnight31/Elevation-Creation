@@ -8,7 +8,8 @@
  * (thread list, message list, rows, text, sender, date separators, header,
  * composer, send control, profile Message button, own profile link).
  * Entries still marked UNVERIFIED, and all of businessSuite, are best-effort
- * guesses. Meta changes its pages often: rerun "Selector health check" in the
+ * guesses. That includes everything the Business Suite sender (src/suite/)
+ * relies on to find a conversation, check it, type and send. Meta changes its pages often: rerun "Selector health check" in the
  * popup when something stops being found.
  *
  * How to fix a miss:
@@ -494,9 +495,12 @@
             'div[contenteditable="true"][role="textbox"]'
           ]
         },
-        // UNVERIFIED. The send control. NEVER clicked. Click blocklist only.
+        // UNVERIFIED. The send control. The shared click helper refuses it, so capture,
+        // labels and the panel can never press it. It is pressed in ONE place only:
+        // src/suite/suite-content.js, after the open conversation was matched to the
+        // lead and the reply box was read back as exactly the text to send.
         sendButton: {
-          desc: 'Send control (never clicked, used as a click blocklist)',
+          desc: 'Send control (click blocklist; pressed only by the Business Suite sender)',
           optional: true,
           blocklist: true,
           css: [
@@ -519,6 +523,14 @@
           optional: true,
           expectAbsent: true,
           css: ['form#login_form', 'input[name="email"][type="text"]', 'input[name="pass"]', 'input[type="password"]']
+        },
+        // UNVERIFIED. Any open dialog. The Business Suite sender scans its visible
+        // text for warning phrases before and while it types.
+        dialog: {
+          desc: 'Open dialog (scanned for warning phrases by the Business Suite sender)',
+          optional: true,
+          transient: true,
+          css: ['[role="dialog"]', '[role="alertdialog"]', '[aria-modal="true"]']
         },
         // UNVERIFIED. The "Labels" block in the contact details side of the open
         // conversation. The text fallback finds the "Labels" heading and climbs
@@ -617,6 +629,24 @@
         outgoingMarkers: ['You sent', 'You replied'],
         ignoreTexts: ['You sent', 'Enter'],
         messageListLabelPrefixes: ['Messages in conversation with '],
+        // UNVERIFIED. Shown in place of the conversation column when a search of the
+        // inbox matches nobody. The Business Suite sender then tries the next search word.
+        noResultsTexts: ['No results', 'No results found', 'No conversations found', 'No messages found', "We couldn't find anything", 'Nothing found'],
+        // UNVERIFIED. Shown instead of, or above, the reply box when Meta will not let
+        // this conversation be replied to. The sender reports the lead as unreachable.
+        cannotReplyTexts: [
+          "You can't reply to this conversation",
+          'You can no longer reply to this conversation',
+          "You can't message this account",
+          "This person isn't receiving messages",
+          'This person is unavailable',
+          'This account is unavailable',
+          'outside of the allowed window',
+          'outside the standard messaging window'
+        ],
+        // UNVERIFIED. Small status texts under the last message that match messageText
+        // but are not messages. Left out when the last message is compared with the app's.
+        statusTexts: ['Seen', 'Sent', 'Delivered', 'Sending', 'Sending...', 'Read', 'Opened', 'You sent', 'You replied', 'Enter'],
         // UNVERIFIED. URL query parameter that carries the open conversation id.
         threadIdParams: ['selected_item_id'],
         // UNVERIFIED. Substrings of the page URL query string that reveal whether
@@ -683,6 +713,28 @@
             'main [role="button"][aria-label="Message"]'
           ],
           text: { candidates: 'header [role="button"], header button, main [role="button"]', values: ['Message'], mode: 'exact' }
+        },
+        // UNVERIFIED. The three dots next to the name on a profile page. On many profiles the way to
+        // message sits inside this menu instead of on a button of its own (reported by the owner, 2026-11-19).
+        optionsButton: {
+          desc: 'Three dots menu next to the name on a profile page',
+          where: 'profile',
+          optional: true,
+          css: [
+            'header [role="button"]:has(svg[aria-label="Options"])',
+            'header button:has(svg[aria-label="Options"])',
+            'main header svg[aria-label="Options"]'
+          ]
+        },
+        // UNVERIFIED. The entry in that menu that opens the chat with this person. Clicked through the
+        // guarded click helper, the same as the Message button.
+        menuMessage: {
+          desc: 'Send message entry in the profile three dots menu',
+          where: 'profile',
+          optional: true,
+          // Kept exact on purpose: the menu also holds Block, Restrict and Report, so the label has to match.
+          css: ['[role="dialog"] button[aria-label="Send message"]', '[role="menu"] [role="menuitem"][aria-label="Send message"]'],
+          text: { candidates: '[role="dialog"] button, [role="dialog"] [role="button"], [role="menu"] [role="menuitem"]', values: ['Send message', 'Message'], mode: 'exact' }
         },
         // UNVERIFIED. The message composer of the thread that opens after the
         // Message button is clicked.

@@ -36,7 +36,8 @@ export function emptyWorkspace(): Workspace {
     settings: {
       defaultAiMode: "suggest",
       autopilotMaster: false,
-      disclosure: "Quick heads up, I use an AI assistant to help me keep up with DMs. A real person reads everything.",
+      // Empty by default: no opening line about AI is added. An owner who wants one writes it in the brief, Voice and rules.
+      disclosure: "",
       replyDelaySeconds: 45,
     },
     playbook: null,
