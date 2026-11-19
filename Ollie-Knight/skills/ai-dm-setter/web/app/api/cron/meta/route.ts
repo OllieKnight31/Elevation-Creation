@@ -4,6 +4,7 @@ import { backfillInstagram, setAvatar, syncInstagram } from "@/lib/engine";
 import { fillFaces, saveMissing } from "@/lib/avatars";
 import { refreshInstagramToken, subscribeWebhooks, WEBHOOK_FIELDS_VERSION } from "@/lib/meta";
 import { onInbound } from "@/lib/live";
+import { sweepTick } from "@/lib/sweep";
 
 export const maxDuration = 60;
 
@@ -39,6 +40,7 @@ export async function GET(req: Request) {
       const last = db.messages.filter((m) => m.conversationId === c.id && m.direction === "in").sort((x, y) => y.sentAt.localeCompare(x.sentAt))[0];
       onInbound(db, c, last?.text ?? "");
     }
+    sweepTick(db);
     ig.lastSyncAt = new Date().toISOString();
     ig.syncError = renewError;
     saveDb();

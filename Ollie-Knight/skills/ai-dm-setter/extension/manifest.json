@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Ainable Setter Helper",
-  "version": "0.3.12",
+  "version": "0.3.22",
   "description": "Reads your own Instagram and Business Suite inbox threads for the Ainable Setter app, applies its labels, and shows its suggested reply. Optional outreach sender, off by default, types and sends first messages in its own tab.",
   "icons": {
     "16": "icons/icon16.png",

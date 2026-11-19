@@ -644,6 +644,19 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
       <p className="mb-3"><ExtLink href="https://accountscenter.instagram.com/info_and_permissions/dyi/">Open Instagram&apos;s Download your information page</ExtLink></p>
       <Shot src="/guide/ig-export.png" alt="Instagram export your information window with the Create export button marked">The page opens on this window. Press Create export.</Shot>
       <ImportHistory onDone={reload} />
+      <div className="mt-5 pt-4 border-t border-line">
+        <div className="font-semibold mb-1">Get your follower list, to message followers who have never messaged you</div>
+        <p className="text-[13.5px] text-ink2 mb-2">Instagram only hands over the full list through the same download. It is free and takes about two minutes to ask for.</p>
+        <ol className="list-decimal pl-5 text-[13.5px] text-ink2 space-y-1 mb-3">
+          <li>Open Instagram&apos;s Download your information page with the link above and press Create export.</li>
+          <li>Pick your Instagram profile, then Export to device.</li>
+          <li>Press Customise information, clear everything, and tick only Followers and following (under Connections). Save.</li>
+          <li>Set Date range to All time and Format to JSON, then press Start export.</li>
+          <li>Instagram emails you when it is ready, usually within the hour. Download the zip from the same page and unzip it.</li>
+          <li>In the unzipped folder open connections, then followers_and_following. The file is followers_1.json (a large account also has followers_2.json and so on).</li>
+          <li>Go to <Link href="/outreach" className="underline">Outreach</Link>, Prospects, Import my followers, press Choose the followers file and pick every followers file. They are read newest first, and anyone already in your inbox is left out.</li>
+        </ol>
+      </div>
     </div>
   );
 

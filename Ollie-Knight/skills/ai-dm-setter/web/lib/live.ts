@@ -40,16 +40,16 @@ export function onInbound(db: Db, conv: Conversation, text = "") {
 }
 
 /** One AI turn: draft, tag, then send (autopilot, all checks passing) or leave the draft for a person. */
-export async function aiTurn(db: Db, conv: Conversation, live = false) {
-  if (isCloseFriend(conv)) return;
+export async function aiTurn(db: Db, conv: Conversation, live = false, opts: { followUpAfterHours?: number } = {}): Promise<boolean> {
+  if (isCloseFriend(conv)) return false;
   try {
     const stamp = conv.lastInboundAt;
-    const { suggestion, lead, summary } = await suggestReply(db, conv);
+    const { suggestion, lead, summary } = await suggestReply(db, conv, opts);
     if (live) {
       // The lead sent another message while this reply was being written. It started its own turn, which reads
       // every unanswered message together, so this half informed draft is dropped rather than sent.
       const latest = (await freshDb()).conversations.find((x) => x.id === conv.id);
-      if (latest && latest.lastInboundAt !== stamp) return;
+      if (latest && latest.lastInboundAt !== stamp) return false;
     }
     applyAiTagging(db, conv, suggestion, lead, summary);
     const gate = canAutopilot(db, conv, suggestion);
@@ -59,6 +59,7 @@ export async function aiTurn(db: Db, conv: Conversation, live = false) {
       await deliver(db, conv, suggestion.bubbles, "ai");
       // Anything the lead sent after this point was not read by this reply, so the next turn picks it up.
       if (suggestion.through) conv.answeredThrough = suggestion.through;
+      return true;
     } else {
       conv.suggestion = conv.aiMode === "autopilot" && !gate.ok ? { ...suggestion, reason: `${suggestion.reason} Not sent automatically: ${gate.why}.` } : suggestion;
     }
@@ -66,6 +67,7 @@ export async function aiTurn(db: Db, conv: Conversation, live = false) {
     conv.suggestion = null;
     console.error("AI turn failed", (e as Error).message);
   }
+  return false;
 }
 
 const learning = ((globalThis as unknown as { __setterLearning?: Map<string, number> }).__setterLearning ??= new Map());

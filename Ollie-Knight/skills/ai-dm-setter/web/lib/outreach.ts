@@ -288,7 +288,8 @@ export function nextTask(db: Db, account: string, now = new Date()) {
   expireLeases(db, now);
   // Without Meta, inbox replies go out through the helper, so it asks again within a minute and a reply never waits long.
   // With Meta connected, replies go through Meta and the helper can wait longer, which lets the database sleep.
-  const cap = db.workspace.meta.instagram ? 900 : 60;
+  // With Autopilot on the inbox sweep sends follow ups through the helper, so it checks in every two minutes.
+  const cap = !db.workspace.meta.instagram ? 60 : db.workspace.settings.autopilotMaster ? 120 : 900;
   const none = (reason: string, retryInSec = 60) => ({ task: null, reason, retryInSec: Math.round(Math.min(cap, retryInSec)) });
   // Inbox replies go first, then a test: both were asked for by a person just now.
   const test = o.prospects.find((p) => p.reply && p.status === "queued") ?? o.prospects.find((p) => p.test && p.status === "queued");
@@ -547,3 +548,49 @@ function replyDone(db: Db, p: Prospect, outcome: "sent" | "failed", note: string
 
 /** Inbox replies the helper has not typed yet, for the screen that shows whether it is keeping up. */
 export const pendingReplies = (db: Db) => db.workspace.outreach.prospects.filter((p) => p.reply && (p.status === "queued" || p.status === "sending")).length;
+
+/* ---------- the owner's own followers ---------- */
+
+const FOLLOWERS_LIST = "My followers";
+
+/** Asks the Chrome helper to read the owner's follower list into a prospect list. Newest followers come first. */
+export function requestFollowers(db: Db, max: unknown) {
+  const o = db.workspace.outreach;
+  const list = o.lists.find((l) => l.name === FOLLOWERS_LIST);
+  o.followers = { status: "wanted", max: Math.max(50, Math.min(MAX_PROSPECTS, Math.round(Number(max)) || 500)), collected: 0, added: 0, cursor: "", listId: list?.id ?? "", error: "", requestedAt: new Date().toISOString() };
+  return o.followers;
+}
+
+/** What the helper should do next: nothing, or read the next page from this place. */
+export function followersJob(db: Db) {
+  const j = db.workspace.outreach.followers;
+  if (!j || (j.status !== "wanted" && j.status !== "running")) return { want: false as const };
+  return { want: true as const, account: db.workspace.outreach.settings.account || db.workspace.helper?.account || "", left: j.max - j.collected };
+}
+
+/** One page of followers from the helper. People already in the inbox, by handle or by exact name, are left out. */
+export function followersBatch(db: Db, b: { users?: unknown; end?: unknown; error?: unknown; note?: unknown }) {
+  const o = db.workspace.outreach, j = o.followers;
+  if (!j || (j.status !== "wanted" && j.status !== "running")) return { done: true, added: 0 };
+  const stop = (status: "done" | "failed", error = "") => { j.status = status; j.error = error.slice(0, 300); j.finishedAt = new Date().toISOString(); return { done: true, added: j.added }; };
+  if (typeof b.error === "string" && b.error) return stop("failed", b.error);
+  const users = (Array.isArray(b.users) ? b.users : []).slice(0, 200) as { username?: unknown; name?: unknown }[];
+  j.status = "running";
+  if (typeof b.note === "string") j.note = b.note.slice(0, 400);
+  // Chats from the history download have a name and no handle until the helper opens them, so names are checked too.
+  const names = new Set(db.conversations.filter((c) => !c.handle && c.name).map((c) => c.name.trim().toLowerCase()));
+  const plain = (v: unknown) => String(v ?? "").replace(/[",\r\n]+/g, " ").trim().slice(0, 80);
+  const rows = users.map((u) => ({ handle: cleanHandle(String(u.username ?? "")), name: plain(u.name) })).filter((u) => u.handle && !(u.name && names.has(u.name.toLowerCase())));
+  if (rows.length) {
+    try {
+      const r = importProspects(db, FOLLOWERS_LIST, "username,name\n" + rows.map((u) => `${u.handle},${u.name}`).join("\n"), o.lists.some((l) => l.id === j.listId) ? j.listId : undefined);
+      j.added += r.added;
+      j.listId = o.lists.some((l) => l.id === r.listId) ? r.listId : "";
+    } catch (e) {
+      return stop("failed", (e as Error).message);
+    }
+  }
+  j.collected += users.length;
+  if (b.end === true || j.collected >= j.max) return stop("done", j.collected ? "" : "The list opened but no followers could be read from it.");
+  return { done: false, added: j.added };
+}

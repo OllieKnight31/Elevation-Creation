@@ -216,7 +216,21 @@ export function transcript(conv: Conversation, msgs: Message[], limit = 60) {
     .join("\n");
 }
 
-export async function suggestReply(db: Db, conv: Conversation): Promise<{ suggestion: Suggestion; lead?: LeadProfile; summary?: { text: string; nextStep: string } }> {
+/** Said to the model when the turn is a follow up to a lead who has gone quiet, not a reply to a new message. */
+function followUpBlock(hours?: number) {
+  if (!hours) return "";
+  const quiet = hours >= 48 ? `about ${Math.round(hours / 24)} days` : `about ${Math.round(hours)} hours`;
+  return `<follow_up>
+The lead has not replied for ${quiet} since the last message from the owner's side. This turn is a follow up, not an answer to a new message.
+Write one short follow up that picks the conversation back up the way the owner would: refer to where things were left, then give one new thought or one easy question. Keep it lighter and shorter than a normal reply.
+Never write "just following up", "bumping this", "circling back" or anything that makes them feel chased, and never repeat the last message.
+Return no bubbles, with needs_human false, when a follow up would be unwelcome or pointless: they said no or asked to stop, the conversation reached a natural end, they are already a client or booked, the thread is personal and not a lead, or it has been so long that a message out of nowhere would read as odd for this relationship.
+</follow_up>
+
+`;
+}
+
+export async function suggestReply(db: Db, conv: Conversation, opts: { followUpAfterHours?: number } = {}): Promise<{ suggestion: Suggestion; lead?: LeadProfile; summary?: { text: string; nextStep: string } }> {
   const msgs = db.messages.filter((m) => m.conversationId === conv.id).sort((a, b) => a.sentAt.localeCompare(b.sentAt));
   // Free times are only read once a call could be on the table, so early small talk never touches the calendar.
   const gate = discoveryGate(conv, msgs, db.workspace.intake);
@@ -255,7 +269,7 @@ ${discoveryBlock(gate)}
 ${transcript(conv, msgs)}
 </conversation>
 
-${burstBlock(waiting)}Write the next reply and tag the conversation.`,
+${burstBlock(waiting)}${followUpBlock(opts.followUpAfterHours)}Write the next reply and tag the conversation.`,
       },
     ],
     output_config: { effort: "low", format: zodOutputFormat(SuggestionSchema) },

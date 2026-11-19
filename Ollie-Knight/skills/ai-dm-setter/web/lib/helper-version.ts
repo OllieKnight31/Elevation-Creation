@@ -1,5 +1,5 @@
 /** The newest Chrome helper. Bump together with extension/manifest.json. */
-export const HELPER_VERSION = "0.3.12";
+export const HELPER_VERSION = "0.3.22";
 
 /** True when version a is older than version b ("0.3.3" < "0.3.6"). */
 export const olderVersion = (a: string, b: string) => {

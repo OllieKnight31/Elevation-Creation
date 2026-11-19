@@ -13,7 +13,7 @@
  */
 'use strict';
 
-importScripts('/src/selectors.js', '/src/lib/core.js', '/src/lib/api.js', '/src/lib/typing.js', '/src/outreach/outreach-runner.js', '/src/faces.js');
+importScripts('/src/selectors.js', '/src/lib/core.js', '/src/lib/api.js', '/src/lib/typing.js', '/src/outreach/outreach-runner.js', '/src/faces.js', '/src/followers.js');
 
 var Core = self.AIDMCore;
 var Api = self.AIDMApi;
@@ -27,6 +27,7 @@ var INBOX_HOSTS = ['www.instagram.com', 'business.facebook.com'];
 var API_CALLS = ['live', 'ping', 'ingest', 'conversation', 'suggest', 'labelQueue', 'labelAck'];
 var OUTREACH_CALLS = ['outreachStatus', 'outreachNext', 'outreachResult'];
 var FACES_CALLS = ['facesNeeded', 'faceResult'];
+var FOLLOWERS_CALLS = ['followersJob', 'followersBatch'];
 
 // Keep the token out of reach of content scripts. They get settings through
 // the "aidm:settings" message, which never includes the token.
@@ -129,6 +130,16 @@ function facesApi(call, arg) {
 var Faces = self.AIDMFaces.createFaces({ chrome: chrome, api: facesApi });
 Faces.init().catch(function () {});
 
+// The owner's own follower list, collected when the app asks for it (src/followers.js).
+function followersApi(call, arg) {
+  if (FOLLOWERS_CALLS.indexOf(call) < 0) return Promise.reject(fail('Unknown followers call: ' + call, 'BAD_CALL'));
+  return getSettings().then(function (s) {
+    if (!s.token) throw fail('Workspace token is not set. Open the extension options.', 'NO_TOKEN');
+    return Api.createApiClient({ baseUrl: s.baseUrl, token: s.token })[call](arg || {});
+  });
+}
+var Followers = self.AIDMFollowers.createFollowers({ chrome: chrome, api: followersApi, isBusy: function () { return Outreach.isBusy && Outreach.isBusy(); } });
+
 function startOutreach() {
   Outreach.init().catch(function () {
     /* the alarm is created again on the next start */
@@ -228,7 +239,7 @@ function selfUpdate(latest) {
 // Heartbeat to the app. Silent when the helper is not linked or the app is not running.
 // The version of this code. Chrome can keep running an old copy of the background code after an update while the
 // manifest version moves on, so the app compares the two to spot that. Bump together with manifest.json.
-var CODE_VERSION = '0.3.12';
+var CODE_VERSION = '0.3.22';
 
 function hello() {
   return Promise.all([getSettings(), outreachLocal(), chrome.storage.local.get('igAccount')])
@@ -242,7 +253,10 @@ function hello() {
       // Only a reading from the last day counts as "signed in".
       if (seen && Date.now() - seen.at < 24 * 3600 * 1000) body.account = seen.handle;
       return Api.createApiClient({ baseUrl: s.baseUrl, token: s.token }).hello(body).then(function (res) {
-        return selfUpdate(res && res.latest);
+        // The app asked for the follower list: collect it now, unless a newer helper has to load first.
+        var updating = selfUpdate(res && res.latest);
+        if (!updating && res && res.followers) Followers.run().catch(function () {});
+        return updating;
       });
       });
     })

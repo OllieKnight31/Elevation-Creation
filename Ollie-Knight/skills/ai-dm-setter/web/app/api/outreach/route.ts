@@ -1,7 +1,7 @@
 import { access } from "@/lib/auth";
 import { fail, json } from "@/lib/api";
 import { saveDb } from "@/lib/store";
-import { OUTREACH_DEFAULTS, capToday, cleanCommentTriggers, cleanLinks, cleanSettings, fill, importProspects, outreachStats, outreachStatus, resume, saveCampaign } from "@/lib/outreach";
+import { OUTREACH_DEFAULTS, capToday, cleanCommentTriggers, cleanLinks, cleanSettings, fill, importProspects, outreachStats, requestFollowers, outreachStatus, resume, saveCampaign } from "@/lib/outreach";
 import type { Db } from "@/lib/types";
 
 function view(db: Db) {
@@ -23,6 +23,7 @@ function view(db: Db) {
     log: o.log.slice(-60).reverse(),
     links: o.links,
     commentTriggers: o.commentTriggers,
+    followers: o.followers ?? null,
     igUsername: db.workspace.meta.instagram?.username ?? "",
     limits: { ...OUTREACH_DEFAULTS.pacing, ...OUTREACH_DEFAULTS.variants, privateReplyPerHour: OUTREACH_DEFAULTS.privateReply.perHour },
   };
@@ -55,6 +56,8 @@ export async function POST(req: Request) {
       case "settings": o.settings = cleanSettings(body.settings, o.settings); break;
       case "resume": resume(db); break;
       case "import": extra = importProspects(db, String(body.name ?? ""), String(body.text ?? ""), typeof body.listId === "string" ? body.listId : undefined); break;
+      case "followers.collect": requestFollowers(db, body.max); break;
+      case "prospect.skip": { const p = o.prospects.find((x) => x.id === body.id && x.status === "queued"); if (p) { p.status = "skipped"; p.detail = "Left out by you."; } break; }
       case "list.delete": {
         // What was already sent stays on record under its campaign; only the waiting rows go.
         o.prospects = o.prospects.filter((p) => p.listId !== body.id || p.status === "sent" || p.status === "typed");

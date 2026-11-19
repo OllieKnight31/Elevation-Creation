@@ -1,7 +1,8 @@
 "use client";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import type { CommentTrigger, EntryLink, OutreachCampaign, OutreachLogItem, OutreachSettings, Prospect, ProspectList } from "@/lib/types";
+import { followersFromFile } from "@/lib/followers-file";
+import type { CommentTrigger, EntryLink, FollowerJob, OutreachCampaign, OutreachLogItem, OutreachSettings, Prospect, ProspectList } from "@/lib/types";
 import { api, Banner, Button, every, PageHeader, timeAgo, Toggle } from "@/components/ui";
 import { Field, Row, Section } from "@/components/settings/parts";
 
@@ -16,6 +17,7 @@ interface View {
   log: OutreachLogItem[];
   links: EntryLink[];
   commentTriggers: CommentTrigger[];
+  followers: FollowerJob | null;
   igUsername: string;
   limits: { hardMax: number; minPerCampaign: number; maxPerCampaign: number; privateReplyPerHour: number };
 }
@@ -228,6 +230,7 @@ function Prospects({ v, act, say }: P) {
   const [open, setOpen] = useState<string | null>(null);
   const [rows, setRows] = useState<{ total: number; rows: Prospect[] } | null>(null);
   const file = useRef<HTMLInputElement>(null);
+  const followFile = useRef<HTMLInputElement>(null);
   useEffect(() => { if (open) api<{ total: number; rows: Prospect[] }>(`/api/outreach?list=${open}`).then(setRows); else setRows(null); }, [open, v.lists]);
   const run = async () => {
     const r = await act<{ added: number; duplicates: number; invalid: number; alreadyLeads: number }>({ action: "import", name, text, listId: into || undefined });
@@ -251,6 +254,37 @@ function Prospects({ v, act, say }: P) {
           </div>
         </div>
       </Section>
+      <Section title="Import my followers" sub="Message followers who have never been in your inbox. Anyone already in your inbox is left out, and nobody is messaged twice.">
+        <div className="p-4 grid gap-4">
+          <div>
+            <div className="font-semibold mb-1">All of them, from Instagram's own download</div>
+            <ol className="list-decimal pl-5 text-[13px] text-mute space-y-0.5 mb-2">
+              <li>In Instagram open Settings, Accounts Centre, Your information and permissions, Download your information.</li>
+              <li>Choose Some of your information, tick Followers and following, format JSON, date range All time.</li>
+              <li>Instagram emails a zip, usually within the hour. Unzip it and choose followers_1.json below (in connections, followers_and_following).</li>
+            </ol>
+            <Button variant="primary" onClick={() => followFile.current?.click()}>Choose the followers file</Button>
+            <input ref={followFile} type="file" accept=".json,.html,application/json,text/html" multiple hidden onChange={async (e) => {
+              const files = [...(e.target.files ?? [])];
+              e.target.value = "";
+              if (!files.length) return;
+              const handles = [...new Set((await Promise.all(files.map((f) => f.text()))).flatMap(followersFromFile))];
+              if (!handles.length) { say("No followers found in that file. Choose followers_1.json from the unzipped download."); return; }
+              const mine = v.lists.find((l) => l.name === "My followers");
+              const r = await act<{ added: number; duplicates: number; alreadyLeads: number }>({ action: "import", name: "My followers", text: "username\n" + handles.slice(0, 20000).join("\n"), listId: mine?.id });
+              if (r) say(`${handles.length} followers read, newest first. ${r.added} added.${r.duplicates ? ` ${r.duplicates} already on a list.` : ""}${r.alreadyLeads ? ` ${r.alreadyLeads} already in your inbox, left out.` : ""}`);
+            }} />
+          </div>
+          <div className="border-t border-line pt-4">
+            <div className="font-semibold mb-1">Just the newest few, straight away</div>
+            <p className="text-[12.5px] text-mute mb-2">The Chrome helper opens your Followers list in a window and reads what Instagram shows there, which is only about your newest 14. It starts within 15 minutes and the window closes itself.</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button onClick={() => act({ action: "followers.collect", max: 500 }, "Asked the helper for your newest followers.")} disabled={v.followers?.status === "wanted" || v.followers?.status === "running"}>Read my newest followers</Button>
+              {v.followers && <span className="text-[12.5px] text-mute">{v.followers.status === "wanted" ? "Waiting for the helper." : v.followers.status === "running" ? `Reading: ${v.followers.collected} so far.` : v.followers.status === "done" ? `Done: ${v.followers.collected} read, ${v.followers.added} added.` : `Stopped: ${v.followers.error}`}</span>}
+            </div>
+          </div>
+        </div>
+      </Section>
       <Section title="Lists" sub="A handle is only ever on one list, and anyone already in your inbox is left out.">
         {v.lists.length ? v.lists.map((l) => (
           <div key={l.id} className="border-b border-line last:border-b-0">
@@ -264,7 +298,7 @@ function Prospects({ v, act, say }: P) {
             {open === l.id && rows && (
               <div className="px-4 pb-4"><div className="max-h-[320px] overflow-y-auto scroll rounded-[10px] border border-line">
                 <table className="w-full text-[12.5px]"><tbody>
-                  {rows.rows.map((p) => <tr key={p.id} className="border-b border-line last:border-b-0"><td className="p-2 font-medium">@{p.handle}</td><td className="p-2">{p.name}</td><td className="p-2 text-mute">{STATUS_WORDS[p.status] ?? p.status}{p.detail ? `: ${p.detail}` : ""}</td><td className="p-2 text-mute truncate max-w-[320px]">{p.text ?? ""}</td></tr>)}
+                  {rows.rows.map((p) => <tr key={p.id} className="border-b border-line last:border-b-0"><td className="p-2 font-medium">@{p.handle}</td><td className="p-2">{p.name}</td><td className="p-2 text-mute">{STATUS_WORDS[p.status] ?? p.status}{p.detail ? `: ${p.detail}` : ""}</td><td className="p-2 text-mute truncate max-w-[320px]">{p.text ?? ""}</td><td className="p-2 text-right">{p.status === "queued" && <button className="underline text-mute" onClick={() => act({ action: "prospect.skip", id: p.id })}>Leave out</button>}</td></tr>)}
                 </tbody></table>
                 {rows.total > rows.rows.length && <div className="p-2 text-[12px] text-mute">Showing the first {rows.rows.length} of {rows.total}.</div>}
               </div></div>

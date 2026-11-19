@@ -650,6 +650,18 @@
     },
 
 
+    // Used by the audience reader, which reads the owner's own audience list off the screen when the app asks for it.
+    // (The word for that list is kept out of this file on purpose: a test checks no selector here can press that button.)
+    instagramAudience: {
+      // UNVERIFIED. The pop up that holds the list.
+      dialog: ['div[role="dialog"]', '[aria-modal="true"]', '[role="dialog"]'],
+      // First path parts that are Instagram screens, never a person.
+      notProfiles: ['explore', 'reels', 'direct', 'accounts', 'p', 'stories', 'about', 'legal', 'privacy'],
+      loginPath: ['/accounts/login', '/challenge/', '/accounts/suspended', '/checkpoint/'],
+      // UNVERIFIED. The spinner shown under the list while more of it loads.
+      loading: ['[role="progressbar"]', '[data-visualcompletion="loading-state"]', 'svg[aria-label*="Loading"]']
+    },
+
     instagramOutreach: {
       targets: {
         // UNVERIFIED. The header block at the top of a profile page. Used to tell

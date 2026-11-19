@@ -113,6 +113,10 @@ export interface CalendarConfig {
 }
 
 export interface Conversation {
+  /** Follow ups sent since the lead's last message (anchor is that message's time) */
+  followUp?: { count: number; at: string; anchor: string | null };
+  /** When the inbox sweep last looked at this chat and sent nothing, so it is not asked about again for a day */
+  sweepTriedAt?: string;
   id: string;
   platform: Platform;
   externalId: string;
@@ -373,6 +377,24 @@ export interface LabelQueueItem {
   createdAt: string;
 }
 
+export interface InboxSweep {
+  /** Reply to chats whose last message is the lead's and has no answer */
+  answerWaiting: boolean;
+  /** Send a follow up when the lead has not replied */
+  followUp: boolean;
+  /** Hours of silence before a follow up */
+  followUpHours: number;
+  /** Follow ups per silence. The count starts again when the lead replies. */
+  followUpMax: number;
+  /** Minutes between these automatic messages */
+  gapMinutes: number;
+  /** Only chats with a message in the last this many days. 0 means every chat, however old. */
+  maxAgeDays: number;
+  /** When the last one was started, and a short hold so two servers never work the same chat */
+  lastAt?: string;
+  busyUntil?: string;
+}
+
 export interface Workspace {
   id: string;
   apiToken: string;
@@ -386,6 +408,8 @@ export interface Workspace {
     replyDelaySeconds: number;
     /** Replies wait as long as a person would take to read and type, with a typing indicator. */
     humanTiming?: boolean;
+    /** With Autopilot on: answer chats left unanswered, and follow up when a lead goes quiet. */
+    inboxSweep?: InboxSweep;
   };
   playbook: Playbook | null;
   /** The long form brief: deep answers, the owner's own questions and uploaded intake forms. */
@@ -594,6 +618,26 @@ export interface Outreach {
   commentTriggers: CommentTrigger[];
   /** Comment ids already answered, newest last */
   repliedComments: string[];
+  /** The owner's own follower list being collected by the Chrome helper */
+  followers?: FollowerJob;
+}
+
+export interface FollowerJob {
+  status: "wanted" | "running" | "done" | "failed";
+  /** Most followers to read */
+  max: number;
+  /** Followers read so far */
+  collected: number;
+  /** Added to the list (the rest were already in the inbox or on a list) */
+  added: number;
+  /** Instagram's place marker for the next page */
+  cursor: string;
+  listId: string;
+  error: string;
+  /** What the helper last saw, for working out a stall */
+  note?: string;
+  requestedAt: string;
+  finishedAt?: string;
 }
 
 export interface Db {

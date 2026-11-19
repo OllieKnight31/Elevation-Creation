@@ -3,6 +3,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { api, backfillAll, Banner, Button, PageHeader, Toggle, useAppState, usePipeline } from "@/components/ui";
 import ImportHistory from "@/components/ImportHistory";
+import type { InboxSweep } from "@/lib/types";
 import { Row, Section } from "@/components/settings/parts";
 import TeamTab from "@/components/settings/Team";
 import { GoalsTab, ShortcutsTab, TriggersTab } from "@/components/settings/Shortcuts";
@@ -40,6 +41,12 @@ function Settings() {
   if (!state) return <div className="p-8 text-mute">Loading settings…</div>;
   const ws = state.workspace;
   const put = async (body: unknown) => { await api("/api/workspace", "PUT", body); reload(); };
+  // The inbox sweep: its settings and how many chats it would act on now.
+  const [sweep, setSweep] = useState<{ settings: InboxSweep; waiting: number; followUps: number } | null>(null);
+  const loadSweep = () => api<{ settings: InboxSweep; waiting: number; followUps: number }>("/api/sweep").then(setSweep).catch(() => null);
+  useEffect(() => { loadSweep(); }, []);
+  const sw: InboxSweep = sweep?.settings ?? { answerWaiting: false, followUp: false, followUpHours: 24, followUpMax: 1, gapMinutes: 4, maxAgeDays: 90 };
+  const putSweep = async (patch: Partial<InboxSweep>) => { await api("/api/workspace", "PUT", { settings: { inboxSweep: { ...sw, ...patch } } }); await loadSweep(); reload(); };
   const metaMsg = q.get("meta");
   const admin = state.me.role === "owner" || state.me.role === "admin";
   const tabs = TABS.filter(([t]) => admin || (t !== "team" && t !== "setup" && t !== "sheets"));
@@ -76,6 +83,22 @@ function Settings() {
         <Section title="AI" sub="How much the AI does on its own.">
           <Row title="Autopilot master switch" sub="Off: the AI only drafts. On: conversations set to Autopilot are answered automatically, inside Meta's 24 hour window, when the AI is confident and nothing sensitive is going on.">
             <Toggle label="Autopilot master switch" on={ws.settings.autopilotMaster} onChange={(v) => put({ settings: { autopilotMaster: v } })} />
+          </Row>
+          <Row title="Answer every waiting chat" sub={`With Autopilot on, the AI also works back through the inbox and replies to chats whose last message is the lead's and has no answer, newest first.${sweep ? ` ${sweep.waiting} waiting now.` : ""}`}>
+            <Toggle label="Answer every waiting chat" on={sw.answerWaiting} onChange={(v) => putSweep({ answerWaiting: v })} />
+          </Row>
+          <Row title="Follow up when a lead goes quiet" sub={`With Autopilot on, a lead who has not replied gets a follow up written for their conversation. The AI skips anyone a follow up would be wrong for. Chats tagged Close friend or Do not contact are never messaged.${sweep ? ` ${sweep.followUps} due now.` : ""}`}>
+            <Toggle label="Follow up when a lead goes quiet" on={sw.followUp} onChange={(v) => putSweep({ followUp: v })} />
+          </Row>
+          <Row title="How far back" sub="Only chats with a message in the last this many days are answered or followed up. 0 means every chat, however old.">
+            <input type="number" min={0} max={3650} className="field !w-24" defaultValue={sw.maxAgeDays} onBlur={(e) => putSweep({ maxAgeDays: Number(e.target.value) || 0 })} aria-label="Days back" />
+          </Row>
+          <Row title="Follow up timing" sub="Hours of silence before a follow up, how many follow ups per silence, and minutes between these automatic messages. Outside Meta's 24 hour window they are typed by the Chrome helper, during your outreach sending hours.">
+            <div className="flex gap-2">
+              <input type="number" min={1} max={720} className="field !w-20" defaultValue={sw.followUpHours} onBlur={(e) => putSweep({ followUpHours: Number(e.target.value) || 24 })} aria-label="Hours before a follow up" />
+              <input type="number" min={1} max={5} className="field !w-16" defaultValue={sw.followUpMax} onBlur={(e) => putSweep({ followUpMax: Number(e.target.value) || 1 })} aria-label="Follow ups per silence" />
+              <input type="number" min={1} max={240} className="field !w-16" defaultValue={sw.gapMinutes} onBlur={(e) => putSweep({ gapMinutes: Number(e.target.value) || 4 })} aria-label="Minutes between automatic messages" />
+            </div>
           </Row>
           <Row title="Default for new conversations" sub="Applied when a new lead messages.">
             <select className="field !w-auto" value={ws.settings.defaultAiMode} onChange={(e) => put({ settings: { defaultAiMode: e.target.value } })} aria-label="Default AI mode">

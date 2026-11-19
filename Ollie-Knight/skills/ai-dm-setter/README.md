@@ -63,6 +63,8 @@ The Outreach screen holds prospect lists, campaigns and the sending rules. The C
 4. Run `npm run outreach:chrome`. It opens a separate Google Chrome profile with the extension loaded and pointed at the app. Sign in to Instagram there once. Leave the command running; it ends when you close that window. (To use your everyday Chrome instead, load the `extension` folder by hand at `chrome://extensions`.)
 5. Switch on Outreach sending in the app and in the extension popup.
 
+Outreach, Prospects also has Import my followers, two ways. The full list: upload `followers_1.json` from Instagram's own Download your information (Followers and following, JSON); it is read in the browser by `web/lib/followers-file.ts`, newest first, and only the handles are sent to the app. The newest few: the helper opens your Followers list in a window and reads it off the screen (`extension/src/followers.js`, routes `/api/ext/followers`); Instagram only shows about 14 there, and only while the window is on screen. The helper presses nothing except the link that opens the list and calls no Instagram endpoint. Each row in a list has Leave out.
+
 Sending stops by itself on any Instagram warning, a request to confirm it is you, a signed out session, or two failed sends in a day. Press Resume on the Outreach screen once it is cleared. People already in your inbox are never messaged and a handle is only contacted once. Follow up messages and stopping on reply are not built yet.
 
 Automating Instagram this way is against Instagram's terms and can get an account restricted; Meta can also act against an app linked to it. Cold marketing messages to individuals need consent in the UK and EU. Use a separate outreach account where you can.
@@ -127,6 +129,15 @@ Getting tags into Meta: Messenger uses the official Page label API. Instagram ha
 ## The business brief (the setter's brain)
 
 The brief has six parts: the business, the offer, ideal client, conversion goals, voice and rules, additional information. Each part has short fields, a set of deeper questions (67 in all, `web/lib/brain.ts`), any number of the owner's own questions and answers, and uploaded intake forms (.docx, .pdf, .rtf, .txt, .md, .csv, up to 4 MB, or pasted text; text is pulled out by `web/lib/extract.ts`). It is saved as `workspace.brain` and the whole of it goes into the system prompt of every reply (`brainBlock` in `web/lib/brain.ts`, added in `intakeBlock` in `web/lib/ai.ts`), so a very large brain raises the cost of each reply. Every answer box has a Speak your answer button (`web/components/Speak.tsx`) that uses the browser's own speech recognition, so it needs Chrome, Edge or Safari and microphone permission. Limit: 400,000 characters. Routes: `/api/brain`, `/api/brain/upload`.
+
+## Autopilot across the whole inbox
+
+With the Autopilot master switch on, new messages are answered as they arrive (Meta webhook, then `onInbound` in `web/lib/live.ts`). Two further switches in Settings, AI (`web/lib/sweep.ts`, off by default) work back through the inbox on the hosted system, one chat at a time, newest first:
+
+- **Answer every waiting chat.** Chats whose last message is the lead's and has no answer get their reply.
+- **Follow up when a lead goes quiet.** After 24 hours of silence (changeable) the lead gets one follow up written for their conversation. The AI sends nothing when a follow up would be unwelcome. The count starts again when the lead replies.
+
+"How far back" limits both to chats with a message in the last N days (90 by default, 0 for every chat). Each send passes the same checks as any Autopilot reply: never Close friend or Do not contact, never past the setter's stages, never when the AI asks for a person. Inside Meta's 24 hour window the message goes through Meta; outside it the Chrome helper types it, during the outreach sending hours. The clock is the helper checking in (every two minutes with Autopilot on) plus the daily timed job, so nothing depends on an open screen or a terminal. `/api/sweep` shows how many chats are due.
 
 ## How the AI talks
 

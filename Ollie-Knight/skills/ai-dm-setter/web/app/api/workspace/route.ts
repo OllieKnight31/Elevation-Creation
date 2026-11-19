@@ -4,6 +4,7 @@ import { fail, json, publicWorkspace } from "@/lib/api";
 import { cleanPipeline, DEFAULT_TAGS, STAGES } from "@/lib/pipeline";
 import { cleanShortcuts } from "@/lib/shortcuts";
 import { cleanTriggers } from "@/lib/engine";
+import { cleanSweep, sweepSettings } from "@/lib/sweep";
 
 const str = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
@@ -30,7 +31,11 @@ export async function PUT(req: Request) {
     ws.intake = { ...ws.intake, ...body.intake };
     ws.intake.goals = (ws.intake.goals ?? []).slice(0, 20).map((g) => ({ ...g, label: str(g.label, 60), url: str(g.url, 500), when: str(g.when, 240), ...(str(g.message, 400) ? { message: str(g.message, 400) } : { message: undefined }) }));
   }
-  if (body.settings) ws.settings = { ...ws.settings, ...body.settings };
+  if (body.settings) {
+    const { inboxSweep, ...rest } = body.settings as Record<string, unknown>;
+    ws.settings = { ...ws.settings, ...rest };
+    if (inboxSweep) ws.settings.inboxSweep = cleanSweep(inboxSweep, sweepSettings(db));
+  }
   if (body.meta) {
     const { datasetId, capiToken, capiEnabled, mirrorMessengerLabels } = body.meta;
     if (typeof datasetId === "string") ws.meta.datasetId = datasetId.trim();

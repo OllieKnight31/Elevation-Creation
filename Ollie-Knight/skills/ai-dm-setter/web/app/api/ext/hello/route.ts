@@ -1,5 +1,5 @@
 import { extAuth, fail, json } from "@/lib/api";
-import { cleanHandle } from "@/lib/outreach";
+import { cleanHandle, followersJob } from "@/lib/outreach";
 import { saveDb } from "@/lib/store";
 import { HELPER_VERSION } from "@/lib/helper-version";
 
@@ -17,5 +17,5 @@ export async function POST(req: Request) {
   if (account && !ws.outreach.settings.account) ws.outreach.settings.account = account;
   saveDb();
   // latest lets a helper loaded from the project folder reload itself onto newer files.
-  return json({ ok: true, workspace: ws.intake.businessName || "Ainable Setter", account: ws.outreach.settings.account, latest: HELPER_VERSION });
+  return json({ ok: true, workspace: ws.intake.businessName || "Ainable Setter", account: ws.outreach.settings.account, latest: HELPER_VERSION, followers: followersJob(db).want });
 }

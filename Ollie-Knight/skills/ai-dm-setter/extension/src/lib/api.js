@@ -205,6 +205,16 @@
         });
       },
 
+      // GET /api/ext/followers -> { want, account, left }. Whether the app wants the owner's follower list collected.
+      followersJob: function () {
+        return request('GET', '/api/ext/followers');
+      },
+
+      // POST /api/ext/followers -> { done, added }. One page of followers, or the reason collecting stopped.
+      followersBatch: function (body) {
+        return request('POST', '/api/ext/followers', { body: body, timeoutMs: 60000 });
+      },
+
       // GET /api/ext/faces -> { handles, remaining }. Chats whose profile picture Meta will not share.
       facesNeeded: function () {
         return request('GET', '/api/ext/faces').then(function (d) {
