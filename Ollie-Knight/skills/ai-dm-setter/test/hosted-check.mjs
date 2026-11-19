@@ -98,7 +98,9 @@ if (demo) {
   ok("an incoming test message is stored", r.status === 200 && (await call(`/api/conversations/${demo.id}`)).messages.length === before + 1, r._text.slice(0, 200));
   r = await call(`/api/conversations/${demo.id}/suggest`, "POST");
   const bubbles = r.conversation?.suggestion?.bubbles || r.suggestion?.bubbles || [];
-  ok("AI drafts a reply", r.status === 200 && bubbles.length > 0, r._text.slice(0, 300));
+  const sug = r.conversation?.suggestion || r.suggestion || {};
+  // No bubbles is a valid answer when the AI hands the chat to a person (this demo chat collects repeated test messages).
+  ok("AI drafts a reply", r.status === 200 && (bubbles.length > 0 || (sug.engine === "claude" && sug.needsHuman === true)), r._text.slice(0, 300));
   ok(`AI engine in use: ${/no credit|basic draft|demo/i.test(JSON.stringify(r)) ? "basic keyword engine (Claude unavailable)" : "Claude"}`, true);
   r = await call(`/api/conversations/${demo.id}/summary`, "POST");
   ok("conversation summary", r.status === 200, r._text.slice(0, 200));
@@ -115,6 +117,24 @@ ok("knowledge answer saved", r.status === 200 && kid, r._text.slice(0, 200));
 if (kid) {
   r = await call("/api/knowledge", "POST", { action: "delete", id: kid });
   ok("knowledge answer removed", r.status === 200, r._text.slice(0, 200));
+}
+
+// ---------- brain (the long form brief) ----------
+{
+  const before = await call("/api/brain");
+  ok("the brain loads with all six parts", before.status === 200 && ["business", "offer", "idealClient", "goals", "voice", "extra"].every((k) => before.brain?.sections?.[k]), before._text.slice(0, 150));
+  const up = await call("/api/brain/upload", "POST", { section: "extra", name: `Check doc ${stamp}`, text: `Check document ${stamp}. The check codeword is heron.` });
+  ok("a pasted document is added to the brain", up.status === 200 && up.added?.id, up._text.slice(0, 150));
+  const docId = up.added?.id;
+  const read = await call(`/api/brain?doc=${docId}`);
+  ok("the document text reads back", read.status === 200 && String(read.doc?.text).includes(stamp), read._text.slice(0, 150));
+  const state = await call("/api/state");
+  ok("screens get brain counts, not its text", state.status === 200 && state.workspace?.brain?.sections?.extra?.docs >= 1 && !state._text.includes(`Check document ${stamp}`), JSON.stringify(state.workspace?.brain).slice(0, 150));
+  const bad = await call("/api/brain/upload", "POST", { section: "nowhere", text: "x" });
+  ok("a document for an unknown part is refused", bad.status === 400, bad.status);
+  const gone = await call("/api/brain", "PUT", { removeDocs: [docId] });
+  ok("the check's document is removed again", gone.status === 200 && !gone.brain.sections.extra.docs.some((d) => d.id === docId), gone._text.slice(0, 150));
+  ok("existing answers were left alone", JSON.stringify(gone.brain.sections.business.answers) === JSON.stringify(before.brain.sections.business.answers));
 }
 
 // ---------- outreach ----------

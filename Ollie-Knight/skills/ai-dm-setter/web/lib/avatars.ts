@@ -17,7 +17,7 @@ let ready: Promise<void> | null = null;
 const tbl = () => `${hostedTable()}_avatars`;
 
 function schema() {
-  return (ready ??= hostedSql().query(`create table if not exists ${tbl()} (id text primary key, url text not null, type text not null, data text not null, at timestamptz not null default now())`).then(() => {}));
+  return (ready ??= Promise.resolve(hostedSql().query(`create table if not exists ${tbl()} (id text primary key, url text not null, type text not null, data text not null, at timestamptz not null default now())`)).then(() => hostedSql().query(`alter table ${tbl()} enable row level security`)).then(() => {}));
 }
 
 const dir = () => path.join(DATA_DIR, "avatars");

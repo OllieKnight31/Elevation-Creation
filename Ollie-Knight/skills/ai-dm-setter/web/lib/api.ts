@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { brainSummary } from "./brain";
 import type { Conversation, Db, Member, Workspace } from "./types";
 import { can, publicMember } from "./auth";
 import { profileUrl } from "./supabase";
@@ -21,10 +22,12 @@ export const fail = (message: string, status = 400) => NextResponse.json({ error
 /** Workspace without secrets, safe to send to the browser. */
 export function publicWorkspace(ws: Workspace, me?: Member) {
   // Outreach lists and the knowledge base can be large, so they travel through their own routes.
-  const { secret: _secret, outreach: _outreach, knowledge: _knowledge, calendar: _calendar, sheets: _sheets, ...rest } = ws;
+  const { secret: _secret, outreach: _outreach, knowledge: _knowledge, calendar: _calendar, sheets: _sheets, brain: _brain, ...rest } = ws;
   const settings = !me || can(me, "settings");
   return {
     ...rest,
+    // The brain can run to hundreds of pages, so only its counts travel here; the brief screen fetches the text.
+    brain: brainSummary(ws.brain),
     // The workspace token opens the extension and booking hooks, so only people who manage settings see it.
     apiToken: settings ? ws.apiToken : "",
     members: ws.members.map(publicMember),

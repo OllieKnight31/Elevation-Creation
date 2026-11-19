@@ -4,7 +4,7 @@
 //
 // Usage:
 //   OWNER_PASSWORD=... node test/full-check.mjs [base url]        (default https://ainable-setter.vercel.app)
-//   OWNER_EMAIL     owner login (default owner@example.com)
+//   OWNER_EMAIL     owner login (default ollieknight31@gmail.com)
 //   OWNER_PASSWORD_FILE  read the password from this file instead
 //   SKIP_BROWSER=1  skip the headless Chrome page checks
 //   NO_SWEEP=1      do not delete leftovers of earlier check runs (chats named "Check Lead ..." or with handles check_lead_...,
@@ -22,7 +22,7 @@ import path from "node:path";
 
 const BASE = (process.argv[2] || "https://ainable-setter.vercel.app").replace(/\/+$/, "");
 const env = process.env;
-const OWNER_EMAIL = env.OWNER_EMAIL || "owner@example.com";
+const OWNER_EMAIL = env.OWNER_EMAIL || "ollieknight31@gmail.com";
 const OWNER_PASSWORD = env.OWNER_PASSWORD || (env.OWNER_PASSWORD_FILE ? fs.readFileSync(env.OWNER_PASSWORD_FILE, "utf8").trim() : "");
 if (!OWNER_PASSWORD) { console.error("Set OWNER_PASSWORD or OWNER_PASSWORD_FILE"); process.exit(2); }
 

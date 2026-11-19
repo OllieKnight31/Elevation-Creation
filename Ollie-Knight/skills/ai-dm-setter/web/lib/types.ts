@@ -295,6 +295,37 @@ export interface Intake {
   discoveryMessages?: number;
 }
 
+/** The six parts of the brain, in the order the brief shows them. */
+export type BrainKey = "business" | "offer" | "idealClient" | "goals" | "voice" | "extra";
+
+/** A question the owner wrote themselves, with their answer. */
+export interface BrainEntry {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+/** An uploaded intake form or document, kept as plain text. */
+export interface BrainDoc {
+  id: string;
+  name: string;
+  text: string;
+  addedAt: string;
+}
+
+export interface BrainSection {
+  /** Answers to the built in questions, by question id. */
+  answers: Record<string, string>;
+  custom: BrainEntry[];
+  docs: BrainDoc[];
+}
+
+/** Everything the owner has told the AI about the business beyond the short brief. Read into every reply. */
+export interface Brain {
+  sections: Partial<Record<BrainKey, BrainSection>>;
+  updatedAt?: string;
+}
+
 export interface PlaybookItem {
   title: string;
   detail: string;
@@ -353,6 +384,8 @@ export interface Workspace {
     humanTiming?: boolean;
   };
   playbook: Playbook | null;
+  /** The long form brief: deep answers, the owner's own questions and uploaded intake forms. */
+  brain?: Brain;
   /** Owner edited stages and tags. Absent means the built in set. */
   pipeline?: PipelineConfig;
   /** Signs login sessions. Never sent to the browser. */

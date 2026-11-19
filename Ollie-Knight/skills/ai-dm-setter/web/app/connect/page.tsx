@@ -172,8 +172,10 @@ export default function ConnectPage() {
                 <Li n="1">The key is fine but the account has no credit. Add some on this page, then press Check again. <ExtLink href="https://console.anthropic.com/settings/billing">Open Anthropic billing</ExtLink></Li>
               ) : (
                 <>
-                  <Li n="1">Create a key on this page and copy it. If the account is new, add credit first. <ExtLink href="https://console.anthropic.com/settings/keys">Open Anthropic keys</ExtLink> <ExtLink href="https://console.anthropic.com/settings/billing">Open Anthropic billing</ExtLink></Li>
-                  <Li n="2">
+                  <Li n="1">Open Anthropic&apos;s Claude Console and sign in, or press <b>Continue with Google</b> to make a free account. <ExtLink href="https://console.anthropic.com/settings/billing">Open Anthropic billing</ExtLink></Li>
+                  <Li n="2">On the billing page press <b>Buy credits</b> and add $5. That covers roughly 10,000 replies.</Li>
+                  <Li n="3">Open the keys page, press <b>Create key</b>, name it after this app, and press <b>Copy</b>. The key starts with sk-ant and is shown once. <ExtLink href="https://console.anthropic.com/settings/keys">Open Anthropic keys</ExtLink></Li>
+                  <Li n="4">
                     Paste the key here and press Save.
                     <span className="flex gap-2 mt-1.5">
                       <input className="field flex-1" type="password" placeholder="sk-ant-…" value={aiKey} onChange={(e) => setAiKey(e.target.value)} aria-label="Anthropic key" />
@@ -211,8 +213,13 @@ export default function ConnectPage() {
         <Block ok={v.crm} title="Your CRM (optional)" status={v.crm ? "Leads are being passed on." : "Not connected. Leads stay in this app only."} video="connections">
           {!v.crm && (
             <ol className="space-y-3 text-[14px]">
-              <Li n="1">In GoHighLevel, open the sub account that should receive leads, go to Settings, Private Integrations, and create one with contacts, opportunities, locations and custom fields ticked. <ExtLink href="https://app.gohighlevel.com/">Open GoHighLevel</ExtLink></Li>
-              <Li n="2">Paste the token and the location ID into the CRM section. <Link className="underline font-medium" href="/settings?tab=crm">Open Settings, CRM</Link></Li>
+              <Li n="1">In GoHighLevel, open the sub account that should receive leads and press <b>Settings</b> at the bottom of the left menu. <ExtLink href="https://app.gohighlevel.com/">Open GoHighLevel</ExtLink></Li>
+              <Li n="2">
+                Copy the <b>Location ID</b>. It is at the top of <b>Business Profile</b>, the first page of Settings.
+                <Shot src="/guide/ghl-location.png" alt="GoHighLevel business profile settings with Business Profile in the menu and the Location ID marked">Settings, Business Profile (1). The Location ID is at the top, with a copy button next to it (2).</Shot>
+              </Li>
+              <Li n="3">In the same Settings menu, open <b>Private Integrations</b>, press <b>Create new integration</b>, name it after this app, tick contacts, opportunities, locations and custom fields, press <b>Create</b>, and copy the token. It is shown once. No Private Integrations in the menu? Your login does not have that permission: ask the account&apos;s admin to create the token for you.</Li>
+              <Li n="4">Paste the token and the location ID into the CRM section. <Link className="underline font-medium" href="/settings?tab=crm">Open Settings, CRM</Link></Li>
             </ol>
           )}
         </Block>
@@ -276,6 +283,7 @@ export default function ConnectPage() {
                     <Li n="2">On <b>Ainable Setter Helper</b>, click the on and off switch to turn it off, then click it again to turn it back on.</Li>
                     <Li n="3">Come back here. This message goes within a minute.</Li>
                   </ol>
+                  <Shot src="/guide/chrome-helper-switch.png" alt="The Ainable Setter Helper card on Chrome's extensions page with its reload arrow and on and off switch marked">The reload arrow is 1. The on and off switch is 2.</Shot>
                 </div>
               )}
               {installed && !linked && (() => {
@@ -294,6 +302,7 @@ export default function ConnectPage() {
                       <Li n="2">Find <b>Ainable Setter Helper</b> and press its round reload arrow, next to the on and off switch.</Li>
                       <Li n="3">Come back to this tab and press <b>Cmd+R</b>. It links within a few seconds.</Li>
                     </ol>
+                    <Shot src="/guide/chrome-helper-switch.png" alt="The Ainable Setter Helper card on Chrome's extensions page with its reload arrow and on and off switch marked">The reload arrow is 1. The on and off switch is 2.</Shot>
                     <p className="text-[12.5px] text-mute mt-3">Still stuck? On chrome://extensions press <b>Remove</b> on the helper, then add it again with the steps above, and refresh this page.</p>
                   </div>
                 );
@@ -468,6 +477,18 @@ function Block({ ok, title, status, video, children }: { ok: boolean; title: str
   );
 }
 
+/** A real screenshot of the step, with the place to click marked in orange. Click it to see it full size. */
+function Shot({ src, alt, children }: { src: string; alt: string; children?: React.ReactNode }) {
+  return (
+    <figure className="mt-3 mb-1 not-prose">
+      <a href={src} target="_blank" rel="noopener noreferrer" title="Open the picture full size">
+        <img src={src} alt={alt} loading="lazy" className="w-full max-w-[680px] rounded-[10px] border border-linestrong bg-white" />
+      </a>
+      {children && <figcaption className="text-[12px] text-mute mt-1">{children} Details that belong to one account are blurred. Click the picture to enlarge it.</figcaption>}
+    </figure>
+  );
+}
+
 function Li({ n, children }: { n: string; children: React.ReactNode }) {
   return <li className="flex gap-2.5"><span className="font-semibold text-mute w-4 shrink-0">{n}</span><div className="min-w-0 flex-1">{children}</div></li>;
 }
@@ -541,19 +562,18 @@ function HostedInstall({ zip, store, copied, copy }: { zip: string; store: strin
         </>) },
         { title: "Switch on Developer mode", body: (<>
           , the switch in the top right corner of that page. Two new buttons appear on the left.
+          <Shot src="/guide/chrome-extensions-page.png" alt="Chrome's extensions page with the Developer mode switch marked in the top right">Developer mode is the switch marked 4, top right.</Shot>
         </>) },
         { title: "Click Load unpacked and pick the folder", body: (<>
           , the first of those buttons. A window opens to choose a folder.{" "}
           {os === "mac"
             ? <>Press <Kbd>Cmd + Shift + G</Kbd>, paste the address below with <Kbd>Cmd + V</Kbd>, press <Kbd>Enter</Kbd>, then click <b>Select</b>.<Copy label="~/Downloads/ainable-setter-helper" value="~/Downloads/ainable-setter-helper" on={copied === "dir"} onClick={() => copy("dir", "~/Downloads/ainable-setter-helper")} /></>
             : <>Go to <b>Downloads</b> and open <code>ainable-setter-helper</code>. If there is another <code>ainable-setter-helper</code> folder inside, open that one too. When you can see a file called <code>manifest.json</code>, click <b>Select Folder</b>.</>}
-          <figure className="mt-2.5">
-            <img src="/guide/chrome-extensions-page.png" alt="Chrome's extensions page with Developer mode switched on in the top right and the Load unpacked button in the top left" className="w-full max-w-[640px] rounded-[10px] border border-line" />
-            <figcaption className="text-[12px] text-mute mt-1">Developer mode is top right. Load unpacked is top left.</figcaption>
-          </figure>
+          <Shot src="/guide/chrome-extensions-page.png" alt="Chrome's extensions page with Developer mode switched on in the top right and the Load unpacked button in the top left">Developer mode is top right (4). Load unpacked is top left (5).</Shot>
         </>) },
         { title: "Done: it links itself", body: (<>
           Ainable Setter Helper appears in the list, Chrome brings you back to this page, and the helper links itself within a few seconds. Nothing to copy or type. If this page has not moved on after a minute, press <Kbd>{k.refresh}</Kbd>.
+          <Shot src="/guide/chrome-helper-switch.png" alt="The Ainable Setter Helper card on Chrome's extensions page with its reload arrow and on and off switch marked">The helper&apos;s card. If it ever stops linking, press the reload arrow (1), or switch it off and on again (2).</Shot>
         </>) },
       ]} />
       <details className="mt-4 rounded-[10px] border border-line p-3 text-[13.5px]">
@@ -622,6 +642,7 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
       <div className="font-semibold mb-1">Bring in every older message too</div>
       <p className="text-[13.5px] text-ink2 mb-2">Meta only lets apps read the last 20 messages of each chat. For the full history, ask Instagram for a copy of your messages and load it here. It is free and only message text is uploaded.</p>
       <p className="mb-3"><ExtLink href="https://accountscenter.instagram.com/info_and_permissions/dyi/">Open Instagram&apos;s Download your information page</ExtLink></p>
+      <Shot src="/guide/ig-export.png" alt="Instagram export your information window with the Create export button marked">The page opens on this window. Press Create export.</Shot>
       <ImportHistory onDone={reload} />
     </div>
   );
@@ -668,9 +689,16 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
           <li><b>&quot;Requirements&quot; and &quot;Overview&quot;.</b> Just press <b>Next</b>, then <b>Go to dashboard</b>. If Meta asks for your Facebook password again, type it.</li>
         </ul>
         <span className="block mt-2 text-[12.5px] text-mute">You are done with this step when you see your app&apos;s dashboard with your app&apos;s name at the top left.</span>
+        <span className="block mt-3 font-semibold text-ink">What each screen looks like</span>
+        <Shot src="/guide/meta-create-1.png" alt="Meta create an app screen with the app name box, the contact email box and the Next button marked">Screen 1, App details. Type the app name (1), check the email (2), press Next (3).</Shot>
+        <Shot src="/guide/meta-create-2.png" alt="Meta add use cases list with Manage messaging and content on Instagram ticked">Screen 2, Use cases. Choose All on the left, scroll down and tick only Manage messaging and content on Instagram (2).</Shot>
+        <Shot src="/guide/meta-create-2b.png" alt="The Next button at the bottom right of the use cases screen">Then scroll to the bottom. It says 1 use case added. Press Next (3).</Shot>
+        <Shot src="/guide/meta-create-3.png" alt="Meta business portfolio screen with the list of businesses and the option not to connect one marked">Screen 3, Business. Pick your business, or the last option if yours is not listed, then press Next.</Shot>
+        <Shot src="/guide/meta-create-4.png" alt="Meta publishing requirements screen with the Next button marked">Screen 4, Requirements. Nothing to fill in. Press Next.</Shot>
+        <Shot src="/guide/meta-create-5.png" alt="Meta overview screen with the green Create app button marked">Screen 5, Overview. Check the name and the Instagram use case, then press Create app.</Shot>
       </>) },
       { title: "Paste your App ID", body: (<>
-        On that dashboard, at the top left under the app name, is <b>App ID</b> followed by a long number, like 1234567890123456. Click the number to copy it, then click in this box and paste it with <Kbd>Cmd + V</Kbd>. The next steps then get buttons that open the exact pages inside your app.
+        On that dashboard, in the box called <b>Application Rate Limit</b>, under your app&apos;s name, is <b>App ID</b> followed by a long number, like 1234567890123456. Select the number and copy it, then click in this box and paste it with <Kbd>Cmd + V</Kbd>. The next steps then get buttons that open the exact pages inside your app.
         <span className="flex flex-wrap items-center gap-2 mt-1.5">
           <input className="field !w-72" inputMode="numeric" placeholder="Paste the App ID here" value={dash} onChange={(e) => setTyped(e.target.value.replace(/\D/g, ""))} onKeyDown={(e) => { if (e.key === "Enter" && dash.length >= 10 && dash !== saved) saveDash(); }} aria-label="Meta app ID" />
           <Button variant="primary" disabled={work === "dash" || dash.length < 10 || dash === saved} onClick={saveDash}>{work === "dash" ? "Saving…" : dash === saved && saved ? "Saved" : "Save"}</Button>
@@ -678,6 +706,7 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
         {dash.length > 0 && dash.length < 10 && <span className="block text-[12.5px] text-warn mt-1">That looks too short. It is usually 15 or 16 digits.</span>}
         {saved && dash === saved && <span className="block text-[12.5px] text-ok mt-1">Saved: {saved}. The buttons in the next steps open this app.</span>}
         {saved && dash !== saved && dash.length >= 10 && <span className="block text-[12.5px] text-mute mt-1">Press Save to use this number instead of {saved}.</span>}
+        <Shot src="/guide/meta-app-id.png" alt="Meta app dashboard with the App ID under the app name marked">The App ID sits under the app name on the Dashboard page. Dashboard is the first item in the left menu.</Shot>
       </>) },
       { title: "Give it permission to read your DMs", body: (<>
         These are the only three things it needs. The quickest way: press the button, and on the page that opens, under <b>1. Add required messaging permissions</b>, press <b>Add all required permissions</b>. Done.
@@ -696,6 +725,7 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
           </li>
           <li>You do <b>not</b> need <b>Request advanced access</b> or App Review. Meta only asks for that when an app is used on accounts you do not own.</li>
         </ul>
+        <Shot src="/guide/meta-permission-list.png" alt="Meta permissions and features list with the three Instagram business permissions showing Ready for testing">Permissions and features, scrolled down to the names starting instagram_business. The three you need are marked. Each one should say Ready for testing.</Shot>
       </>) },
       { title: "Add your Instagram as a tester", body: (<>
         While the app is new, it only works for accounts you add to it.
@@ -705,12 +735,15 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
           <li>Accept it on Instagram, signed in as that account: <b>Settings</b>, <b>Apps and websites</b>, the <b>Tester invitations</b> tab, then <b>Accept</b>. <ExtLink href="https://www.instagram.com/accounts/manage_access/">Open Instagram&apos;s apps and websites</ExtLink></li>
           <li>Already accepted? The app is listed there as <b>Authorised by you</b>. Nothing more to do.</li>
         </ul>
+        <Shot src="/guide/meta-roles.png" alt="Meta app roles page with the Add People button and an Instagram Tester row marked">In your Meta app: App roles, then Roles. Press Add People (1). Your Instagram then shows in the list as Instagram Tester (2).</Shot>
+        <Shot src="/guide/ig-tester.png" alt="Instagram apps and websites settings with the Tester invitations tab marked">On Instagram: open the Tester invitations tab (1) and press Accept. Afterwards the app is listed under Active.</Shot>
       </>) },
       { title: "Copy the Instagram app ID and secret", body: (<>
         Press the button. It opens <b>API setup with Instagram login</b>.
         <span className="block mt-1.5">{app ? <ExtLink href={igSetup} primary>Open my app&apos;s Instagram set up</ExtLink> : later}</span>
         <ul className="mt-2.5 space-y-2 list-disc pl-5">
-          <li>Find <b>Instagram app ID</b> and <b>Instagram app secret</b> at the top of that page, under <b>Instagram app name</b>.</li>
+          <li>On the left, make sure <b>API setup with Instagram login</b> is the one selected. Meta shows a yellow note recommending Unified login: ignore it, this app uses Instagram login.</li>
+          <li>Find <b>Instagram app ID</b> and <b>Instagram app secret</b> at the top of that page, next to <b>Instagram app name</b>.</li>
           <li>The Instagram app ID is a <b>different</b> number from step 2. Copy it into the first box below.</li>
           <li>For the secret, press <b>Show</b>. Meta asks you to <b>re-enter your Facebook password</b> first: type it and press Submit. The secret is 32 letters and numbers. Copy it into the second box and press <b>Save</b>.</li>
         </ul>
@@ -721,6 +754,7 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
         </span>
         {v.meta.configured && <span className="block text-[12.5px] text-ok mt-1">Saved.</span>}
         {(igId && dash && igId === dash) ? <span className="block text-[12.5px] text-warn mt-1">This is the same number as step 2. Copy the Instagram app ID from the Instagram page instead.</span> : null}
+        <Shot src="/guide/meta-ig-ids.png" alt="Meta Instagram set up page with API setup with Instagram login, the Instagram app ID and the Show button for the secret marked">Choose API setup with Instagram login (1). Copy the Instagram app ID (2). Press Show to see the secret (3).</Shot>
       </>) },
       { title: "Switch on instant messages (webhooks)", body: (<>
         On the same <b>API setup with Instagram login</b> page, open <b>3. Configure webhooks</b> (on older pages it is number 2).
@@ -731,6 +765,7 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
           <li>Turn on (Subscribe) <b>messages</b>, <b>messaging_referral</b> and <b>comments</b>. Turn on <b>message_echoes</b> too if it is listed. The others (reactions, seen, postbacks) do no harm on or off.</li>
           <li>The section gets a green tick once Meta has checked the address. If Meta says it could not verify it, check the Callback URL has no space at the end and try again.</li>
         </ul>
+        <Shot src="/guide/meta-webhooks.png" alt="Meta configure webhooks section with the Callback URL, Verify token, Verify and save button and the subscribe switches marked">Paste the Callback URL (1) and the Verify token (2), press Verify and save (3), then switch on comments, messages and messaging_referral (4).</Shot>
       </>) },
       { title: "Add the return address for the sign in", body: (<>
         On the same page, open <b>4. Set up Instagram business login</b> (on older pages number 3), then press <b>Business login settings</b>.
@@ -739,6 +774,8 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
           <li>Meta sometimes adds a <b>/</b> to the end by itself. If it did, delete it and save again.</li>
           <li>Leave <b>Deauthorize callback URL</b> and <b>Data deletion request URL</b> empty.</li>
         </ul>
+        <Shot src="/guide/meta-business-login.png" alt="Meta set up Instagram business login section with the Business login settings button marked">Open section 4 and press Business login settings.</Shot>
+        <Shot src="/guide/meta-redirect.png" alt="Meta business login settings window with the OAuth redirect URIs box and the Save button marked">Paste the address into OAuth redirect URIs and press Enter so it turns into a tag (1), then press Save (2).</Shot>
       </>) },
       { title: "Fill in the app's basic details", body: (<>
         Meta needs these before the app can go Live. Press the button: it opens <b>App settings</b>, then <b>Basic</b>.
@@ -752,19 +789,23 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
           <li><b>Category</b>: choose <b>Business and pages</b>.</li>
           <li>Press <b>Save changes</b> at the bottom. You should see <b>Changes saved</b>, and the red <b>Currently ineligible for submission</b> box at the top goes away when you reload.</li>
         </ul>
+        <Shot src="/guide/meta-basic.png" alt="Meta basic settings page with App domains, Privacy policy URL, Terms of Service URL, User data deletion, App icon and Category marked">App settings, Basic. Fill in App domains (1), Privacy policy URL (2), Terms of Service URL (3), User data deletion (4), App icon (5) and Category (6).</Shot>
+        <Shot src="/guide/meta-basic-save.png" alt="The Save Changes button at the bottom right of the basic settings page">Scroll to the bottom of the same page and press Save Changes.</Shot>
       </>) },
       { title: "Switch the app to Live", body: (<>
         Meta only sends instant messages to apps that are <b>Live</b>.
         <ul className="mt-2.5 space-y-2 list-disc pl-5">
-          <li>Press <b>Publish</b> in the left menu of your app (it shows <b>Unpublished</b> next to it). The page says <b>All required app settings are complete</b>. Press the <b>Publish</b> button at the bottom. Meta shows <b>Your app was successfully published</b>, and the left menu now says <b>Published</b>. {app ? <ExtLink href={`${app}/dashboard/`}>Open my app&apos;s dashboard</ExtLink> : later}</li>
+          <li>Press <b>Publish</b> in the left menu of your app (it shows <b>Unpublished</b> next to it). The page says <b>All required app settings are complete</b>. Press the <b>Publish</b> button at the bottom right. Meta shows <b>Your app was successfully published</b>, and the left menu now says <b>Published</b>. {app ? <ExtLink href={`${app}/dashboard/`}>Open my app&apos;s dashboard</ExtLink> : later}</li>
           <li>On older dashboards it is a switch at the top: <b>App mode: Development</b>, turned to <b>Live</b>.</li>
           <li>If Meta lists something still missing, it links to it: fill it in and try again.</li>
           <li>If Meta asks you to verify your business first, start that and carry on with the last step anyway. Until the app is Live, messages come in every 20 seconds while the Ainable Setter inbox is open, instead of instantly all the time.</li>
         </ul>
+        <Shot src="/guide/meta-publish.png" alt="Meta publish page with Publish in the left menu and the button at the bottom right marked">Press Publish in the left menu (1), then the Publish button at the bottom right (2). This picture is from an app that is already published, so its button says Unpublish.</Shot>
       </>) },
       { title: "Connect your Instagram", body: (<>
         {v.meta.configured ? "Press the button." : "This button appears once step 5 is saved."} Instagram opens and says your app <b>is requesting access</b> to your account. Log in if it asks, then press <b>Allow</b>. You come straight back here, and this section now says <b>Connected as @yourname</b>.
         {v.meta.configured && v.meta.https && <span className="block mt-1.5"><a href="/api/meta/connect?back=connect" className="inline-flex items-center justify-center rounded-[10px] bg-ink text-onbrand px-4 h-10 text-[14px] font-medium hover:opacity-85">Continue with Instagram</a></span>}
+        <Shot src="/guide/ig-allow.png" alt="Instagram screen asking to share information with the app, with the Allow button marked">Instagram asks whether to share your account with your app. Press Allow. The first time, the wording is that the app is requesting access.</Shot>
       </>) },
       { title: "Let your past chats load", body: (<>
         Past chats start loading by themselves the moment you connect, 25 chats at a time, each with its last 20 messages.
@@ -837,7 +878,8 @@ function InboxSetup({ v, business, appSecret, setAppSecret, igToken, setIgToken,
           <details className="mt-4 rounded-[10px] border border-line p-3 text-[13.5px]">
             <summary className="cursor-pointer font-semibold">The button will not work? Connect with a token instead</summary>
             <ol className="space-y-3 mt-3">
-              <Li n="a">On your app&apos;s Instagram page, find <b>Generate access tokens</b>. Press <b>Add account</b> and log in to your Instagram. Your account appears in the list: press <b>Generate token</b> next to it, tick the box to agree, and press <b>Copy</b>. {app ? <ExtLink href={`${app}/instagram-business/API-Setup/`}>Open your app&apos;s Instagram set up</ExtLink> : later}</Li>
+              <Li n="a">On your app&apos;s Instagram page, find <b>Generate access tokens</b>. Press <b>Add account</b> and log in to your Instagram. Your account appears in the list: press <b>Generate token</b> next to it, tick the box to agree, and press <b>Copy</b>. {app ? <ExtLink href={`${app}/instagram-business/API-Setup/`}>Open your app&apos;s Instagram set up</ExtLink> : later}
+                <Shot src="/guide/meta-token.png" alt="Meta generate access tokens section with Add account and Generate token marked">Press Add account (1), then Generate token next to your account (2).</Shot></Li>
               <Li n="b">
                 Paste the token here and press Connect.
                 <span className="flex gap-2 mt-1.5">

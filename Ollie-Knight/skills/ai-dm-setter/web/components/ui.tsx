@@ -57,14 +57,48 @@ export async function api<T = unknown>(path: string, method = "GET", body?: unkn
 export const hasArea = (me: PublicMember | undefined, area: Area) => !me || me.role === "owner" || me.role === "admin" || me.areas.includes(area);
 
 /*
- * Live updates. Every open screen shares one tiny check, every two seconds while the tab is visible, of a number
- * that goes up whenever anything is saved. A change reloads what the screen shows, so a message sent or received
- * anywhere appears within about two seconds without downloading everything over and over.
+ * Live updates. Every open screen shares one tiny check of a number that goes up whenever anything is saved. A change
+ * reloads what the screen shows, so a message sent or received anywhere appears without downloading everything over
+ * and over.
+ *
+ * The check is paced, because each one wakes the server and asks the database a question, and the free plans count
+ * both. Straight after something changes, or after the person comes back to the tab, it asks every 2 seconds, so a
+ * chat that is going back and forth feels live. With nothing new it eases off in steps to once every 30 seconds.
+ * Asking every 2 seconds all day was about 1,800 requests an hour for each open tab; this is about 120 on a quiet hour.
  */
+export const PACE_STEPS = [
+  { untilMs: 15_000, everyMs: 2_000 },
+  { untilMs: 60_000, everyMs: 5_000 },
+  { untilMs: 180_000, everyMs: 15_000 },
+] as const;
+export const PACE_SLOW_MS = 30_000;
+/** A click or key press brings the next check forward when the last one is at least this old. */
+export const NUDGE_MS = 10_000;
+/** How long to wait between checks, given how long ago something last changed or the person last came back. */
+export function paceMs(sinceBusyMs: number) {
+  for (const s of PACE_STEPS) if (sinceBusyMs < s.untilMs) return s.everyMs;
+  return PACE_SLOW_MS;
+}
+
 const changeListeners = new Set<() => void>();
-let changeOff: (() => void) | null = null;
 let seenVersion = "";
 let checking = false;
+let busyAt = Date.now();
+let lastCheckAt = 0;
+let checkTimer: ReturnType<typeof setTimeout> | undefined;
+/*
+ * Windows of the same browser tell each other what they learned, so several windows side by side cost about the same
+ * as one. For that to work only one of them may ask at a time: a window whose latest answer came from another window
+ * holds back a little longer than the pace, so the one that asked last keeps asking and the rest keep listening. If
+ * that one is closed or hidden, the others stop hearing from it and one of them takes over a couple of seconds late.
+ * The extra wait has a random part so that two listeners do not both take over at the same moment, time after time.
+ */
+const FOLLOW_WAIT_MS = 1_500;
+const FOLLOW_SPREAD_MS = 1_500;
+let following = false;
+const versionChannel = typeof window !== "undefined" && typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("setter-version") : null;
+/** Hosted versions look like h123. The number lets the server say whether what changed since then matters to a screen. */
+const versionNumber = (v: string) => (/^h\d+$/.test(v) ? Number(v.slice(1)) : null);
 
 /*
  * Every timed check stops while nobody is looking: a hidden tab, or 10 minutes without a click, key or mouse move.
@@ -113,28 +147,111 @@ export function every(fn: () => void, ms: number) {
   return () => { clearInterval(t); wakers.delete(fn); };
 }
 
+/** Records an answer, from the server or from another tab. Only a change that matters reloads screens and speeds the checks up. */
+function tookVersion(v: string, quiet: boolean) {
+  lastCheckAt = Date.now();
+  const changed = Boolean(seenVersion) && v !== seenVersion;
+  seenVersion = v;
+  if (!changed || quiet) return;
+  busyAt = Date.now();
+  changeListeners.forEach((f) => f());
+}
+
+function scheduleCheck() {
+  clearTimeout(checkTimer);
+  if (!changeListeners.size) return;
+  const now = Date.now();
+  const holdBack = following ? FOLLOW_WAIT_MS + Math.random() * FOLLOW_SPREAD_MS : 0;
+  checkTimer = setTimeout(timedCheck, Math.max(0, lastCheckAt + paceMs(now - busyAt) + holdBack - now));
+}
+
+function timedCheck() {
+  if (pageActive()) { checkVersion(); return; }
+  // Hidden or idle: ask the server nothing and look again later. Coming back runs a check at once, see backToBusy.
+  clearTimeout(checkTimer);
+  checkTimer = setTimeout(timedCheck, PACE_SLOW_MS);
+}
+
 async function checkVersion() {
   if (checking) return;
   checking = true;
+  clearTimeout(checkTimer);
   try {
-    const { v } = await api<{ v: string }>("/api/version");
-    if (seenVersion && v !== seenVersion) changeListeners.forEach((f) => f());
-    seenVersion = v;
-  } catch { /* the next check tries again */ } finally { checking = false; }
+    const since = versionNumber(seenVersion);
+    // Say so before asking, so the other windows wait for this answer even when the server is slow to give it.
+    versionChannel?.postMessage({ asking: true });
+    const r = await api<{ v: string; quiet?: boolean }>(since === null ? "/api/version" : `/api/version?since=${since}`);
+    const quiet = r.quiet === true;
+    // This window asked and got an answer, so it is the one that keeps asking; the others hear it and hold back.
+    following = false;
+    tookVersion(r.v, quiet);
+    versionChannel?.postMessage({ v: r.v, quiet, since });
+  } catch { /* the next check tries again */ } finally {
+    checking = false;
+    lastCheckAt = Date.now();
+    scheduleCheck();
+  }
 }
+
+/** The person came back to the tab or the window: check now and return to the fast pace. */
+function backToBusy() {
+  if (!changeListeners.size || !pageActive()) return;
+  busyAt = Date.now();
+  if (Date.now() - lastCheckAt >= PACE_STEPS[0].everyMs) checkVersion();
+  else scheduleCheck();
+}
+
+/*
+ * A click or a key press does not bring the fast pace back by itself: someone working in the inbox clicks and types
+ * all day, and that would keep every tab asking every 2 seconds. It only brings a check forward when the last one is old.
+ */
+function nudge() {
+  if (changeListeners.size && pageActive() && Date.now() - lastCheckAt >= NUDGE_MS) checkVersion();
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("focus", backToBusy);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) backToBusy(); });
+  for (const e of ["pointerdown", "keydown"]) window.addEventListener(e, nudge, { passive: true });
+  if (versionChannel) {
+    versionChannel.onmessage = (e: MessageEvent) => {
+      const d = (e.data ?? {}) as { v?: unknown; quiet?: unknown; since?: unknown; asking?: unknown };
+      // A hidden or idle tab ignores it and checks for itself when the person returns.
+      if (!changeListeners.size || !pageActive()) return;
+      // Another window has just asked. Count the wait from now; if its answer never comes, this one asks after the usual wait.
+      if (d.asking === true) {
+        following = true;
+        lastCheckAt = Date.now();
+        if (!checking) scheduleCheck();
+        return;
+      }
+      if (typeof d.v !== "string") return;
+      const theirs = versionNumber(d.v), mine = versionNumber(seenVersion);
+      // An answer older than what this tab already has would look like a change and reload the screen for nothing.
+      if (theirs !== null && mine !== null && theirs < mine) return;
+      // "Nothing that matters changed" was worked out from where the other tab stood. It holds here only if this tab was at least that far.
+      const quiet = d.quiet === true && typeof d.since === "number" && mine !== null && mine >= d.since;
+      following = true;
+      tookVersion(d.v, quiet);
+      if (!checking) scheduleCheck();
+    };
+  }
+}
+
 export function onDataChange(fn: () => void) {
   changeListeners.add(fn);
-  if (!changeOff) {
-    changeOff = every(checkVersion, 2000);
-    checkVersion();
+  if (changeListeners.size === 1) {
+    wakers.add(backToBusy);
+    if (Date.now() - lastCheckAt >= PACE_STEPS[0].everyMs) checkVersion();
+    else scheduleCheck();
   }
   return () => {
     changeListeners.delete(fn);
-    if (!changeListeners.size && changeOff) { changeOff(); changeOff = null; }
+    if (!changeListeners.size) { clearTimeout(checkTimer); wakers.delete(backToBusy); }
   };
 }
 
-/** pollMs is the slow fallback; changes arrive through onDataChange within about two seconds. */
+/** pollMs is the slow fallback; changes arrive through onDataChange, within about two seconds while a chat is active. */
 export function useAppState(pollMs = 6000) {
   const [state, setState] = useState<AppState | null>(null);
   const [error, setError] = useState("");

@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { brainBlock } from "./brain";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import type { Conversation, Db, LeadProfile, Message, Playbook, PlaybookItem, StageId, Suggestion, Workspace } from "./types";
@@ -100,6 +101,7 @@ const PlaybookSchema = z.object({
 
 function intakeBlock(ws: Workspace) {
   const i = ws.intake;
+  const brain = brainBlock(ws);
   const goals = i.goals.filter((g) => g.url).map((g) => `- ${g.label} (${g.type}): ${g.url}. Send when: ${g.when || "it fits the lead"}${g.message ? `. How the owner introduces it: ${g.message}` : ""}`).join("\n");
   return `<business>
 Business: ${i.businessName}. Owner: ${i.ownerName}. Niche: ${i.niche}
@@ -125,7 +127,7 @@ ${i.voiceNotes || "None supplied."}
 </voice_notes_from_owner>
 <about_owner note="the only personal facts you may share as the owner">
 ${i.aboutMe?.trim() || "None supplied, so share nothing personal about the owner."}
-</about_owner>`;
+</about_owner>${brain ? "\n" + brain : ""}`;
 }
 
 function playbookBlock(pb: Playbook | null) {
@@ -164,7 +166,7 @@ ${HUMAN_RULES}
 Two things decide how a reply looks. The shape (how many messages, how long, casing, full stops, emoji) mirrors the lead, as described in lead_style for each conversation. The words (vocabulary, phrases, tone) are the owner's, from their messages in this thread and the playbook. Nothing that reads like marketing copy.
 
 Hard limits, because the owner is legally responsible for what is sent in their name:
-- State only facts from the business brief, approved claims, the playbook and learned_answers. No invented results, numbers, guarantees, scarcity or testimonials.
+- State only facts from the business brief (including business_brain), approved claims, the playbook and learned_answers. No invented results, numbers, guarantees, scarcity or testimonials.
 - When the lead asks a question or raises an objection and the answer is in none of those places, do not guess and do not improvise around it. Set needs_human to true, leave bubbles empty, and fill unknown. The owner then answers it once, and that answer is added to learned_answers for every later conversation. A question you can answer from what you have is never unknown, and neither is ordinary conversation: this is only for a gap in what you know about the business, the offer, or how the owner handles that pushback.
 - Only send a link that appears in conversion_goals or in available_call_times, copied exactly.
 - Respect every line in never_say.

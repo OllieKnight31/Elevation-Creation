@@ -1,12 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { ConversionGoal, Intake } from "@/lib/types";
+import type { BrainKey, ConversionGoal, Intake } from "@/lib/types";
 import { api, Banner, Button, useAppState } from "@/components/ui";
 import ImportHistory from "@/components/ImportHistory";
+import { Speak } from "@/components/Speak";
+import BrainSection, { type BrainView, type SectionView } from "@/components/BrainSection";
 import { GOAL_TYPES } from "@/lib/shortcuts";
 
-const STEPS = ["Business", "Offer", "Ideal client", "Conversion goals", "Voice and rules", "Connect and import", "Review"];
+const STEPS = ["Business", "Offer", "Ideal client", "Conversion goals", "Voice and rules", "Additional information", "Connect and import", "Review"];
+// The first six steps each have a long form part, kept in the brain.
+const BRAIN_STEP: BrainKey[] = ["business", "offer", "idealClient", "goals", "voice", "extra"];
+const CONNECT = 6, REVIEW = 7;
 
 const EXAMPLE: Intake = {
   businessName: "Northbound Coaching", ownerName: "Alex", niche: "Coaches and consultants who sell a service online",
@@ -36,15 +41,47 @@ export default function Onboarding() {
   const [disclosure, setDisclosure] = useState("");
   const [busy, setBusy] = useState("");
   const [msg, setMsg] = useState("");
+  const [brain, setBrain] = useState<BrainView | null>(null);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     if (state && !f) { setF(state.workspace.intake); setDisclosure(state.workspace.settings.disclosure); }
   }, [state, f]);
+  useEffect(() => {
+    api<{ brain: BrainView }>("/api/brain").then((r) => setBrain(r.brain)).catch((e) => setSaveError((e as Error).message));
+  }, []);
 
   if (!state || !f) return <div className="p-8 text-mute">Loading…</div>;
   const set = <K extends keyof Intake>(k: K, v: Intake[K]) => setF({ ...f, [k]: v });
-  const save = () => api("/api/workspace", "PUT", { intake: f, settings: { disclosure } });
-  const go = async (n: number) => { await save(); setStep(Math.max(0, Math.min(STEPS.length - 1, n))); };
+  // Answers and own questions travel with the rest of the brief. Documents are saved when they are added,
+  // so only their list comes back and the copy on screen is replaced by what was stored.
+  const saveBrain = async () => {
+    if (!brain) return;
+    const sections = Object.fromEntries(BRAIN_STEP.map((k) => [k, { answers: brain.sections[k].answers, custom: brain.sections[k].custom }]));
+    const r = await api<{ brain: BrainView }>("/api/brain", "PUT", { sections });
+    setBrain((cur) => (cur ? { ...r.brain, sections: Object.fromEntries(BRAIN_STEP.map((k) => [k, { ...cur.sections[k], docs: r.brain.sections[k].docs }])) as BrainView["sections"] } : r.brain));
+  };
+  const save = async () => {
+    setSaveError("");
+    try {
+      await api("/api/workspace", "PUT", { intake: f, settings: { disclosure } });
+      await saveBrain();
+    } catch (e) {
+      setSaveError((e as Error).message);
+      throw e;
+    }
+  };
+  const go = async (n: number) => { try { await save(); } catch { return; } setStep(Math.max(0, Math.min(STEPS.length - 1, n))); window.scrollTo?.(0, 0); };
+  const brainWords = brain ? Math.round(brain.chars / 6) : 0;
+  const deeper = (i: number) => brain && (
+    <BrainSection
+      sectionKey={BRAIN_STEP[i]}
+      value={brain.sections[BRAIN_STEP[i]]}
+      onChange={(next: SectionView) => setBrain({ ...brain, sections: { ...brain.sections, [BRAIN_STEP[i]]: next } })}
+      onBrain={(b) => setBrain((cur) => (cur ? { ...b, sections: Object.fromEntries(BRAIN_STEP.map((k) => [k, { ...cur.sections[k], docs: b.sections[k].docs }])) as BrainView["sections"] } : b))}
+      beforeUpload={save}
+    />
+  );
   const missing = [
     !f.businessName && "business name", !f.businessModel && "business model", !f.offer && "offer", !f.idealClient && "ideal client",
     !f.qualifyingQuestions.some(Boolean) && "a qualifying question", !f.goals.some((g) => g.url) && "a conversion link",
@@ -52,13 +89,14 @@ export default function Onboarding() {
   const threads = state.conversations.length;
 
   const T = (label: string, k: keyof Intake, rows = 3, hint = "") => (
-    <label className="block mb-4">
-      <span className="font-semibold">{label}</span>
+    <div className="mb-4">
+      <label htmlFor={`bf_${k}`} className="block font-semibold">{label}</label>
       {hint && <span className="block text-[12.5px] text-mute mb-1">{hint}</span>}
       {rows === 1
-        ? <input className="field mt-1" value={(f[k] as string) ?? ""} onChange={(e) => set(k, e.target.value as never)} />
-        : <textarea className="field mt-1" rows={rows} value={(f[k] as string) ?? ""} onChange={(e) => set(k, e.target.value as never)} />}
-    </label>
+        ? <input id={`bf_${k}`} className="field mt-1" value={(f[k] as string) ?? ""} onChange={(e) => set(k, e.target.value as never)} />
+        : <textarea id={`bf_${k}`} className="field mt-1" rows={rows} value={(f[k] as string) ?? ""} onChange={(e) => set(k, e.target.value as never)} />}
+      {rows > 1 && <Speak value={(f[k] as string) ?? ""} onChange={(v) => set(k, v as never)} />}
+    </div>
   );
 
   return (
@@ -79,7 +117,8 @@ export default function Onboarding() {
           <div className="flex items-end justify-between mb-4">
             <div>
               <h1 className="text-[22px] font-semibold">Business brief</h1>
-              <p className="text-mute">The AI answers from this brief and nothing else, so the more specific it is, the better it sets.</p>
+              <p className="text-mute">This is the brain of your setter. The AI answers from this brief and nothing else, so the more you put in, the better it sets. Each part has the short fields the app relies on, then a deeper set of questions and a place to upload your intake forms.</p>
+              {brain && brain.chars > 0 && <p className="text-[12.5px] text-mute mt-1">The brain holds about {brainWords.toLocaleString()} words so far ({Math.round((brain.chars / brain.limit) * 100)}% of the room available).</p>}
             </div>
             <Button onClick={() => setF({ ...EXAMPLE })}>Fill with example</Button>
           </div>
@@ -91,12 +130,14 @@ export default function Onboarding() {
               <div className="grid grid-cols-2 gap-4">{T("Business name", "businessName", 1)}{T("Your first name", "ownerName", 1, "")}</div>
               {T("Who you serve", "niche", 1, "The niche, in one line.")}
               {T("How your business model works", "businessModel", 6, "Explain it the way you would to a lead: what they get, how it is delivered, how long it takes. The AI uses this to explain your offer inside the DMs.")}
+              {deeper(0)}
             </>}
 
             {step === 1 && <>
               {T("Offer name and what is included", "offer", 3)}
               {T("Price and payment options", "price", 1, "The AI only quotes what is written here.")}
               {T("Claims the AI is allowed to make", "approvedClaims", 4, "Results, numbers and proof you can stand behind. Anything not listed here will not be said.")}
+              {deeper(1)}
             </>}
 
             {step === 2 && <>
@@ -111,6 +152,7 @@ export default function Onboarding() {
                 </div>
               ))}
               <Button onClick={() => set("qualifyingQuestions", [...f.qualifyingQuestions, ""])}>Add question</Button>
+              {deeper(2)}
             </>}
 
             {step === 3 && <>
@@ -131,6 +173,7 @@ export default function Onboarding() {
               })}
               <Button onClick={() => set("goals", [...f.goals, { id: "g" + Date.now(), type: "call", label: "", url: "", when: "" }])}>Add destination</Button>
               <div className="mt-5">{T("Business model breakdown message", "breakdownMessage", 4, "The message you send to explain how it works before the link. Write it how you would type it. Sending it moves the lead to Business model sent.")}</div>
+              {deeper(3)}
             </>}
 
             {step === 4 && <>
@@ -157,9 +200,15 @@ export default function Onboarding() {
                 <span className="block text-[12.5px] text-mute mb-1">Sent once, before the AI&apos;s first automatic message in a thread. Laws in the EU and California require telling people when they are talking to an AI, so clear this only on legal advice. Whatever you choose, the AI never denies being an AI.</span>
                 <textarea className="field" rows={2} value={disclosure} onChange={(e) => setDisclosure(e.target.value)} />
               </label>
+              {deeper(4)}
             </>}
 
             {step === 5 && <>
+              <p className="text-mute">Anything that did not fit in the other parts. Upload whole documents, paste scripts, or write your own questions and answers. It all becomes part of what the AI knows.</p>
+              {deeper(5)}
+            </>}
+
+            {step === CONNECT && <>
               <h3 className="font-semibold mb-1">Connect Instagram</h3>
               <p className="text-mute mb-2">Uses Meta&apos;s official login. Lets the app receive new messages as they arrive and send replies.</p>
               {state.workspace.meta.instagram
@@ -174,9 +223,10 @@ export default function Onboarding() {
               <p className="text-mute">Reads full threads straight from your open inbox, shows suggested replies beside the chat, and applies your stage and labels inside Meta Business Suite. Set it up from Settings.</p>
             </>}
 
-            {step === 6 && <>
+            {step === REVIEW && <>
               {missing.length > 0 ? <Banner tone="warn">Still missing: {missing.join(", ")}. The AI will work without them, but worse.</Banner> : <Banner tone="ok">The brief is complete.</Banner>}
               <ul className="mt-4 space-y-1.5 text-[13.5px]">
+                <li>Brain: {brain && brain.chars > 0 ? `about ${brainWords.toLocaleString()} words across ${BRAIN_STEP.filter((k) => Object.keys(brain.sections[k].answers).length || brain.sections[k].custom.length || brain.sections[k].docs.length).length} of 6 parts, ${BRAIN_STEP.reduce((n, k) => n + brain.sections[k].docs.length, 0)} documents` : "nothing added beyond the short fields yet"}.</li>
                 <li><b>{threads}</b> conversations in the inbox{state.flags.demoData ? " (demo data)" : ""}.</li>
                 <li>Playbook: {state.workspace.playbook ? `built from ${state.workspace.playbook.conversationsAnalysed} conversations` : "not built yet"}.</li>
                 <li>Instagram: {state.workspace.meta.instagram ? `connected as @${state.workspace.meta.instagram.username}` : "not connected"}.</li>
@@ -187,11 +237,12 @@ export default function Onboarding() {
                 <Button disabled={!!busy || threads === 0} onClick={async () => { setBusy("pb"); setMsg(""); try { await save(); await api("/api/playbook", "POST"); await reload(); } catch (e) { setMsg((e as Error).message); } setBusy(""); }}>
                   {busy === "pb" ? "Analysing inbox…" : state.workspace.playbook ? "Re-analyse inbox" : "Analyse inbox"}
                 </Button>
-                <Button variant="primary" disabled={!!busy} onClick={async () => { setBusy("fin"); await save(); await api("/api/workspace", "PUT", { onboardingComplete: true }); router.push("/inbox"); }}>Finish and open inbox</Button>
+                <Button variant="primary" disabled={!!busy} onClick={async () => { setBusy("fin"); try { await save(); await api("/api/workspace", "PUT", { onboardingComplete: true }); router.push("/inbox"); } catch { setBusy(""); } }}>Finish and open inbox</Button>
               </div>
             </>}
           </div>
 
+          {saveError && <div className="mt-3"><Banner tone="error">Not saved: {saveError}</Banner></div>}
           <div className="flex justify-between mt-4">
             <Button disabled={step === 0} onClick={() => go(step - 1)}>Back</Button>
             {step < STEPS.length - 1 && <Button variant="primary" onClick={() => go(step + 1)}>Save and continue</Button>}
