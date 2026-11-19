@@ -124,7 +124,7 @@ Someone guarded should never be rushed to a link.`;
  * Last pass over a draft so it matches the lead's shape even when the model drifts: no more messages than the lead
  * would send, no dashes as pauses, no emoji to someone who uses none, no full stops to someone who never uses them.
  */
-export function shapeBubbles(bubbles: string[], style: LeadStyle | null): string[] {
+export function shapeBubbles(bubbles: string[], style: LeadStyle | null, room = 1): string[] {
   const plain = Boolean(style && !style.emoji.length);
   const tidy = (b: string) => (plain ? b.replace(EMOJI, "").replace(/️/g, "") : b).replace(/\s*[—–]\s*/g, ", ").replace(/\s+([,.!?])/g, "$1").replace(/\s{2,}/g, " ").replace(/^,\s*/, "").trim();
   let out = bubbles.map(tidy).filter(Boolean);
@@ -135,7 +135,8 @@ export function shapeBubbles(bubbles: string[], style: LeadStyle | null): string
   const first = out.findIndex(asks);
   if (first >= 0) out = out.filter((b, i) => i <= first || !asks(b));
   if (!style) return out;
-  const max = style.perTurn >= 1.6 && style.words <= 12 ? 4 : 2;
+  // room: a lead who just sent several messages in a row gets up to one message back per point (see burst.ts).
+  const max = Math.max(style.perTurn >= 1.6 && style.words <= 12 ? 4 : 2, room);
   if (out.length > max) out = [...out.slice(0, max - 1), out.slice(max - 1).join(" ")];
   // Sentence case for a lead who writes that way, even when the owner's own habit is lowercase.
   if (!style.lower) out = out.map((b) => b.replace(/^(\p{Ll})/u, (c) => c.toUpperCase()));

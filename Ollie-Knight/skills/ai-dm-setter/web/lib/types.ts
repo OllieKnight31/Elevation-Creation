@@ -81,6 +81,8 @@ export interface Suggestion {
   times?: CalendarSlot[];
   /** The offered time the lead chose, whose link this reply sends */
   picked?: CalendarSlot;
+  /** Time of the newest lead message this draft had read */
+  through?: string;
 }
 
 /** One free time in the owner's calendar, with the link that opens the booking page on that time. */
@@ -149,6 +151,8 @@ export interface Conversation {
   gapId?: string | null;
   /** Calendar times last offered to this lead. draft is the createdAt of the suggestion that offered them. */
   proposed?: { at: string; draft: string; slots: CalendarSlot[]; picked?: CalendarSlot } | null;
+  /** Time of the newest lead message the last AI reply had read. A message that landed while that reply was being written or typed is later than this, and the next reply answers it. */
+  answeredThrough?: string;
   /** Older messages of this thread were moved to the Google Sheets archive, up to this time. Anything captured again from before it is skipped. */
   prunedUntil?: string;
   /** How many moved messages had each direction and text (by short hash), so a fresh capture by the helper does not add them back */

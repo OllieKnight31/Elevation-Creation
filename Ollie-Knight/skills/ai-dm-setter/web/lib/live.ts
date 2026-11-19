@@ -7,7 +7,7 @@ import { flushNow, freshDb, saveDb } from "./store";
 import { background, sleep } from "./hosted";
 
 /**
- * Called after a real inbound message. Waits briefly so a burst of messages gets one reply,
+ * Called after a real inbound message. Waits briefly so a burst of messages gets one reply that answers every one of them (see burst.ts),
  * then drafts, tags, and either sends (autopilot, all checks passing) or leaves the draft for the owner.
  * The wait runs after the response has gone (on Vercel too). When it ends, the turn only goes ahead if no
  * newer message arrived meanwhile: that message started its own wait and takes the turn.
@@ -33,23 +33,32 @@ export function onInbound(db: Db, conv: Conversation, text = "") {
     const now = await freshDb();
     const c = now.conversations.find((x) => x.id === id);
     if (!c || c.lastInboundAt !== stamp || c.aiMode === "off" || isCloseFriend(c)) return;
-    await aiTurn(now, c);
+    await aiTurn(now, c, true);
     saveDb();
     await flushNow();
   });
 }
 
 /** One AI turn: draft, tag, then send (autopilot, all checks passing) or leave the draft for a person. */
-export async function aiTurn(db: Db, conv: Conversation) {
+export async function aiTurn(db: Db, conv: Conversation, live = false) {
   if (isCloseFriend(conv)) return;
   try {
+    const stamp = conv.lastInboundAt;
     const { suggestion, lead, summary } = await suggestReply(db, conv);
+    if (live) {
+      // The lead sent another message while this reply was being written. It started its own turn, which reads
+      // every unanswered message together, so this half informed draft is dropped rather than sent.
+      const latest = (await freshDb()).conversations.find((x) => x.id === conv.id);
+      if (latest && latest.lastInboundAt !== stamp) return;
+    }
     applyAiTagging(db, conv, suggestion, lead, summary);
     const gate = canAutopilot(db, conv, suggestion);
     if (gate.ok && suggestion.bubbles.length) {
       // Kept on the conversation while it sends, so any calendar times it offers are remembered.
       conv.suggestion = suggestion;
       await deliver(db, conv, suggestion.bubbles, "ai");
+      // Anything the lead sent after this point was not read by this reply, so the next turn picks it up.
+      if (suggestion.through) conv.answeredThrough = suggestion.through;
     } else {
       conv.suggestion = conv.aiMode === "autopilot" && !gate.ok ? { ...suggestion, reason: `${suggestion.reason} Not sent automatically: ${gate.why}.` } : suggestion;
     }

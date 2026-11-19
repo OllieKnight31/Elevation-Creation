@@ -9,6 +9,7 @@ import { basicSummary } from "./summary";
 import { gapsBlock, knowledgeBlock, looksLikeAnswer, matchKnowledge } from "./knowledge";
 import { HUMAN_RULES, leadStyle, shapeBubbles, styleBlock } from "./style";
 import { discoveryBlock, discoveryGate } from "./discovery";
+import { burstBlock, burstRoom, missed, unanswered } from "./burst";
 import { type CalendarOffer, calendarRules, calendarUrls, matchPick, offerBlock, offerFor, slotLabel } from "./calendar";
 
 // Replies, summaries and openers run often, so they use Haiku: about 30 times cheaper than Opus per reply.
@@ -61,6 +62,7 @@ const SuggestionSchema = z.object({
     same_as: z.string().nullable().describe("The id of the entry in open_questions that this is the same question as, or null."),
   }).nullable().describe("Fill only when you cannot answer the lead from what you have been given. Otherwise null."),
   used_knowledge: z.array(z.string()).describe("Ids of the learned_answers entries this reply relies on. Empty if none."),
+  addressed: z.array(z.number()).describe("When unanswered_messages is given: the number of every message in it that this reply responds to. Empty when there is no such list."),
   offered_times: z.array(z.string()).describe("The start value of every time from available_call_times that this reply offers the lead. Empty when the reply offers no times or no calendar is listed."),
   picked_time: z.string().nullable().describe("The start value of the listed time the lead chose and whose link this reply sends. Otherwise null."),
   summary: z.string().describe("Brief for a teammate opening this thread cold: who the lead is, what they want, what has been said and where it stands. 2 to 4 plain sentences, no greeting."),
@@ -224,6 +226,9 @@ export async function suggestReply(db: Db, conv: Conversation): Promise<{ sugges
 
   const w = windowState(conv.lastInboundAt);
   const style = leadStyle(msgs);
+  // Every message the lead has sent that no reply has covered yet. More than one means a burst: each gets its answer.
+  const waiting = unanswered(msgs, conv.answeredThrough);
+  const through = [...msgs].reverse().find((m) => m.direction === "in")?.sentAt;
   let res;
   try {
     res = await anthropic().messages.parse({
@@ -250,7 +255,7 @@ ${discoveryBlock(gate)}
 ${transcript(conv, msgs)}
 </conversation>
 
-Write the next reply and tag the conversation.`,
+${burstBlock(waiting)}Write the next reply and tag the conversation.`,
       },
     ],
     output_config: { effort: "low", format: zodOutputFormat(SuggestionSchema) },
@@ -292,22 +297,26 @@ Write the next reply and tag the conversation.`,
     ? { question: p.unknown.question.trim(), kind: p.unknown.kind, quote: p.unknown.quote.trim(), sameAs: p.unknown.same_as ?? undefined }
     : undefined;
   const known = new Set(db.workspace.knowledge.items.map((i) => i.id));
+  // code level check: in a burst, a reply that leaves one of the lead's questions out is held, never sent
+  const skipped = gap || !p.bubbles.length ? [] : missed(waiting, p.addressed);
+  const skippedWhy = skipped.length ? `Held for review: the lead sent ${waiting.length} messages in a row and this draft does not answer ${skipped.map((m) => `"${m.text.trim().slice(0, 60)}"`).join(" or ")}.` : "";
   return {
     lead,
     summary: p.summary.trim() ? { text: p.summary.trim(), nextStep: p.next_step.trim() } : undefined,
     suggestion: {
       // A reply written around a gap would be a guess, so nothing goes out until a person has answered it.
-      bubbles: gap ? [] : shapeBubbles(p.bubbles.map((b) => b.trim()).filter(Boolean), style),
+      bubbles: gap ? [] : shapeBubbles(p.bubbles.map((b) => b.trim()).filter(Boolean), style, burstRoom(waiting.length)),
       ...(gap ? { gap } : {}),
       usedKnowledge: p.used_knowledge.filter((id) => known.has(id)),
       ...(times.length && !gap ? { times } : {}),
       ...(picked && !gap ? { picked } : {}),
-      reason: gap ? `The AI does not know how to answer this: ${gap.question}` : early ? earlyWhy : badTime ? "Held for review: the draft offers a call time that the calendar does not list as free." : badUrl ? `Held for review: the draft contains a link that is not in your conversion goals (${badUrl}).` : p.reason,
+      reason: gap ? `The AI does not know how to answer this: ${gap.question}` : early ? earlyWhy : skippedWhy ? skippedWhy : badTime ? "Held for review: the draft offers a call time that the calendar does not list as free." : badUrl ? `Held for review: the draft contains a link that is not in your conversion goals (${badUrl}).` : p.reason,
       stage: p.stage === "no_change" || (!gate.open && (p.stage === "business_model_sent" || p.stage === "qualified")) ? conv.stage : (p.stage as StageId),
       labels: p.labels,
-      needsHuman: p.needs_human || Boolean(badUrl) || badTime || Boolean(gap) || early,
+      needsHuman: p.needs_human || Boolean(badUrl) || badTime || Boolean(gap) || early || skipped.length > 0,
       engine: "claude",
       createdAt: new Date().toISOString(),
+      ...(through ? { through } : {}),
     },
   };
 }
