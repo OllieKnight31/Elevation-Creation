@@ -1,0 +1,9 @@
+{
+  "act_id": "act_000000000000000",
+  "token_source": { "file": "/path/to/your/.env", "var": "META_ACCESS_TOKEN" },
+  "conversion_event": "complete_registration",
+  "target_cpl": 10,
+  "breakeven_cpl": 15,
+  "currency": "GBP",
+  "notes": "Copy this file to clients/<slug>.json and fill in your own values. Never commit real tokens."
+}
